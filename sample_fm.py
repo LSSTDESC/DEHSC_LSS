@@ -42,7 +42,15 @@ ipix=mi.pos2pix(data['ra'],data['dec'])
 print "Binning"
 #Bin positions into pixels
 mp=np.bincount(ipix,minlength=mi.get_size())
+
+print "Writing map"
+mi.write_flat_map("map_test",mp)
+
+print "Reading map"
+mi2,mp2=fm.read_flat_map("map_test.npz")
+
 print "Plotting"
 #Plot resulting map
 mi.view_map(mp)
+mi2.view_map(mp2)
 plt.show()
