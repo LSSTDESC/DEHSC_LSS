@@ -128,3 +128,32 @@ class FlatMapInfo(object) :
         ax.set_xlabel(xlabel,fontsize=15)
         ax.set_ylabel(ylabel,fontsize=15)
 
+    def write_flat_map(self,filename,maps) :
+        """
+        Saves a set of maps in npz format.
+        We'll try to implement other more standard formats with proper WCS coordinates etc. ASAP.
+        """
+        if maps.ndim<1 :
+            raise ValueError("Must supply at least one map")
+        if maps.ndim==1 :
+            maps=np.array([maps])
+        if len(maps[0])!=self.npix :
+            raise ValueError("Map doesn't conform to this pixelization")
+            
+        np.savez(filename,x_range=[self.x0,self.xf],y_range=[self.y0,self.yf],nx=self.nx,ny=self.ny,
+                 maps=maps)
+
+
+
+def read_flat_map(filename,i_map=0) :
+    """
+    Reads a flat-sky map and the details of its pixelization scheme.
+    The latter are returned as a FlatMapInfo object.
+    i_map : map to read. If -1, all maps will be read.
+    """
+    data=np.load(filename)
+
+    fmi=FlatMapInfo(data['x_range'],data['y_range'],nx=data['nx'],ny=data['ny'])
+    if i_map==-1 :
+        i_map=np.arange(len(data['maps']))
+    return fmi,data['maps'][i_map]
