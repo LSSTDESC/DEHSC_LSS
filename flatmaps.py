@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 class FlatMapInfo(object) :
     def __init__(self,x_range,y_range,nx=None,ny=None,dx=None,dy=None) :
@@ -119,12 +120,26 @@ class FlatMapInfo(object) :
         """
         if len(map_in)!=self.npix :
             raise ValueError("Input map doesn't have the correct size")
+
+	# set up the colorbar
+	cmap = cm.magma
+	cmap.set_under("w")
+	# min, max
+	median= np.median(map_in)
+        stddev= np.std(map_in)
+        colorMin= median-1.5*stddev
+        colorMax= median+1.5*stddev
+
         if ax is None :
             plt.figure()
             ax=plt.gca()
         if title is not None :
             ax.set_title(title,fontsize=15)
-        ax.imshow(map_in.reshape([self.ny,self.nx]),origin='lower',interpolation='nearest',aspect='auto',extent=[self.x0,self.xf,self.y0,self.yf])
+        image= ax.imshow(map_in.reshape([self.ny,self.nx]),
+			origin='lower', interpolation='nearest',
+			aspect='auto', extent=[self.x0,self.xf,self.y0,self.yf],
+			vmin= colorMin, vmax= colorMax, cmap= cmap)
+	plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
         ax.set_ylabel(ylabel,fontsize=15)
 
