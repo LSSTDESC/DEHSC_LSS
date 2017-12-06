@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import pymaster as nmt
 
 class FlatMapInfo(object) :
     def __init__(self,x_range,y_range,nx=None,ny=None,dx=None,dy=None) :
@@ -140,7 +141,7 @@ class FlatMapInfo(object) :
             ax.set_title(title,fontsize=15)
         image= ax.imshow(map_in.reshape([self.ny,self.nx]),
 			origin='lower', interpolation='nearest',
-			aspect='auto', extent=[self.x0,self.xf,self.y0,self.yf],
+			aspect='equal', extent=[self.x0,self.xf,self.y0,self.yf],
 			vmin= colorMin, vmax= colorMax, cmap= cmap)
 	plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
@@ -161,6 +162,78 @@ class FlatMapInfo(object) :
         np.savez(filename,x_range=[self.x0,self.xf],y_range=[self.y0,self.yf],nx=self.nx,ny=self.ny,
                  maps=maps)
 
+    def compute_power_spectrum(self,map1,mask1,map2=None,mask2=None,l_bpw=None,return_bpw=False,wsp=None,return_wsp=False) :
+        """
+        Computes power spectrum between two maps.
+        map1 : first map to correlate
+        mask1 : mask for the first map
+        map2 : second map to correlate. If None map2==map1.
+        mask2 : mask for the second map. If None mask2==mask1.
+        l_bpw : bandpowers on which to calculate the power spectrum. Should be an [2,N_ell] array, where
+                the first and second columns list the edges of each bandpower. If None, the function will
+                create bandpowers of its own taylored to the properties of your map.
+        return_bpw : if True, the bandpowers will also be returned
+        wsp : NmtWorkspaceFlat object to accelerate the calculation. If None, this will be precomputed.
+        return_wsp : if True, the workspace will also be returned 
+        """
+        same_map=False
+        if map2 is None :
+            map2=map1
+            same_map=True
+        
+        same_mask=False
+        if mask2 is None :
+            mask2=mask1
+            same_mask=False
+
+        if len(map1)!=self.npix :
+            raise ValueError("Input map has the wrong size")
+        if (len(map1)!=len(map2)) or (len(map1)!=len(mask1)) or (len(map1)!=len(mask2)) :
+            raise ValueError("Sizes of all maps and masks don't match")
+            
+        lx_rad=self.lx*np.pi/180
+        ly_rad=self.ly*np.pi/180
+
+        if l_bpw is None :
+            ell_min=max(2*np.pi/lx_rad,2*np.pi/ly_rad)
+            ell_max=min(self.nx*np.pi/lx_rad,self.ny*np.pi/ly_rad)
+            d_ell=2*ell_min
+            n_ell=int((ell_max-ell_min)/d_ell)
+            l_bpw=np.zeros([2,n_ell])
+            l_bpw[0,:]=ell_min+np.arange(n_ell)*d_ell
+            l_bpw[1,:]=l_bpw[0,:]+d_ell
+            return_bpw=True
+        
+        #Generate binning scheme
+        b=nmt.NmtBinFlat(l_bpw[0,:],l_bpw[1,:])
+
+        #Generate fields
+        f1=nmt.NmtFieldFlat(lx_rad,ly_rad,mask1.reshape([self.ny,self.nx]),[map1.reshape([self.ny,self.nx])])
+        if same_map and same_mask :
+            f2=f1
+        else :
+            f2=nmt.NmtFieldFlat(lx_rad,ly_rad,mask2.reshape([self.ny,self.nx]),[map2.reshape([self.ny,self.nx])])
+
+        #Compute workspace if needed
+        if wsp is None :
+            wsp=nmt.NmtWorkspaceFlat();
+            wsp.compute_coupling_matrix(f1,f2,b)
+            return_wsp=True
+
+        #Compute power spectrum
+        cl_coupled=nmt.compute_coupled_cell_flat(f1,f2)
+        cl_uncoupled=wsp.decouple_cell(cl_coupled)[0]
+
+        #Return
+        if return_bpw and return_wsp :
+            return cl_uncoupled,l_bpw,wsp
+        else :
+            if return_bpw :
+                return cl_uncoupled,l_bpw
+            elif return_wsp :
+                return cl_uncoupled,wsp
+            else :
+                return cl_uncoupled
 
 
 def read_flat_map(filename,i_map=0) :

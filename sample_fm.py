@@ -5,7 +5,7 @@ import pandas as pd
 from astropy.io import fits
 from astropy.table import Table
 
-fname="/global/cscratch1/sd/damonge/HSC/HSC_WIDE_WIDE_GAMA15H_forced.fits"
+fname="/global/cscratch1/sd/damonge/HSC/HSC_WIDE_GAMA15H_forced.fits"
 
 #Create information for a flat-sky map covering the GAMA15H field with resolution ~3.4 arcmin
 mi=fm.FlatMapInfo([212.5,222.],[-2.,2.],dx=0.057,dy=0.057)
