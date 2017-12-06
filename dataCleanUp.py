@@ -27,6 +27,17 @@ def dataCleanUp(dataDF):
     before= len(dataDF)
     dataDF= dataDF.dropna(axis= 0)
     print 'Dropped %s rows since they contained nan entries.'%(before-len(dataDF.keys()))
+    
+    # randoms might have isPrimary= False objects. remove them.
+    key= 'idetect_is_primary'
+    if key in dataDF.keys():
+        print '%s in dataframe, so dropping objects with %s= False.'%(key, key)
+        ind= np.where(~dataDF[key])[0]
+        dataDF= dataDF.drop(ind, axis= 0)
+        print 'Dropped %s rows based on %s= False.'%(len(ind), key)
+        # drop the column now
+        dataDF= dataDF.drop(key, axis= 1)
+        
     print 'Final size of the dataframe: ', np.shape(dataDF)
     print ''
     return dataDF
