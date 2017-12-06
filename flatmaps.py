@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 class FlatMapInfo(object) :
     def __init__(self,x_range,y_range,nx=None,ny=None,dx=None,dy=None) :
@@ -113,18 +114,35 @@ class FlatMapInfo(object) :
         """
         return np.zeros(self.npix,dtype=float)
 
-    def view_map(self,map_in,ax=None,xlabel='x',ylabel='y',title=None) :
+    def view_map(self,map_in,ax=None, xlabel='x', ylabel='y',
+		 title=None, posColorbar= False, cmap = cm.magma,
+                 colorMax= None, colorMin= None):
         """
         Plots a 2D map (passed as a flattened array)
         """
         if len(map_in)!=self.npix :
             raise ValueError("Input map doesn't have the correct size")
+
+	# set up the colorbar if min, max not given.
+        if colorMax is None or colorMin is None:
+            if posColorbar:
+                ind= np.where(map_in>0)[0]
+                colorMin= np.percentile(map_in[ind], 15)
+                colorMax= np.percentile(map_in[ind], 95)
+            else:
+                colorMin= np.percentile(map_in, 15)
+                colorMax= np.percentile(map_in, 95)
+
         if ax is None :
             plt.figure()
             ax=plt.gca()
         if title is not None :
             ax.set_title(title,fontsize=15)
-        ax.imshow(map_in.reshape([self.ny,self.nx]),origin='lower',interpolation='nearest',aspect='auto',extent=[self.x0,self.xf,self.y0,self.yf])
+        image= ax.imshow(map_in.reshape([self.ny,self.nx]),
+			origin='lower', interpolation='nearest',
+			aspect='auto', extent=[self.x0,self.xf,self.y0,self.yf],
+			vmin= colorMin, vmax= colorMax, cmap= cmap)
+	plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
         ax.set_ylabel(ylabel,fontsize=15)
 
