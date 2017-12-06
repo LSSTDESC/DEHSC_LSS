@@ -198,7 +198,7 @@ class FlatMapInfo(object) :
             ell_min=max(2*np.pi/lx_rad,2*np.pi/ly_rad)
             ell_max=min(self.nx*np.pi/lx_rad,self.ny*np.pi/ly_rad)
             d_ell=2*ell_min
-            n_ell=int((ell_max-ell_min)/d_ell)
+            n_ell=int((ell_max-ell_min)/d_ell)-1
             l_bpw=np.zeros([2,n_ell])
             l_bpw[0,:]=ell_min+np.arange(n_ell)*d_ell
             l_bpw[1,:]=l_bpw[0,:]+d_ell
