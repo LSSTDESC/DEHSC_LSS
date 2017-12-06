@@ -57,7 +57,7 @@ def createMeanStdMaps(ra, dec, quantity, flatSkyGrid, returnMaps= True, plotMaps
     mpWeighted= np.bincount(flatmap, weights= quantity, minlength= flatSkyGrid.get_size())
     mpWeightedSq= np.bincount(flatmap, weights= quantity**2, minlength= flatSkyGrid.get_size())
     mean= mpWeighted/mp
-    std= np.sqrt((mpWeightedSq/mp)-mean**2)
+    std= np.sqrt((mpWeightedSq/mp)-mean**2)/np.sqrt(mp)
     if plotMaps:
         flatSkyGrid.view_map(mean, posColorbar= True, title= 'mean %s'%quantityName, xlabel='ra', ylabel='dec')
         flatSkyGrid.view_map(std, posColorbar= True, title= 'std %s'%quantityName, xlabel='ra', ylabel='dec')
