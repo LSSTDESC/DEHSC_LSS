@@ -114,21 +114,24 @@ class FlatMapInfo(object) :
         """
         return np.zeros(self.npix,dtype=float)
 
-    def view_map(self,map_in,ax=None,xlabel='x',ylabel='y',title=None) :
+    def view_map(self,map_in,ax=None, xlabel='x', ylabel='y',
+		 title=None, posColorbar= False, cmap = cm.magma,
+                 colorMax= None, colorMin= None):
         """
         Plots a 2D map (passed as a flattened array)
         """
         if len(map_in)!=self.npix :
             raise ValueError("Input map doesn't have the correct size")
 
-	# set up the colorbar
-	cmap = cm.magma
-	cmap.set_under("w")
-	# min, max
-	median= np.median(map_in)
-        stddev= np.std(map_in)
-        colorMin= median-1.5*stddev
-        colorMax= median+1.5*stddev
+	# set up the colorbar if min, max not given.
+        if colorMax is None or colorMin is None:
+            if posColorbar:
+                ind= np.where(map_in>0)[0]
+                colorMin= np.percentile(map_in[ind], 15)
+                colorMax= np.percentile(map_in[ind], 95)
+            else:
+                colorMin= np.percentile(map_in, 15)
+                colorMax= np.percentile(map_in, 95)
 
         if ax is None :
             plt.figure()
