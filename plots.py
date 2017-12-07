@@ -42,3 +42,28 @@ def plotDiagnostics(dataDF, bands= ['g', 'r', 'i', 'z', 'y']): # assume cleaned 
     neededKeys= ['%scountinputs'%b for b in bands]
     plotHists(neededKeys, dataDF, 'countinputs')
   
+def plot_wtheta(theta, wtheta, wtheta_sig, title= None):
+    # theta assumed to be in degrees
+    if title is None: title= ''
+
+    plt.clf()
+    fig, ax= plt.subplots(1,1)
+    ax.plot(theta, np.zeros(len(theta))+1, color= 'k', lw=2, linestyle= ':')
+    ax.plot(theta, np.zeros(len(theta)), color= 'k', lw=2, linestyle= ':')
+    ax.plot(theta, np.zeros(len(theta))-1, color= 'k', lw=2, linestyle= ':')
+
+    color= 'b'
+    ax.plot(theta, wtheta, lw= 2, color= color)
+    ax.scatter(theta, wtheta, color= color)
+    ax.errorbar(theta, wtheta, yerr= wtheta_sig, color=color)
+
+    fontsize= 12
+    ax.set_title(title, fontsize= fontsize)
+    ax.set_xlabel(r'$\theta$ (Degrees)', fontsize= fontsize+2)
+    ax.set_ylabel(r'$w(\theta)$', fontsize= fontsize+2)
+
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.tick_params(axis='x', labelsize=fontsize)
+    ax.tick_params(axis='y', labelsize=fontsize)
+    plt.show()
