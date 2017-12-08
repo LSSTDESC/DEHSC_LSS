@@ -103,7 +103,7 @@ def desc_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plotMaps
 
 #############################################
 
-def flur_err_method(ra, dec, flux_err, band, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
+def flux_err_method(ra, dec, flux_err, band, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
                     saveMaps= False, outputDir= None):
     # 5sigma Magnitude limit= average of 5*flux_err for all objs in each pixel (and then transformed to magnitude)
     # SNRthreshold= 5 => 5sigma depth.

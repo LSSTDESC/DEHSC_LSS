@@ -68,14 +68,16 @@ if o.dirname_out_depth is not None:
    save_depth=True
 else:
    save_depth=False
+# Compute SNR
+snr = cat['%scmodel_flux'%o.band][sel]/cat['%scmodel_flux_error'%o.band][sel]
 # Create depth maps
 if o.method==0:
     estDepth.dr1paper_method(cat['ra'][sel],cat['dec'][sel],o.band,cat['%scmodel_mag'%o.band][sel], \
-    cat['%scmodel-SNR'%o.band][sel],flatSkyGrid,SNRthreshold=o.min_snr, \
+    snr,flatSkyGrid,SNRthreshold=o.min_snr, \
     plotMaps=o.gen_plot,saveMaps=save_depth,outputDir=o.dirname_out_depth)
 if o.method==1:
     estDepth.desc_method(cat['ra'][sel],cat['dec'][sel],o.band,cat['%scmodel_mag'%o.band][sel], \
-    cat['%scmodel-SNR'%o.band][sel],flatSkyGrid,SNRthreshold=o.min_snr, \
+    snr,flatSkyGrid,SNRthreshold=o.min_snr, \
     plotMaps=o.gen_plot,saveMaps=save_depth,outputDir=o.dirname_out_depth)
 if o.method==2:
     estDepth.flux_err(cat['ra'][sel],cat['dec'][sel],cat['%scmodel_flux_err'%o.band][sel], \
@@ -83,6 +85,6 @@ if o.method==2:
     saveMaps=save_depth,otuputDir=o.dirname_out_depth)
 if o.method==3:
     estDepth.depth_map_meanSNRrange(cat['ra'][sel],cat['dec'][sel],o.band,cat['%scmodel_mag'%o.band][sel], \
-    cat['%scmodel-SNR'%o.band][sel],flatSkyGrid,SNRthreshold=o.min_snr, \
+    snr,flatSkyGrid,SNRthreshold=o.min_snr, \
     plotMaps=o.gen_plot,saveMaps=save_depth,outputDir=o.dirname_out_depth)
 
