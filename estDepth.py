@@ -158,7 +158,7 @@ def random_sky_std_method(ra, dec, sky_std, band, flatSkyGrid, SNRthreshold= 5, 
                                          quantity= -2.5*np.log10(SNRthreshold*sky_std)+27.0,
                                          flatSkyGrid= flatSkyGrid,
                                          plotMaps= plotMaps,
-                                         quantityName= 'random-sky_std method: %s-band %ssigma depth'%(band, SNRthreshold))
+                                         quantityName= 'random-sky_std method\n%s-band %ssigma depth'%(band, SNRthreshold))
     if saveMaps:
         methodName= 'randomSkyStd-isPrimary'
         saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid, )
@@ -205,10 +205,10 @@ def dr1paper_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plot
     
     if plotMaps:
         flatSkyGrid.view_map(depth, posColorbar= True,
-                             title= "dr1paper method: mean %s-band %sigma depth"%(band, SNRthreshold),
+                             title= "dr1paper method\nmean %s-band %sigma depth"%(band, SNRthreshold),
                              xlabel='ra', ylabel='dec')
         flatSkyGrid.view_map(depth_std, posColorbar= True,
-                             title= "dr1paper method: std %s-band %sigma depth"%(band, SNRthreshold),
+                             title= "dr1paper method\nstd %s-band %sigma depth"%(band, SNRthreshold),
                              xlabel='ra', ylabel='dec')
     
     if saveMaps:
