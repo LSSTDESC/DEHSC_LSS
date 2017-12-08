@@ -39,51 +39,6 @@ class FlatMapInfo(object) :
 
         self.npix=self.nx*self.ny
 
-    def u_grade(self,mp,x_fac,y_fac=None) :
-        """
-        Up-grades the resolution of a map and returns the associated FlatSkyInfo object.
-        mp : input map
-        x_fac : the new map will be sub-divided into x_fac*nx pixels in the x direction
-        y_fac : the new map will be sub-divided into y_fac*ny pixels in the y direction
-                if y_fac=None, then y_fac=x_fac
-        """
-        if y_fac is None :
-            y_fac=x_fac
-        if len(mp)!=self.npix :
-            raise ValueError("Input map has a wrong size")
-
-        fm_ug=FlatMapInfo([self.x0,self.xf],[self.y0,self.yf],nx=x_fac*self.nx,ny=y_fac*self.ny)
-        mp_ug=np.repeat(np.repeat(mp.reshape([self.ny,self.nx]),y_fac,axis=0),x_fac,axis=1).flatten()
-        
-        return fm_ug,mp_ug
-
-    def d_grade(self,mp,x_fac,y_fac=None) :
-        """
-        Down-grades the resolution of a map and returns the associated FlatSkyInfo object.
-        mp : input map
-        x_fac : the new map will be sub-divided into floor(nx/x_fac) pixels in the x direction
-        y_fac : the new map will be sub-divided into floor(ny/y_fac) pixels in the y direction
-                if y_fac=None, then y_fac=x_fac.
-        Note that if nx/ny is not a multiple of x_fac/y_fac, the remainder pixels will be lost.
-        """
-        if y_fac is None :
-            y_fac=x_fac
-        if len(mp)!=self.npix :
-            raise ValueError("Input map has a wrong size")
-
-        nx_new=self.nx/int(x_fac)
-        ny_new=self.ny/int(y_fac)
-        xf_new=self.x0+self.dx*x_fac*nx_new
-        yf_new=self.y0+self.dy*y_fac*ny_new
-        fm_dg=FlatMapInfo([self.x0,xf_new],[self.y0,yf_new],nx=nx_new,ny=ny_new)
-
-        ix_max=nx_new*int(x_fac)
-        iy_max=ny_new*int(y_fac)
-        mp2d=mp.reshape([self.ny,self.nx])[:iy_max,:ix_max]
-        mp_dg=np.mean(np.mean(np.reshape(mp2d.flatten(),[ny_new,int(y_fac),nx_new,int(x_fac)]),axis=-1),axis=-2)
-        
-        return fm_dg,mp_dg
-
     def get_dims(self) :
         """
         Returns map size
