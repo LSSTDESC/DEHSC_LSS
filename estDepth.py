@@ -66,7 +66,7 @@ def depth_map_snr_nonHP(ra, dec, mags, snr, snrthreshold, flatSkyGrid):
             map_var_out[px]= 0
     return map_out, map_var_out
 
-def javis_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
+def desc_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
                           saveMaps= False, outputDir= None):
     # make a histograms of the S/N in bins of magnitude for all objects in a given pixel
     # define the 5 sigma depth as the magnitude of the histogram whose median S/N is ~5.
