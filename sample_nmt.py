@@ -6,12 +6,20 @@ import matplotlib.pyplot as plt
 DTOR=np.pi/180
 
 #Create information for a flat-sky map covering the GAMA15H field with resolution ~1.2 arcmin
-mi=fm.FlatMapInfo([212.5,222.],[-2.,2.],dx=0.024,dy=0.024)
+mi=fm.FlatMapInfo([212.5,222.],[-2.,2.],nx=396,ny=168)
 
 #Generate a map as a Gaussian random field
 larr=np.arange(8000.)
 clarr=((larr+1000.)/1000.)**(-1.5)
 mp=(nmt.synfast_flat(mi.nx,mi.ny,mi.lx*DTOR,mi.ly*DTOR,clarr)[0]).flatten()
+
+#Generate up-graded and de-graded versions (just for show)
+mi_hi,mp_hi=mi.u_grade(mp,2)
+mi_lo,mp_lo=mi.d_grade(mp,2)
+mi.view_map(mp,title='normal')
+mi_hi.view_map(mp_hi,title='u-grade')
+mi_lo.view_map(mp_lo,title='d-grade')
+
 
 #Generate a mask (just remove the edges of the field)
 mask=np.ones([mi.ny,mi.nx])
