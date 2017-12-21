@@ -116,7 +116,7 @@ class FlatMapInfo(object) :
         return np.zeros(self.npix,dtype=float)
 
     def view_map(self,map_in,ax=None, xlabel='x', ylabel='y',
-		 title=None, posColorbar= False, cmap = cm.magma,
+		 title=None, addColorbar=True,posColorbar= False, cmap = cm.magma,
                  colorMax= None, colorMin= None):
         """
         Plots a 2D map (passed as a flattened array)
@@ -143,7 +143,8 @@ class FlatMapInfo(object) :
 			origin='lower', interpolation='nearest',
 			aspect='equal', extent=[self.x0,self.xf,self.y0,self.yf],
 			vmin= colorMin, vmax= colorMax, cmap= cmap)
-	plt.colorbar(image)
+        if addColorbar :
+	    plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
         ax.set_ylabel(ylabel,fontsize=15)
 
