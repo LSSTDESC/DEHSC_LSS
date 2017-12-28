@@ -2,6 +2,8 @@ import numpy as np
 
 def createCountsMap(ra, dec, flatSkyGrid, returnMap= True, plotMap= False, quantityName= ''):
     flatmap= flatSkyGrid.pos2pix(ra, dec)
+    mask = flatmap>=0
+    flatmap = flatmap[mask]
     mp= np.bincount(flatmap, weights= None, minlength= flatSkyGrid.get_size())
 
     if plotMap:
@@ -11,6 +13,9 @@ def createCountsMap(ra, dec, flatSkyGrid, returnMap= True, plotMap= False, quant
 
 def createMeanStdMaps(ra, dec, quantity, flatSkyGrid, returnMaps= True, plotMaps= False, quantityName= ''):
     flatmap=flatSkyGrid.pos2pix(ra, dec)
+    mask = flatmap>=0
+    flatmap = flatmap[mask]
+    quantity = quantity[mask]
     mp= np.bincount(flatmap, weights= None, minlength= flatSkyGrid.get_size())
     mpWeighted= np.bincount(flatmap, weights= quantity, minlength= flatSkyGrid.get_size())
     mpWeightedSq= np.bincount(flatmap, weights= quantity**2, minlength= flatSkyGrid.get_size())

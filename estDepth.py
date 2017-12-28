@@ -89,14 +89,14 @@ def desc_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plotMaps
     
     if plotMaps:
         flatSkyGrid.view_map(depth, posColorbar= True, 
-                             title= "Javi's method\nmean %s-band %sigma depth"%(band, SNRthreshold),
+                             title= "DESC method\nmean %s-band %sigma depth"%(band, SNRthreshold),
                              xlabel='ra', ylabel='dec')
         flatSkyGrid.view_map(depth_std, posColorbar= True,
-                             title= "Javi's method\nstd %s-band %sigma depth"%(band, SNRthreshold),
+                             title= "DESC method\nstd %s-band %sigma depth"%(band, SNRthreshold),
                              xlabel='ra', ylabel='dec')
     
     if saveMaps:
-        methodName= 'Javis'
+        methodName= 'DESC'
         saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid, )
         
     return depth, depth_std
