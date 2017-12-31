@@ -2,7 +2,7 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.table
-from createMaps import createMeanStdMaps
+from createMaps import createMeanStdMaps, createCountsMap
 import estDepth
 from optparse import OptionParser
 import flatmaps as fm
@@ -10,6 +10,8 @@ import sys
 import intermediates
 from twoPtCorr import *
 import time
+def opt_callback(option, opt, value, parser):
+  setattr(parser.values, option.dest, value.split(','))
 parser = OptionParser()
 # Options
 parser.add_option('--input-catalog', dest='fname_in', default=None, type=str,
@@ -58,6 +60,9 @@ parser.add_option('--num-proc',dest='num_proc',default=4,type=int,
     help='Number of parallel JK processes')
 parser.add_option('--output-cov',dest='fname_cov',default=None,
     help='Name of the output covariance')
+parser.add_option("--templates", dest="templates_fname", default="none",type="string",
+    help="Templates to subtract from power-spectrum",action="callback", callback=opt_callback)
+
 ####
 # Read options
 (o, args) = parser.parse_args()
@@ -176,4 +181,41 @@ if o.harmonic==False:
         t1 = time.time()
         print('Done with covariances. Ellapsed time %f (s)' % (t1-t0))
         np.save(o.fname_cov,cov)
- 
+    # Calculate the cross-correlations with systematics
+    #if "none" not in o.templates_fname:
+    #    temps=[]
+    #    for tname in o.templates_fname:
+    #        temps.append(createSysMap(flatSkyGrid,hp.read_map(tname),fp_mask,plotMaps=o.gen_plot))
+if o.harmonic:
+    mp = createCountsMap(ra_data, dec_data, flatSkyGrid, returnMap= True)
+    dmap = np.zeros(len(mp))
+    dmap[mp!=0]=mp[mp!=0]/np.mean(mp[mp!=0])-1.
+    cl, lbpw, wsp = flatSkyGrid.compute_power_spectrum(dmap*fp_mask,fp_mask)
+    ells = np.mean(lbpw,axis=0)
+    tab_2pt = astropy.table.Table([ells,cl],names=('l','cl'))
+    tab_2pt.write(o.fname_out_2pt,overwrite=True)
+    if o.do_jk:
+        import multiprocessing
+        labels = get_labels_one(ra_data,dec_data,o.num_reg)
+        def run_cl(label):
+            mp = createCountsMap(ra_data[labels!=label], dec_data[labels!=label], flatSkyGrid, returnMap= True)
+            dmap = np.zeros(len(mp))
+            dmap[mp!=0]=mp[mp!=0]/np.mean(mp[mp!=0])-1.
+            cl, lbpw, wsp = flatSkyGrid.compute_power_spectrum(dmap*fp_mask,fp_mask)
+            return cl
+        print('Starting covariance calculation')
+        t0 = time.time()
+        pool = multiprocessing.Pool(processes=o.num_proc)
+        # We are going to perform a take one out JK
+        param = np.unique(labels)
+        print('Going to perform ',len(param), ' JK regions')
+        cl_list = pool.map(run_cl,param)
+        cl_list = np.array(cl_list)
+        cov = np.cov(cl_list,rowvar=False)
+        if o.gen_plot:
+            plt.figure()
+            plt.imshow(cov)
+            plt.show()
+        t1 = time.time()
+        print('Done with covariances. Ellapsed time %f (s)' % (t1-t0))
+        np.save(o.fname_cov,cov) 

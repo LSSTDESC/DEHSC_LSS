@@ -48,3 +48,19 @@ def get_labels(data_ra,data_dec,rnd_ra,rnd_dec,ncen):
     labels = km.find_nearest(X)
     labels_rnd = km.find_nearest(X2)
     return labels, labels_rnd
+def get_labels_one(data_ra,data_dec,ncen):
+    import kmeans_radec
+    X= np.zeros((len(data_ra),2))
+    X[:,0] = data_ra
+    X[:,1] = data_dec
+    cen_guess = np.zeros((ncen,2))
+    xmin = np.nanmin(data_ra)
+    xmax = np.nanmax(data_ra)
+    ymin = np.nanmin(data_dec)
+    ymax = np.nanmin(data_dec)
+    cen_guess[:,0] = np.linspace(xmin,xmax,ncen)
+    cen_guess[:,1] = np.linspace(ymin,ymax,ncen)
+    km = kmeans_radec.KMeans(cen_guess,tol=1e-3)
+    km.run(X, maxiter=100)
+    labels = km.find_nearest(X) 
+    return labels
