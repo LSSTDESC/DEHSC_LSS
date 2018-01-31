@@ -117,7 +117,7 @@ class FlatMapInfo(object) :
 
     def view_map(self,map_in,ax=None, xlabel='x', ylabel='y',
 		 title=None, addColorbar=True,posColorbar= False, cmap = cm.magma,
-                 colorMax= None, colorMin= None):
+                 colorMax= None, colorMin= None,fnameOut=None):
         """
         Plots a 2D map (passed as a flattened array)
         """
@@ -125,14 +125,14 @@ class FlatMapInfo(object) :
             raise ValueError("Input map doesn't have the correct size")
 
 	# set up the colorbar if min, max not given.
-        if colorMax is None or colorMin is None:
-            if posColorbar:
-                ind= np.where(map_in>0)[0]
-                colorMin= np.percentile(map_in[ind], 15)
-                colorMax= np.percentile(map_in[ind], 95)
-            else:
-                colorMin= np.percentile(map_in, 15)
-                colorMax= np.percentile(map_in, 95)
+        #if colorMax is None or colorMin is None:
+        #    if posColorbar:
+        #        ind= np.where(map_in>0)[0]
+        #        colorMin= np.percentile(map_in[ind], 15)
+        #        colorMax= np.percentile(map_in[ind], 95)
+        #    else:
+        #        colorMin= np.percentile(map_in, 15)
+        #        colorMax= np.percentile(map_in, 95)
 
         if ax is None :
             plt.figure()
@@ -147,6 +147,8 @@ class FlatMapInfo(object) :
 	    plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
         ax.set_ylabel(ylabel,fontsize=15)
+        if fnameOut is not None :
+            plt.savefig(fnameOut,bbox_inches='tight')
 
     def write_flat_map(self,filename,maps) :
         """
@@ -163,7 +165,9 @@ class FlatMapInfo(object) :
         np.savez(filename,x_range=[self.x0,self.xf],y_range=[self.y0,self.yf],nx=self.nx,ny=self.ny,
                  maps=maps)
 
-    def compute_power_spectrum(self,map1,mask1,map2=None,mask2=None,l_bpw=None,return_bpw=False,wsp=None,return_wsp=False) :
+    def compute_power_spectrum(self,map1,mask1,map2=None,mask2=None,l_bpw=None,
+                               return_bpw=False,wsp=None,return_wsp=False,
+                               temp1=None,temp2=None) :
         """
         Computes power spectrum between two maps.
         map1 : first map to correlate
@@ -176,6 +180,8 @@ class FlatMapInfo(object) :
         return_bpw : if True, the bandpowers will also be returned
         wsp : NmtWorkspaceFlat object to accelerate the calculation. If None, this will be precomputed.
         return_wsp : if True, the workspace will also be returned 
+        temp1 : if not None, set of contaminants to remove from map1
+        temp2 : if not None, set of contaminants to remove from map2
         """
         same_map=False
         if map2 is None :
@@ -208,12 +214,23 @@ class FlatMapInfo(object) :
         #Generate binning scheme
         b=nmt.NmtBinFlat(l_bpw[0,:],l_bpw[1,:])
 
+        if temp1 is not None :
+            tmp1=np.array([[t.reshape([self.ny,self.nx])] for t in temp1])
+        else :
+            tmp1=None
+        if temp2 is not None :
+            tmp2=np.array([[t.reshape([self.ny,self.nx])] for t in temp2])
+        else :
+            tmp2=None
+
         #Generate fields
-        f1=nmt.NmtFieldFlat(lx_rad,ly_rad,mask1.reshape([self.ny,self.nx]),[map1.reshape([self.ny,self.nx])])
+        f1=nmt.NmtFieldFlat(lx_rad,ly_rad,mask1.reshape([self.ny,self.nx]),
+                            [map1.reshape([self.ny,self.nx])],templates=tmp1)
         if same_map and same_mask :
             f2=f1
         else :
-            f2=nmt.NmtFieldFlat(lx_rad,ly_rad,mask2.reshape([self.ny,self.nx]),[map2.reshape([self.ny,self.nx])])
+            f2=nmt.NmtFieldFlat(lx_rad,ly_rad,mask2.reshape([self.ny,self.nx]),
+                                [map2.reshape([self.ny,self.nx])],templates=tmp2)
 
         #Compute workspace if needed
         if wsp is None :
@@ -222,7 +239,7 @@ class FlatMapInfo(object) :
             return_wsp=True
 
         #Compute power spectrum
-        cl_coupled=nmt.compute_coupled_cell_flat(f1,f2)
+        cl_coupled=nmt.compute_coupled_cell_flat(f1,f2,b)
         cl_uncoupled=wsp.decouple_cell(cl_coupled)[0]
 
         #Return

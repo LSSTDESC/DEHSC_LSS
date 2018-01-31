@@ -1,18 +1,5 @@
 import numpy as np
-from createMaps import createMeanStdMaps
-
-def saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid, ):
-    if outputDir is None:
-        print 'outputDir not specified so maps will be saved in %s.'%os.getcwd()
-        outputDir= ''
-        
-    filename= 'depthMap_%ssigma_%s-band_%sMethod'%(SNRthreshold, band, methodName)
-    flatSkyGrid.write_flat_map(outputDir+filename, depth)
-    print 'Wrote %s.npz'% filename
-
-    filename= 'depthMap_std_%ssigma_%s-band_%sMethod'%(SNRthreshold, band, methodName)
-    flatSkyGrid.write_flat_map(outputDir+filename, depth_std)
-    print 'Wrote %s.npz'% filename
+from createMaps import createMeanStdMaps, createCountsMap
 
 #############################################
 # code from Javier: /global/projecta/projectdirs/lsst/groups/LSS/DC1/scripts/map_utils.py
@@ -39,6 +26,8 @@ def depth_map_snr_nonHP(ra, dec, mags, snr, snrthreshold, flatSkyGrid):
     
     map_out = np.zeros(flatSkyGrid.get_size())
     map_var_out = np.zeros(flatSkyGrid.get_size())
+    mask_nans=np.zeros(flatSkyGrid.get_size());
+
     #Binned statistic 2d is awfully slow (because it doesn't use the fact that all bins are equal width
     #median_snr, xed, _, _ = binned_statistic_2d(mags,pix_nums,snr,statistic='median',bins=(50,12*nside**2),
     #                                           range=[(20,30),(0,12*nside**2)])
@@ -47,6 +36,7 @@ def depth_map_snr_nonHP(ra, dec, mags, snr, snrthreshold, flatSkyGrid):
     
     bin_centers = np.linspace(22+6/30.,28-6/30.,30.)
     for px in np.unique(pix_nums):
+        mask_nans[px]=1
         mask = px==pix_nums
         if np.count_nonzero(mask)>0:
             median_snr = binned_statistic(mags[mask],snr[mask],np.nanmedian, nbins=30, range=(22,28))
@@ -64,58 +54,35 @@ def depth_map_snr_nonHP(ra, dec, mags, snr, snrthreshold, flatSkyGrid):
         else:
             map_out[px]=0.
             map_var_out[px]= 0
+
+    map_out[mask_nans<1]=0
+    map_var_out[mask_nans<1]=0
+
     return map_out, map_var_out
 
-def desc_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
-                          saveMaps= False, outputDir= None):
+def desc_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5):
     # make a histograms of the S/N in bins of magnitude for all objects in a given pixel
     # define the 5 sigma depth as the magnitude of the histogram whose median S/N is ~5.
     # SNRthreshold= 5 => 5sigma depth. can tweak it.
-    SNRthreshold= int(SNRthreshold)
     
-    print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
     depth, depth_std= depth_map_snr_nonHP(ra, dec,
                                           mags= mags,
                                           snr= snr,
                                           snrthreshold= SNRthreshold,
                                           flatSkyGrid= flatSkyGrid)    
-    # the output has zero in out-of-survey region, so need to mask stuff.
-    mask, mask= createMeanStdMaps(ra, dec, quantity= ra,
-                                  flatSkyGrid= flatSkyGrid,
-                                  plotMaps= False)
-    ind= np.where(np.isnan(mask)==True) # out of survey
-    depth[ind]= np.nan
-    depth_std[ind]= np.nan
-    
-    if plotMaps:
-        flatSkyGrid.view_map(depth, posColorbar= True, 
-                             title= "Javi's method\nmean %s-band %sigma depth"%(band, SNRthreshold),
-                             xlabel='ra', ylabel='dec')
-        flatSkyGrid.view_map(depth_std, posColorbar= True,
-                             title= "Javi's method\nstd %s-band %sigma depth"%(band, SNRthreshold),
-                             xlabel='ra', ylabel='dec')
-    
-    if saveMaps:
-        methodName= 'Javis'
-        saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid, )
-        
+
     return depth, depth_std
 
 #############################################
 
-def flux_err_method(ra, dec, flux_err, band, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
-                    saveMaps= False, outputDir= None):
+def flux_err_method(ra, dec, band, flux_err, flatSkyGrid, SNRthreshold= 5):
     # 5sigma Magnitude limit= average of 5*flux_err for all objs in each pixel (and then transformed to magnitude)
     # SNRthreshold= 5 => 5sigma depth.
     
     # Since want mags (mean, std) at the end, need to first run the createMeanStdMaps with 
     # 5flux_error to get the mean flux map which can be converted to fluxea.
     # To get std mags, need to run createMeanStdMaps with 5*flux_error converted to mags and keep only the std.
-    
-    SNRthreshold= int(SNRthreshold)
-    print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
-    flux_err= np.array(flux_err)
-    
+
     depth, dontcare = createMeanStdMaps(ra, dec,
                                         quantity= SNRthreshold*flux_err,
                                         flatSkyGrid= flatSkyGrid,
@@ -131,18 +98,12 @@ def flux_err_method(ra, dec, flux_err, band, flatSkyGrid, SNRthreshold= 5, plotM
     dontcare, depth_std= createMeanStdMaps(ra, dec,
                                            quantity= quantity,
                                            flatSkyGrid= flatSkyGrid)
-    
-    if plotMaps:
-        flatSkyGrid.view_map(depth, posColorbar= True, 
-                             title= 'flux_error method\nmean %s-band %sigma depth'%(band, SNRthreshold),
-                             xlabel='ra', ylabel='dec')
-        flatSkyGrid.view_map(depth_std, posColorbar= True,
-                             title= 'flux_error method\nstd %s-band %sigma depth'%(band, SNRthreshold),
-                             xlabel='ra', ylabel='dec')
-    if saveMaps:
-        methodName= 'FluxErr'
-        saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid)
-        
+
+    #Zeros in empty pixels
+    nc=createCountsMap(ra,dec,flatSkyGrid)
+    depth[nc<1]=0
+    depth_std[nc<1]=0
+
     return depth, depth_std
 
 #############################################
@@ -152,7 +113,6 @@ def random_sky_std_method(ra, dec, sky_std, band, flatSkyGrid, SNRthreshold= 5, 
     # Using the random sky_std as here: https://hsc-release.mtk.nao.ac.jp/doc/index.php/random-points-for-dr1/
     # SNRthreshold= 5 => 5sigma depth.
     SNRthreshold= int(SNRthreshold)
-    print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
     sky_std= np.array(sky_std)
     depth, depth_std = createMeanStdMaps(ra, dec,
                                          quantity= -2.5*np.log10(SNRthreshold*sky_std)+27.0,
@@ -171,10 +131,12 @@ def depth_map_meanSNRrange(ra, dec, mags, snr, snrthreshold, flatSkyGrid):
     good = np.logical_or(np.logical_not(np.isnan(ra)),np.logical_not(np.isnan(dec)))
     pix_nums = np.array(flatSkyGrid.pos2pix(ra, dec))
 
-    map_out = np.zeros(flatSkyGrid.get_size())
-    map_var_out = np.zeros(flatSkyGrid.get_size())
+    map_out = np.zeros(flatSkyGrid.get_size());
+    map_var_out = np.zeros(flatSkyGrid.get_size());
+    mask_nans=np.zeros(flatSkyGrid.get_size());
     
     for px in np.unique(pix_nums):
+        mask_nans[px]=1
         mask = px==pix_nums
         if np.count_nonzero(mask)>0:
             map_out[px]= np.mean(mags[mask][(snr[mask]>snrthreshold-1) & (snr[mask]<snrthreshold+1)])
@@ -183,36 +145,53 @@ def depth_map_meanSNRrange(ra, dec, mags, snr, snrthreshold, flatSkyGrid):
             map_out[px]=0
             map_var_out[px]= 0
             
+    map_out[mask_nans<1]=0
+    map_var_out[mask_nans<1]=0
+
     return map_out, map_var_out
 
-def dr1paper_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
-                          saveMaps= False, outputDir= None):
+def dr1_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5):
     # follow the paper: choose gals with 4<SNR<6 for 5sigma depth.
     # SNRthreshold= 5 => 5sigma depth.
-    SNRthreshold= int(SNRthreshold)
-    print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
+
     depth, depth_std= depth_map_meanSNRrange(ra, dec,  mags= mags,
                                              snr= snr,
                                              snrthreshold= SNRthreshold,
                                              flatSkyGrid= flatSkyGrid)
-    # the output has zero in out-of-survey region, so need to mask stuff.
-    mask, mask= createMeanStdMaps(ra, dec, quantity= ra,
-                                  flatSkyGrid= flatSkyGrid,
-                                  plotMaps= False)
-    ind= np.where(np.isnan(mask)==True) # out of survey
-    depth[ind]= np.nan
-    depth_std[ind]= np.nan
+        
+    return depth, depth_std
+
+def get_depth(method,ra,dec,band,arr1,arr2,flatSkyGrid,SNRthreshold=5,
+              plotMaps=True,saveMaps=False,prefixOut=None) :
+    
+    SNRthreshold= int(SNRthreshold)
+    print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
+    if method=='dr1' :
+        depth,depth_std=dr1_method(ra,dec,band,mags=arr1,snr=arr2,flatSkyGrid=flatSkyGrid,
+                                   SNRthreshold=SNRthreshold)
+    elif method=='desc' :
+        depth,depth_std=desc_method(ra,dec,band,mags=arr1,snr=arr2,flatSkyGrid=flatSkyGrid,
+                                    SNRthreshold=SNRthreshold)
+    elif method=='fluxerr' :
+        depth,depth_std=flux_err_method(ra,dec,band,flux_err=arr1,flatSkyGrid=flatSkyGrid,
+                                        SNRthreshold=SNRthreshold)
+    else :
+        raise KeyError("Unknown method "+method)
     
     if plotMaps:
         flatSkyGrid.view_map(depth, posColorbar= True,
-                             title= "dr1paper method\nmean %s-band %sigma depth"%(band, SNRthreshold),
-                             xlabel='ra', ylabel='dec')
+                             colorMin=np.nanmin(depth[depth>0]), 
+                             colorMax=np.nanmax(depth[depth>0]),
+                             title= method+' method\nmean %s%d depth'%(band,SNRthreshold),
+                             xlabel='ra', ylabel='dec',
+                             fnameOut=prefixOut+'_'+method+'_'+band+'%d_mean.png'%SNRthreshold)
         flatSkyGrid.view_map(depth_std, posColorbar= True,
-                             title= "dr1paper method\nstd %s-band %sigma depth"%(band, SNRthreshold),
-                             xlabel='ra', ylabel='dec')
-    
+                             colorMin=np.nanmin(depth_std[depth_std>0]),
+                             colorMax=np.nanmax(depth_std[depth_std>0]),
+                             title= method+' method\nstd %s%d depth'%(band,SNRthreshold),
+                             xlabel='ra', ylabel='dec',
+                             fnameOut=prefixOut+'_'+method+'_'+band+'%d_std.png'%SNRthreshold)
     if saveMaps:
-        methodName= 'dr1paper'
-        saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid, )
-        
-    return depth, depth_std
+        flatSkyGrid.write_flat_map(prefixOut+'_'+method+'_'+band+'%d_mean'%SNRthreshold,depth)
+        flatSkyGrid.write_flat_map(prefixOut+'_'+method+'_'+band+'%d_std'%SNRthreshold,depth_std)
+    return depth,depth_std

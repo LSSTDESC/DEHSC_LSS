@@ -7,10 +7,13 @@ def dataCleanUp(dataDF):
     # 2) remove the objs. with any null entries.
     print 'Given size of the dataframe: ', np.shape(dataDF)
     isNulls= [k for k in dataDF.keys() if k.__contains__('isnull')] # all the columns that signify nulls
+    print isNulls
 
     indToDrop= []
     for col in isNulls:
-        nullInd= np.where(dataDF[col]==True)[0]
+        nullInd= np.where(dataDF[col]==True)[0].tolist()
+        if len(nullInd)!=0 :
+            print col,len(nullInd)
         indToDrop+=nullInd
 
     # find unique indexes
@@ -26,7 +29,7 @@ def dataCleanUp(dataDF):
     # have nans in different columns. drop row if there's a nan.
     before= len(dataDF)
     dataDF= dataDF.dropna(axis= 0)
-    print 'Dropped %s rows since they contained nan entries.'%(before-len(dataDF.keys()))
+    print 'Dropped %s rows since they contained nan entries.'%(before-len(dataDF))
     
     # randoms might have isPrimary= False objects. remove them.
     key= 'idetect_is_primary'

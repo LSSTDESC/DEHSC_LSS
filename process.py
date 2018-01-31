@@ -1,90 +1,255 @@
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
-import astropy.table
-from createMaps import createMeanStdMaps
+import astropy.io.fits as fits
+from astropy.table import Table,vstack
+from createMaps import createMeanStdMaps, createCountsMap, removeDisconnected
+from flatMask import createMask
 import estDepth
 from optparse import OptionParser
 import flatmaps as fm
 import sys
-parser = OptionParser()
+import time
+import rotate as rtt
+import os
 
-parser.add_option('--input-catalog', dest='fname_in', default=None, type=str,
-    help='Path to input catalog (FITS table)')
-parser.add_option('--min-mag', dest='min_mag', default=15, type=float,
-    help='Minimum magnitude to consider in the analysis')
-parser.add_option('--max-mag', dest='max_mag', default=25.0, type=float,
-    help='Maximum magnitude to consider in the analysis')
+bands = ['g','r','i','z','y']
+depth_methods = ['fluxerr'] #dr1','desc','fluxerr']
+prefix_data='/global/cscratch1/sd/damonge/HSC/'
+def opt_callback(option, opt, value, parser):
+  setattr(parser.values, option.dest, value.split(','))
+
+parser = OptionParser()
+# Options
+parser.add_option('--input-field', dest='field_in', default='NONE', type=str,
+                  help='Path to input catalog (FITS table)')
 parser.add_option('--min-snr', dest='min_snr', default=10.0, type=float,
-    help='SNR threshold used to compute the depth maps')
-parser.add_option('--output-mask', dest='fname_out_mask', default=None, type=str,
-    help='Path to output mask')
-parser.add_option('--output-depth-dir',dest='dirname_out_depth', default=None, type=str,
-    help='Path to output depth map') 
-parser.add_option('--output-catalog', dest='fname_out_cat', default=None, type=str,
-    help='Path to output (clean) catalog')
-parser.add_option('--fourier', dest='fourier', default=False, action='store_true',
-    help='If selected compute the power-spectrum')
-parser.add_option('--output-2pt', dest='fname_out_2pt', default=None, type=str,
-    help='Path to output 2pt results')
-parser.add_option('--plot', dest='gen_plot', default=False, action='store_true',
-    help='If selected show and save some plots')
+                  help='SNR threshold used to compute the depth maps')
+parser.add_option('--output-prefix',dest='out_prefix', default=None, type=str,
+                  help='Path to output directory')
+parser.add_option('--save-depth-maps', dest='sv_depth', default=False, action='store_true',
+                  help='If selected save depth maps')
+parser.add_option('--save-masks', dest='sv_mask', default=False, action='store_true',
+                  help='If selected save masks')
+parser.add_option('--save-systematics', dest='sv_syst', default=False, action='store_true',
+                  help='If selected save systematics maps')
+parser.add_option('--gen-plots', dest='gen_plot', default=False, action='store_true',
+                  help='If selected create and save some plots')
+parser.add_option('--show-plots', dest='show_plot', default=False, action='store_true',
+                  help='If selected show some plots')
 parser.add_option('--depth-cut', dest='depth_cut', default=25.0, type=float,
-    help='Minimum depth to consider in your footprint')
+                  help='Minimum depth to consider in your footprint')
 parser.add_option('--resolution', dest='res', default=0.0285, type=float,
-    help='Map/mask resolution (in degrees)')
+                  help='Map/mask resolution (in degrees)')
+parser.add_option('--resolution-bo', dest='res_bo', default=0.003, type=float,
+                  help='B.O. mask resolution (in degrees)')
+parser.add_option('--field-padding', dest='pad', default=-1, type=float,
+                  help='Edge padding (in degrees)')
 parser.add_option('--analysis-band', dest='band', default='i', type=str,
-    help='Band considered for your analysis (g,r,i,z,y)')
-parser.add_option('--method', dest='method', default='0', type=int,
-    help='Method to construct depth maps: 0-> DR1-like, 1-DESC, 2-Mean SNR, 3-Mean flux')
+                  help='Band considered for your analysis (g,r,i,z,y)')
+parser.add_option('--depth-method', dest='depth_method', default='0', type=int,
+                  help='Method to construct depth maps: 0-> DR1-like, 1-DESC, 2-Flux-error')
+
+####
 # Read options
 (o, args) = parser.parse_args()
-# Read catalog
-try:
-    cat = astropy.table.Table.read(o.fname_in)
-except:
-    raise TypeError('%s is does not contain a FITS table/specify input file' % o.fname_in)
+# Read catalog (with fitsio or astropy)
+print("Reading")
+nparts=0
+while os.path.isfile(prefix_data+'HSC_'+o.field_in+'_part%d_forced.fits'%(nparts+1)) :
+  nparts+=1
+if nparts==0 :
+  #Single-part file
+  fname_in=prefix_data+'HSC_'+o.field_in+'_forced.fits'
+  try:
+    cat = Table.read(fname_in)
+  except:
+    raise TypeError('%s is does not contain a FITS table/specify input file' % fname_in)
     sys.exit(1)
-bands = ['g','r','i','z','y']
+else :
+  #Parted file
+  for ipart in np.arange(nparts)+1 :
+    print(" Reading part %d"%ipart)
+    fname_in=prefix_data+'HSC_'+o.field_in+'_part%d_forced.fits'%ipart
+    try:
+      c=Table.read(fname_in)
+    except:
+      raise TypeError('%s is does not contain a FITS table/specify input file' % fname_in)
+      sys.exit(1)
+    print(len(c))
+    if ipart==1 :
+      cat=c
+    else :
+      cat=vstack([cat,c],join_type='exact')
+print(len(cat))
+
 # Check if the band is available in the catalog
 if o.band not in bands:
    print('Selected band not available, select g, r, i, z or y')
    sys.exit(1)
-# Define bounds for the skymap
-minx = np.min(cat['ra'])
-miny = np.min(cat['dec'])
-maxx = np.max(cat['ra'])
-maxy = np.max(cat['dec'])
-# Generate flat sky map that will contain our galaxies
-flatSkyGrid = fm.FlatMapInfo([minx,maxx],[miny,maxy],dx=o.res,dy=o.res)
-# Clean the catalog to estimate the depths
-sel = np.ones(len(cat),dtype=bool)
-print('Read ', len(cat), ' objects')
-for tab_key in cat.keys():
-    sel = sel & (np.isnan(cat[tab_key])==False)
-print('Selected ', np.count_nonzero(sel), ' objects')
-# Check if we want to save the depth maps
-if o.dirname_out_depth is not None:
-   save_depth=True
-else:
-   save_depth=False
-# Compute SNR
-snr = cat['%scmodel_flux'%o.band][sel]/cat['%scmodel_flux_error'%o.band][sel]
-# Create depth maps
-if o.method==0:
-    estDepth.dr1paper_method(cat['ra'][sel],cat['dec'][sel],o.band,cat['%scmodel_mag'%o.band][sel], \
-    snr,flatSkyGrid,SNRthreshold=o.min_snr, \
-    plotMaps=o.gen_plot,saveMaps=save_depth,outputDir=o.dirname_out_depth)
-if o.method==1:
-    estDepth.desc_method(cat['ra'][sel],cat['dec'][sel],o.band,cat['%scmodel_mag'%o.band][sel], \
-    snr,flatSkyGrid,SNRthreshold=o.min_snr, \
-    plotMaps=o.gen_plot,saveMaps=save_depth,outputDir=o.dirname_out_depth)
-if o.method==2:
-    estDepth.flux_err(cat['ra'][sel],cat['dec'][sel],cat['%scmodel_flux_err'%o.band][sel], \
-    o.band,flatSkyGrid,SNRthreshold=o.min_snr,plotMaps=o.gen_plot, \
-    saveMaps=save_depth,otuputDir=o.dirname_out_depth)
-if o.method==3:
-    estDepth.depth_map_meanSNRrange(cat['ra'][sel],cat['dec'][sel],o.band,cat['%scmodel_mag'%o.band][sel], \
-    snr,flatSkyGrid,SNRthreshold=o.min_snr, \
-    plotMaps=o.gen_plot,saveMaps=save_depth,outputDir=o.dirname_out_depth)
 
+####
+# Clean nulls and nans
+print("Basic cleanup")
+sel=np.ones(len(cat),dtype=bool)
+names=[n for n in cat.keys()]
+isnull_names=[]
+for key in cat.keys() :
+  if key.__contains__('isnull') :
+    sel[cat[key]]=0
+    isnull_names.append(key)
+  else :
+    sel[np.isnan(cat[key])]=0
+print("Will drop %d rows"%(len(sel)-np.sum(sel)))
+cat.remove_columns(isnull_names)
+cat.remove_rows(~sel) #np.where(~sel)[0])#[sel]
+
+####
+# Find centre of mass and rotate to equator
+cat['ra'][cat['ra']<0]+=360.
+ramean=np.mean(cat['ra'])
+decmean=np.mean(cat['dec'])
+rotation,cat['ra_r'],cat['dec_r']=rtt.get_new_coords(cat,ramean,decmean)
+cat['ra_r'][cat['ra_r']<0]+=360.
+
+####
+# Compute field extent. Leave 10-pix padding
+# TODO: worry about 2pi wrapping
+if o.pad<=0 :
+  o.pad=20*o.res
+ramin=np.nanmin(cat['ra_r'])-o.pad
+ramax=np.nanmax(cat['ra_r'])+o.pad
+decmin=np.nanmin(cat['dec_r'])-o.pad
+decmax=np.nanmax(cat['dec_r'])+o.pad
+print('Map edges: ',ramin,ramax,decmin,decmax)
+fsk =fm.FlatMapInfo([ramin,ramax],[decmin,decmax],dx=o.res,dy=o.res)
+
+####
+# Generate systematics maps
+syst={}
+# 1- Dust
+dustmaps=[]
+for b in bands :
+  m,s=createMeanStdMaps(cat['ra_r'],cat['dec_r'],cat['a_'+b],fsk,nan_outside=False)
+  if (b==o.band) and o.gen_plot :
+    fsk.view_map(m,posColorbar= True,title= 'A_%s'%b,
+                 xlabel='ra', ylabel='dec',colorMin=np.amin(m[m>0]),
+                 fnameOut=o.out_prefix+'_a_%s.png'%b)
+  dustmaps.append(m)
+syst['dust']=np.array(dustmaps)
+# 2- Nstar
+#    This needs to be done for stars passing the same cuts as the sample (except for the s/g separator)
+sel_maglim=np.ones(len(cat),dtype=bool); sel_maglim[cat['%scmodel_mag'%o.band]-cat['a_%s'%o.band]>o.depth_cut]=0
+sel_stars=np.ones(len(cat),dtype=bool);  sel_stars[cat['iclassification_extendedness']>0.99]=0
+sel_gals =np.ones(len(cat),dtype=bool);  sel_gals[cat['iclassification_extendedness']<0.99]=0
+mstar=createCountsMap(cat['ra_r'][sel_maglim*sel_stars],cat['dec_r'][sel_maglim*sel_stars],fsk)+0.
+if o.gen_plot :
+  fsk.view_map(mstar,posColorbar=True,title='N_star',xlabel='ra',ylabel='dec',
+               fnameOut=o.out_prefix+'_nstar_'+o.band+'%.2lf.png'%(o.depth_cut))
+syst['nstar_'+o.band+'%.2lf'%(o.depth_cut)]=mstar
+if o.sv_syst :
+   for k in syst.keys() :
+     fsk.write_flat_map(o.out_prefix+'_syst_'+k,syst[k])
+
+####
+# Generate bright-object mask
+#Binary BO mask
+mask_bo,fsg=createMask(cat['ra_r'],cat['dec_r'],
+                       [cat['iflags_pixel_bright_object_center'],
+                        cat['iflags_pixel_bright_object_any']],
+                       fsk,o.res_bo)
+if o.gen_plot :
+  fsg.view_map(mask_bo,posColorbar= True,title= 'Bright-object mask',
+               xlabel='ra', ylabel='dec',colorMin=0,colorMax=1,
+               fnameOut=o.out_prefix+'_BOMask.png')
+if o.sv_mask :
+  fsg.write_flat_map(o.out_prefix+'_BOMask',mask_bo)
+#Masked fraction
+masked=np.ones(len(cat))
+masked*=np.logical_not(cat['iflags_pixel_bright_object_center'])
+masked*=np.logical_not(cat['iflags_pixel_bright_object_center'])
+masked_fraction,s=createMeanStdMaps(cat['ra_r'],cat['dec_r'],masked,fsk)
+masked_fraction_cont=removeDisconnected(masked_fraction,fsk)
+if o.gen_plot :
+  fsk.view_map(masked_fraction_cont,posColorbar=True,title='Masked fraction',
+               xlabel='ra',ylabel='dec',colorMin=0,colorMax=1,
+               fnameOut=o.out_prefix+'_MaskedFraction.png')
+if o.sv_mask :
+  fsk.write_flat_map(o.out_prefix+'_MaskedFraction',masked_fraction_cont)
+
+####
+# Compute SNR and depth maps
+print("Creating depth maps")
+snrs={};
+depths={};
+for i,b in enumerate(bands) :
+  snrs[b]=cat['%scmodel_flux'%b]/cat['%scmodel_flux_err'%b]
+  depths[b]={}
+  plot_stuff= (b==o.band) and o.gen_plot
+  for method in depth_methods :
+    print(b,method,plot_stuff)
+    depths[b][method]={}
+    if method=='fluxerr' :
+      depth,depth_std=estDepth.get_depth(method,cat['ra_r'],cat['dec_r'],b,arr1=cat['%scmodel_flux_err'%b],arr2=None,
+                                         flatSkyGrid=fsk,SNRthreshold=o.min_snr,
+                                         plotMaps=plot_stuff,saveMaps=False,
+                                         prefixOut=o.out_prefix)
+    else :
+      depth,depth_std=estDepth.get_depth(method,cat['ra_r'],cat['dec_r'],b,arr1=cat['%scmodel_mag'%b],arr2=snrs[b],
+                                         flatSkyGrid=fsk,SNRthreshold=o.min_snr,
+                                         plotMaps=plot_stuff,saveMaps=False,
+                                         prefixOut=o.out_prefix)
+    depths[b][method]['depth']=depth; depths[b][method]['depth_std']=depth_std
+if o.sv_depth :
+  for method in depth_methods :
+    mps_m=[]
+    mps_s=[]
+    for b in bands :
+      mps_m.append(depths[b][method]['depth'])
+      mps_s.append(depths[b][method]['depth_std'])
+    fsk.write_flat_map(o.out_prefix+'_%ds_depth_mean_'%(o.min_snr)+method,np.array(mps_m))
+    fsk.write_flat_map(o.out_prefix+'_%ds_depth_std_'%(o.min_snr)+method,np.array(mps_s))
+
+####
+# Compute depth-based mask
+if o.sv_mask :
+  print("Depth-based mask")
+  dmp=(depths[o.band][depth_methods[o.depth_method]]['depth']).copy();
+  #dmp[dmp>100]=-1 #Remove nans
+  msk_depth=np.zeros_like(dmp); msk_depth[dmp>=o.depth_cut]=1
+  msk_depth=removeDisconnected(msk_depth,fsk)
+  if o.gen_plot :
+    name_plot='_DepthMask_'+depth_methods[o.depth_method]+'_'+o.band+'%.2lf'%o.depth_cut
+    fsk.view_map(msk_depth,posColorbar=True,title='%s>%.2lf mask'%(o.band,o.depth_cut),
+                 xlabel='ra',ylabel='dec',colorMin=0,colorMax=1,
+                 fnameOut=o.out_prefix+name_plot+'.png')
+  fsk.write_flat_map(o.out_prefix+name_plot,msk_depth)
+
+####
+# Implement final cuts
+# - Mag. limit
+# - Star-galaxy separator
+print("Will lose %d objects to depth and stars"%(np.sum(sel_maglim*sel_gals)))
+cat.remove_rows(~(sel_maglim*sel_gals))
+
+####
+# Write final catalog
+# 1- header
+print("Writing output")
+hdr=fits.Header()
+hdr['BAND']=o.band
+hdr['DEPTH']=o.depth_cut
+hdr['FIELDN']=o.field_in
+prm_hdu=fits.PrimaryHDU(header=hdr)
+# 2- Catalog
+cat_hdu=fits.table_to_hdu(cat)
+# 3- Rotation matrix
+rot_hdu=fits.ImageHDU(data=rotation)
+# 4- Actual writing
+hdul=fits.HDUList([prm_hdu,cat_hdu,rot_hdu])
+hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',clobber=True)
+
+####
+# Generate plots and exit
+if o.gen_plot and o.show_plot :
+  plt.show();

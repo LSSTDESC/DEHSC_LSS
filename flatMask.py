@@ -19,6 +19,9 @@ def createMask(ra,dec,flags,flatsky_base,reso_mask) :
     #Create mask based on object positions
     mpr=createCountsMap(ra,dec,fsg0,returnMap=True,plotMap=False)
     mskr=np.zeros(fsg0.get_size()); mskr[mpr>0]=1
+
+    if(np.sum(mpr*mskr)/np.sum(mskr)<5) :
+        raise Warning('Base resolution may be too high %.1lf'%(np.sum(mpr*mskr)/np.sum(mskr)))
     
     if reso_mask>fsg0.dx :
         fsg,mpn=fsg0.d_grade(mpr,int(reso_mask/fsg0.dx+0.5))
