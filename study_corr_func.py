@@ -109,7 +109,7 @@ for field in fields:
                                                               random_ra= randCatalog['ra'], random_dec= randCatalog['dec'],
                                                               minSep= minSep, maxSep= maxSep, nBins= nBins)
         tag= 'gal_starCorrected'
-        print('\nRunning for', tag)
+        print('\Calculating %s.\n'%tag)
         # correction based on eq. 26 in https://arxiv.org/abs/1507.05360
         theta[tag]= theta['gal_noCorr']
         wtheta[tag]= (1+fstar)**2*(wtheta['gal_noCorr']-fstar**2*wtheta['stars'])-fstar**4

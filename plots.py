@@ -85,7 +85,7 @@ def plot_wthetas(theta_dict, wtheta_dict, wtheta_sig_dict, title= None,
         ax.plot(theta_dict[tag], np.zeros(len(theta_dict[tag])), color= 'k', lw=2, linestyle= ':')
         ax.plot(theta_dict[tag], np.zeros(len(theta_dict[tag]))-1, color= 'k', lw=2, linestyle= ':')
 
-        if (i>len(colors)):
+        if (i>len(colors)-1):
             style= '.-'
             i= i%len(colors)
         else:
@@ -94,7 +94,7 @@ def plot_wthetas(theta_dict, wtheta_dict, wtheta_sig_dict, title= None,
         ax.errorbar(theta_dict[tag], wtheta_dict[tag], yerr= wtheta_sig_dict[tag], color=colors[i])
 
     fontsize= 12
-    ax.legend(fontsize= fontsize)
+    ax.legend(fontsize= fontsize, bbox_to_anchor= (1.4, 0.5))
     ax.set_title(title, fontsize= fontsize)
     ax.set_xlabel(r'$\theta$ (Degrees)', fontsize= fontsize+2)
     ax.set_ylabel(r'$w(\theta)$', fontsize= fontsize+2)
