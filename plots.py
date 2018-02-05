@@ -1,3 +1,4 @@
+from __future__ import print_function
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
@@ -5,13 +6,13 @@ import numpy as np
 def plotDiagnostics(dataDF, bands= ['g', 'r', 'i', 'z', 'y']): # assume cleaned up data
     ##########################################
     # plot ra, dec. in degrees.
-    print 'Plotting ra, dec plot.'
+    print('Plotting ra, dec plot.')
     sns.jointplot(x=dataDF['ra'], y=dataDF['dec'], kind="hex", color="k")
     plt.show()
     
     ##########################################
     def plotHists(keys, df, xlabel):
-        print 'Plotting %s distributions.'%xlabel
+        print('Plotting %s distributions.'%xlabel)
         if all(i in dataDF.keys() for i in neededKeys): # the keys needed are available
             fig, ax = plt.subplots()
             for key in neededKeys:
@@ -20,7 +21,7 @@ def plotDiagnostics(dataDF, bands= ['g', 'r', 'i', 'z', 'y']): # assume cleaned 
             ax.set_xlabel(xlabel)
             plt.show()
         else:
-            print 'Not plotting %s since dont have the needed columns:\n%s.\n'%(xlabel, neededKeys)
+            print('Not plotting %s since dont have the needed columns:\n%s.\n'%(xlabel, neededKeys))
         
     ##########################################
     # plot the cmodel_mag distributions
