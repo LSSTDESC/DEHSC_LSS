@@ -70,7 +70,7 @@ for field in fields:
 
     # find the mag-limited galaxy sample
     ind= np.where((catalog['%scmodel_mag'%band]<magCut) & (catalog['iclassification_extendedness']==1))[0]
-    galSample_ra, galSample_dec= catalog['ra'][ind], catalog['dec'][ind]
+    galSample_ra, galSample_dec= catalog['ra_r'][ind], catalog['dec_r'][ind]
     print('%s galaxies to in the mag-limited sample.'%len(galSample_ra))
     
     # -------
@@ -89,8 +89,8 @@ for field in fields:
     # create random catalog
     nData= max(len(galSample_ra), len(starSample_ra))   # max output star, gal sample. probably too much.
     randCatalog= intermediates.getRandomCatalog(flatSkyGrid, mask, 
-                                                minRA= min(catalog['ra']), maxRA= max(catalog['ra']),
-                                                minDec=  min(catalog['dec']), maxDec=  max(catalog['dec']),
+                                                minRA= min(catalog['ra_r']), maxRA= max(catalog['ra_r']),
+                                                minDec=  min(catalog['dec_r']), maxDec=  max(catalog['dec_r']),
                                                 nData= nData, plotMap= False)
     if (len(randCatalog)>0):
         # -----
