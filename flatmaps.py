@@ -26,7 +26,7 @@ class FlatMapInfo(object) :
             self.nx=int(self.lx/np.abs(self.wcs.wcs.cdelt[0]))+1
         else :
             self.nx=nx
-            self.lx=nx*self.wcs.wcs.cdelt[0]
+            self.lx=np.fabs(nx*self.wcs.wcs.cdelt[0])
         self.dx=self.lx/self.nx
 
         if ny is None :
@@ -34,7 +34,7 @@ class FlatMapInfo(object) :
             self.ny=int(self.ly/np.abs(self.wcs.wcs.cdelt[1]))+1
         else :
             self.ny=ny
-            self.ly=ny*self.wcs.wcs.cdelt[1]
+            self.ly=np.fabs(ny*self.wcs.wcs.cdelt[1])
         self.dy=self.ly/self.ny
 
         self.npix=self.nx*self.ny
@@ -116,7 +116,7 @@ class FlatMapInfo(object) :
         return np.zeros(self.npix,dtype=float)
 
     def view_map(self,map_in,ax=None, xlabel='RA', ylabel='Dec',
-		 title=None, addColorbar=True,posColorbar= False, cmap = cm.magma,
+		 title=None, addColorbar=True,posColorbar= False, cmap = cm.viridis,
                  colorMax= None, colorMin= None,fnameOut=None):
         """
         Plots a 2D map (passed as a flattened array)
@@ -336,9 +336,11 @@ def read_flat_map(filename,i_map=0) :
     if i_map==-1 :
         maps=np.array([hdu.data for hdu in hdul])
         nm,ny,nx=maps.shape
+        maps=maps.reshape([nm,ny*nx])
     else :
         maps=hdul[i_map].data
         ny,nx=maps.shape
+        maps=maps.flatten()
 
     fmi=FlatMapInfo(w,nx=nx,ny=ny)
 

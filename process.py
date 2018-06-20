@@ -189,7 +189,7 @@ if o.gen_plot :
                xlabel='ra',ylabel='dec',colorMin=0,colorMax=1,
                fnameOut=o.out_prefix+'_MaskedFraction.png')
 if o.sv_mask :
-  fsk.write_flat_map(o.out_prefix+'_MaskedFraction',masked_fraction_cont,descript='Masked fraction')
+  fsk.write_flat_map(o.out_prefix+'_MaskedFraction.fits',masked_fraction_cont,descript='Masked fraction')
 
 ####
 # Compute SNR and depth maps
@@ -221,9 +221,9 @@ if o.sv_depth :
       mps_s.append(depths[b][method]['depth_std'])
       dcp_m.append('%d-s depth, '%o.min_snr+b+' '+method+' mean')
       dcp_s.append('%d-s depth, '%o.min_snr+b+' '+method+' STD')
-    fsk.write_flat_map(o.out_prefix+'_%ds_depth_mean_'%(o.min_snr)+method,
+    fsk.write_flat_map(o.out_prefix+'_%ds_depth_mean_'%(o.min_snr)+method+'.fits',
                        np.array(mps_m),descript=np.array(dcp_m))
-    fsk.write_flat_map(o.out_prefix+'_%ds_depth_std_'%(o.min_snr)+method,
+    fsk.write_flat_map(o.out_prefix+'_%ds_depth_std_'%(o.min_snr)+method+'.fits',
                        np.array(mps_s),descript=np.array(dcp_s))
 
 ####
@@ -239,7 +239,7 @@ if o.sv_mask :
     fsk.view_map(msk_depth,posColorbar=True,title='%s>%.2lf mask'%(o.band,o.depth_cut),
                  xlabel='ra',ylabel='dec',colorMin=0,colorMax=1,
                  fnameOut=o.out_prefix+name_plot+'.png')
-  fsk.write_flat_map(o.out_prefix+name_plot,msk_depth,descript='Depth mask')
+  fsk.write_flat_map(o.out_prefix+name_plot+'.fits',msk_depth,descript='Depth mask')
 
 ####
 # Implement final cuts
@@ -259,7 +259,7 @@ hdr['FIELDN']=o.field_in
 prm_hdu=fits.PrimaryHDU(header=hdr)
 # 2- Catalog
 cat_hdu=fits.table_to_hdu(cat)
-# 4- Actual writing
+# 3- Actual writing
 hdul=fits.HDUList([prm_hdu,cat_hdu])
 hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',overwrite=True)
 
