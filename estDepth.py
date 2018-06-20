@@ -108,7 +108,7 @@ def flux_err_method(ra, dec, band, flux_err, flatSkyGrid, SNRthreshold= 5):
 
 #############################################
 def random_sky_std_method(ra, dec, sky_std, band, flatSkyGrid, SNRthreshold= 5, plotMaps= True,
-                          saveMaps= False, outputDir= None):
+                          outputDir= None):
     # 5sigma depth= -2.5*np.log10(SNRthreshold*sky_std)+27.0,
     # Using the random sky_std as here: https://hsc-release.mtk.nao.ac.jp/doc/index.php/random-points-for-dr1/
     # SNRthreshold= 5 => 5sigma depth.
@@ -119,9 +119,6 @@ def random_sky_std_method(ra, dec, sky_std, band, flatSkyGrid, SNRthreshold= 5, 
                                          flatSkyGrid= flatSkyGrid,
                                          plotMaps= plotMaps,
                                          quantityName= 'random-sky_std method\n%s-band %ssigma depth'%(band, SNRthreshold))
-    if saveMaps:
-        methodName= 'randomSkyStd-isPrimary'
-        saveDepthMaps(depth, depth_std, methodName, outputDir, SNRthreshold, band, flatSkyGrid, )
         
     return depth, depth_std
 
@@ -162,7 +159,7 @@ def dr1_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5):
     return depth, depth_std
 
 def get_depth(method,ra,dec,band,arr1,arr2,flatSkyGrid,SNRthreshold=5,
-              plotMaps=True,saveMaps=False,prefixOut=None) :
+              plotMaps=True,prefixOut=None) :
     
     SNRthreshold= int(SNRthreshold)
     print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
@@ -191,7 +188,4 @@ def get_depth(method,ra,dec,band,arr1,arr2,flatSkyGrid,SNRthreshold=5,
                              title= method+' method\nstd %s%d depth'%(band,SNRthreshold),
                              xlabel='ra', ylabel='dec',
                              fnameOut=prefixOut+'_'+method+'_'+band+'%d_std.png'%SNRthreshold)
-    if saveMaps:
-        flatSkyGrid.write_flat_map(prefixOut+'_'+method+'_'+band+'%d_mean'%SNRthreshold,depth)
-        flatSkyGrid.write_flat_map(prefixOut+'_'+method+'_'+band+'%d_std'%SNRthreshold,depth_std)
     return depth,depth_std

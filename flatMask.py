@@ -22,11 +22,11 @@ def createMask(ra,dec,flags,flatsky_base,reso_mask) :
 
     if(np.sum(mpr*mskr)/np.sum(mskr)<5) :
         raise Warning('Base resolution may be too high %.1lf'%(np.sum(mpr*mskr)/np.sum(mskr)))
-    
-    if reso_mask>fsg0.dx :
-        fsg,mpn=fsg0.d_grade(mpr,int(reso_mask/fsg0.dx+0.5))
+
+    if np.fabs(reso_mask)>np.fabs(fsg0.dx) :
+        fsg,mpn=fsg0.d_grade(mpr,int(np.fabs(reso_mask/fsg0.dx)+0.5))
     else :
-        fsg,mpn=fsg0.u_grade(mpr,int(fsg0.dx/reso_mask+0.5))
+        fsg,mpn=fsg0.u_grade(mpr,int(np.fabs(fsg0.dx/reso_mask)+0.5))
 
     mskn=np.zeros(fsg.get_size()); mskn[mpn>0]=1
     ipix=fsg.pos2pix(ra,dec)

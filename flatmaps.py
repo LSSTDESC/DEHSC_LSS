@@ -2,39 +2,39 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import pymaster as nmt
+from astropy.io import fits
+from astropy.wcs import WCS
 
 class FlatMapInfo(object) :
-    def __init__(self,x_range,y_range,nx=None,ny=None,dx=None,dy=None) :
+    def __init__(self,wcs,nx=None,ny=None,lx=None,ly=None) :
         """
         Creates a flat map
-        x_range : [x_i,x_f] range in the x axis covered by the map
-        y_range : [y_i,y_f] range in the y axis covered by the map
+        wcs : WCS object containing information about reference point and resolution
         nx,ny : Number of pixels in the x/y axes. If None, dx/dy must be provided
-        dx,dy : Resolution in the x/y axes. If None, nx/ny must be provided
+        lx,ly : Extent of themap in the x/y axes. If None, nx/ny must be provided
         """
-        self.x0=x_range[0]
-        self.xf=x_range[1]
-        self.lx=self.xf-self.x0
-        self.y0=y_range[0]
-        self.yf=y_range[1]
-        self.ly=self.yf-self.y0
-        
-        if nx is None and dx is None :
-            raise ValueError("Must provide either nx or dx")
+        self.wcs=wcs.copy()
 
-        if ny is None and dy is None :
-            raise ValueError("Must provide either ny or dy")
+        if nx is None and lx is None :
+            raise ValueError("Must provide either nx or lx")
+
+        if ny is None and ly is None :
+            raise ValueError("Must provide either ny or ly")
 
         if nx is None :
-            self.nx=int(self.lx/dx)+1
+            self.lx=lx
+            self.nx=int(self.lx/np.abs(self.wcs.wcs.cdelt[0]))+1
         else :
             self.nx=nx
+            self.lx=nx*self.wcs.wcs.cdelt[0]
         self.dx=self.lx/self.nx
 
         if ny is None :
-            self.ny=int(self.ly/dy)+1
+            self.ly=ly
+            self.ny=int(self.ly/np.abs(self.wcs.wcs.cdelt[1]))+1
         else :
             self.ny=ny
+            self.ly=ny*self.wcs.wcs.cdelt[1]
         self.dy=self.ly/self.ny
 
         self.npix=self.nx*self.ny
@@ -51,28 +51,27 @@ class FlatMapInfo(object) :
         """
         return self.npix
 
-    def pos2pix(self,x,y) :
+    def pos2pix(self,ra,dec) :
         """
         Returns pixel indices for arrays of x and y coordinates.
         Will return -1 if (x,y) lies outside the map
         """
-        x=np.asarray(x)
+        ra=np.asarray(ra)
         scalar_input=False
-        if x.ndim==0 :
-            x=x[None]
+        if ra.ndim==0 :
+            ra=x[None]
             scalar_input=True
 
-        y=np.asarray(y)
-        if y.ndim==0 :
-            y=y[None]
+        dec=np.asarray(dec)
+        if dec.ndim==0 :
+            dec=dec[None]
 
-        if len(x)!=len(y) :
-            raise ValueError("x and y must have the same size!")
+        if len(ra)!=len(dec) :
+            raise ValueError("ra and dec must have the same size!")
 
-        ix=np.floor((x-self.x0)/self.dx).astype(int)
+        ix,iy=np.transpose(self.wcs.wcs_world2pix(np.transpose(np.array([ra,dec])),0))
+        ix=ix.astype(int); iy=iy.astype(int);
         ix_out=np.where(np.logical_or(ix<0,ix>=self.nx))[0]
-
-        iy=np.floor((y-self.y0)/self.dy).astype(int)
         iy_out=np.where(np.logical_or(iy<0,iy>=self.ny))[0]
 
         ipix=ix+self.nx*iy
@@ -101,13 +100,14 @@ class FlatMapInfo(object) :
         ix=ipix%self.nx
         ioff=np.array(ipix-ix)
         iy=ioff.astype(int)/(int(self.nx))
+        ix=ix.astype(np.float_)
+        iy=iy.astype(np.float_)
 
-        x=self.x0+(ix+0.5)*self.dx
-        y=self.y0+(iy+0.5)*self.dy
+        ra,dec=np.transpose(self.wcs.wcs_pix2world(np.transpose(np.array([ix,iy])),0))
 
         if scalar_input :
-            return np.squeeze(x),np.squeeze(y)
-        return x,y
+            return np.squeeze(ra),np.squeeze(dec)
+        return ra,dec
 
     def get_empty_map(self) :
         """
@@ -115,7 +115,7 @@ class FlatMapInfo(object) :
         """
         return np.zeros(self.npix,dtype=float)
 
-    def view_map(self,map_in,ax=None, xlabel='x', ylabel='y',
+    def view_map(self,map_in,ax=None, xlabel='RA', ylabel='Dec',
 		 title=None, addColorbar=True,posColorbar= False, cmap = cm.magma,
                  colorMax= None, colorMin= None,fnameOut=None):
         """
@@ -135,14 +135,12 @@ class FlatMapInfo(object) :
         #        colorMax= np.percentile(map_in, 95)
 
         if ax is None :
-            plt.figure()
-            ax=plt.gca()
+            fig=plt.figure()
+            ax=fig.add_subplot(111,projection=self.wcs)
         if title is not None :
             ax.set_title(title,fontsize=15)
         image= ax.imshow(map_in.reshape([self.ny,self.nx]),
-			origin='lower', interpolation='nearest',
-			aspect='equal', extent=[self.x0,self.xf,self.y0,self.yf],
-			vmin= colorMin, vmax= colorMax, cmap= cmap)
+			origin='lower', interpolation='nearest')
         if addColorbar :
 	    plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
@@ -150,20 +148,37 @@ class FlatMapInfo(object) :
         if fnameOut is not None :
             plt.savefig(fnameOut,bbox_inches='tight')
 
-    def write_flat_map(self,filename,maps) :
+    def write_flat_map(self,filename,maps,descript=None) :
         """
         Saves a set of maps in npz format.
         We'll try to implement other more standard formats with proper WCS coordinates etc. ASAP.
         """
+
         if maps.ndim<1 :
             raise ValueError("Must supply at least one map")
         if maps.ndim==1 :
             maps=np.array([maps])
         if len(maps[0])!=self.npix :
             raise ValueError("Map doesn't conform to this pixelization")
-            
-        np.savez(filename,x_range=[self.x0,self.xf],y_range=[self.y0,self.yf],nx=self.nx,ny=self.ny,
-                 maps=maps)
+        if descript is not None :
+            if len(maps)==1 :
+                descript=[descript]
+            if len(maps)!=len(descript) :
+                raise ValueError("Need one description per map")
+
+        header=self.wcs.to_header()
+        hdus=[]
+        for im,m in enumerate(maps) :
+            head=header.copy()
+            if descript is not None :
+                head['DESCR']=(descript[im],'Description')
+            if im==0 :
+                hdu=fits.PrimaryHDU(data=m.reshape([self.ny,self.nx]),header=head)
+            else :
+                hdu=fits.ImageHDU(data=m.reshape([self.ny,self.nx]),header=head)
+            hdus.append(hdu)
+        hdulist=fits.HDUList(hdus)
+        hdulist.writeto(filename,overwrite=True)
 
     def compute_power_spectrum(self,map1,mask1,map2=None,mask2=None,l_bpw=None,
                                return_bpw=False,wsp=None,return_wsp=False,
@@ -266,8 +281,15 @@ class FlatMapInfo(object) :
         if len(mp)!=self.npix :
             raise ValueError("Input map has a wrong size")
 
-        fm_ug=FlatMapInfo([self.x0,self.xf],[self.y0,self.yf],nx=x_fac*self.nx,ny=y_fac*self.ny)
-        mp_ug=np.repeat(np.repeat(mp.reshape([self.ny,self.nx]),y_fac,axis=0),x_fac,axis=1).flatten()
+        w=WCS(naxis=2)
+        w.wcs.cdelt=[self.wcs.wcs.cdelt[0]/int(x_fac),self.wcs.wcs.cdelt[1]/int(y_fac)]
+        w.wcs.crval=self.wcs.wcs.crval
+        w.wcs.ctype=self.wcs.wcs.ctype
+        w.wcs.crpix=[self.wcs.wcs.crpix[0]*int(x_fac),self.wcs.wcs.crpix[1]*int(y_fac)]
+
+        fm_ug=FlatMapInfo(w,nx=self.nx*int(x_fac),ny=self.ny*int(y_fac))
+        mp_ug=np.repeat(np.repeat(mp.reshape([self.ny,self.nx]),int(y_fac),axis=0),
+                        int(x_fac),axis=1).flatten()
         
         return fm_ug,mp_ug
 
@@ -284,16 +306,20 @@ class FlatMapInfo(object) :
             y_fac=x_fac
         if len(mp)!=self.npix :
             raise ValueError("Input map has a wrong size")
+        print(x_fac,y_fac)
+        print(int(x_fac),int(y_fac))
 
-        nx_new=self.nx/int(x_fac)
-        ny_new=self.ny/int(y_fac)
-        xf_new=self.x0+self.dx*x_fac*nx_new
-        yf_new=self.y0+self.dy*y_fac*ny_new
-
-        ix_max=nx_new*int(x_fac)
-        iy_max=ny_new*int(y_fac)
-        mp2d=mp.reshape([self.ny,self.nx])[:iy_max,:ix_max]
-        fm_dg=FlatMapInfo([self.x0,xf_new],[self.y0,yf_new],nx=nx_new,ny=ny_new)
+        w=WCS(naxis=2)
+        w.wcs.cdelt=[self.wcs.wcs.cdelt[0]*int(x_fac),self.wcs.wcs.cdelt[1]*int(y_fac)]
+        w.wcs.crval=self.wcs.wcs.crval
+        w.wcs.ctype=self.wcs.wcs.ctype
+        w.wcs.crpix=[self.wcs.wcs.crpix[0]/int(x_fac),self.wcs.wcs.crpix[1]/int(y_fac)]
+        
+        nx_new=self.nx/int(x_fac); ix_max=nx_new*int(x_fac)
+        ny_new=self.ny/int(y_fac); iy_max=ny_new*int(y_fac)
+        
+        mp2d=mp.reshape([self.ny,self.nx])[:iy_max,:][:,:ix_max]
+        fm_dg=FlatMapInfo(w,nx=nx_new,ny=ny_new)
         mp_dg=np.mean(np.mean(np.reshape(mp2d.flatten(),[ny_new,int(y_fac),nx_new,int(x_fac)]),axis=-1),axis=-2).flatten()
         
         return fm_dg,mp_dg
@@ -304,9 +330,16 @@ def read_flat_map(filename,i_map=0) :
     The latter are returned as a FlatMapInfo object.
     i_map : map to read. If -1, all maps will be read.
     """
-    data=np.load(filename)
+    hdul=fits.open(filename)
+    w=WCS(hdul[0].header)
 
-    fmi=FlatMapInfo(data['x_range'],data['y_range'],nx=data['nx'],ny=data['ny'])
     if i_map==-1 :
-        i_map=np.arange(len(data['maps']))
-    return fmi,data['maps'][i_map]
+        maps=np.array([hdu.data for hdu in hdul])
+        nm,ny,nx=maps.shape
+    else :
+        maps=hdul[i_map].data
+        ny,nx=maps.shape
+
+    fmi=FlatMapInfo(w,nx=nx,ny=ny)
+
+    return fmi,maps
