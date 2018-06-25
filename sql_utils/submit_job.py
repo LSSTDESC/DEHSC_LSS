@@ -81,6 +81,14 @@ def write_boxsearch(tablename,dec_range,ra_range,fname_out,output_format="fits",
     if submit :
         submit_job(fname_out,output_format)
 
+def add_photoz(mt) :
+    sto=""
+    sto+="       ,p"+mt+".photoz_mean as pz_mean_"+mt+"\n"
+    sto+="       ,p"+mt+".photoz_mode as pz_mode_"+mt+"\n"
+    sto+="       ,p"+mt+".photoz_best as pz_best_"+mt+"\n"
+    sto+="       ,p"+mt+".photoz_mc as pz_mc_"+mt+"\n"
+    return sto
+
 def write_boxsearch_random(tablename,dec_range,ra_range,fname_out,output_format="fits",do_box=True,submit=False) :
     filters=['g','r','i','z','y']
     stout="-- Run box, "+fname_out+"\n"
@@ -128,7 +136,7 @@ def write_boxsearch_random(tablename,dec_range,ra_range,fname_out,output_format=
     if submit :
         submit_job(fname_out,output_format)
 
-def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_field=True,submit=False,ra_range=None) :
+def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_field=True,submit=False,ra_range=None,do_photoz=False) :
     filters=['g','r','i','z','y']
     stout="-- Run field, "+fname_out+"\n"
 
@@ -171,8 +179,16 @@ def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_fiel
     stout+=add_filters("cmodel_flux_flags",behind=False)
     stout+=add_filters("cmodel_mag",behind=False)
     stout+=add_filters("cmodel_mag_err",behind=False)
+    if do_photoz :
+        stout+=add_photoz("eab")
+        stout+=add_photoz("frz")
+        stout+=add_photoz("nnz")
     stout+="FROM\n"
     stout+="       "+tablename+".forced\n"
+    if do_photoz :
+        stout+="       LEFT JOIN "+tablename+".photoz_ephor_ab peab USING (object_id)\n"
+        stout+="       LEFT JOIN "+tablename+".photoz_frankenz pfrz USING (object_id)\n"
+        stout+="       LEFT JOIN "+tablename+".photoz_nnpz pnnz USING (object_id)\n"
     stout+="WHERE\n"
     stout+="       detect_is_primary=True and\n"
     stout+="       icmodel_flags_badcentroid=False and\n"
@@ -247,6 +263,25 @@ def write_getspecz(tablename,fname_out,output_format='fits',submit=False) :
 
     if submit :
         submit_job(fname_out,output_format)
+
+for fld in ['gama09h','gama15h','hectomap','wide12h','xmm_lss','aegis'] :
+    write_fieldsearch("pdr1_wide",fld,"field_wide_"+fld+"_pz.sql",do_field=True,submit=True,do_photoz=True)
+write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h1.sql",do_field=True,submit=True,ra_range=[330.,336.],do_photoz=True)
+write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h2.sql",do_field=True,submit=True,ra_range=[336.,342.],do_photoz=True)
+
+#DEEP fields
+for fld in ['cosmos','deep2_3','elais_n1','xmm_lss'] :
+    write_fieldsearch("pdr1_deep",fld,"field_deep_"+fld+".sql",do_field=True,submit=True,do_photoz=True)
+
+#UDEEP fields
+for fld in ['cosmos','sxds'] :
+    write_fieldsearch("pdr1_udeep",fld,"field_udeep_"+fld+".sql",do_field=True,submit=True,do_photoz=True)
+
+#WIDE-depth COSMOS
+for see in ['best','median','worst'] :
+    write_fieldsearch("pdr1_cosmos_widedepth_"+see,"none","field_cosmo_wide_"+see+".sql",do_field=False,submit=True,do_photoz=False)
+
+exit(1)
 
 #WIDE fields
 for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss'] :
