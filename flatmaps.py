@@ -178,7 +178,8 @@ class FlatMapInfo(object) :
                 hdu=fits.ImageHDU(data=m.reshape([self.ny,self.nx]),header=head)
             hdus.append(hdu)
         hdulist=fits.HDUList(hdus)
-        hdulist.writeto(filename,overwrite=True)
+        #hdulist.writeto(filename,overwrite=True)
+        hdulist.writeto(filename,clobber=True)
 
     def compute_power_spectrum(self,map1,mask1,map2=None,mask2=None,l_bpw=None,
                                return_bpw=False,wsp=None,return_wsp=False,
@@ -324,6 +325,46 @@ class FlatMapInfo(object) :
         
         return fm_dg,mp_dg
 
+    @classmethod
+    def from_coords(FlatMapInfo,ra_arr,dec_arr,reso,pad=None) :
+        """
+        Generates a FlatMapInfo object that can encompass all points with coordinates
+        given by ra_arr (R.A.) and dec_arr (dec.) with pixel resolution reso.
+        The parameter pad should correspond to the number of pixel sizes you want
+        to leave as padding around the edges of the map. If None, it will default to 20.
+        """
+
+        if len(ra_arr.flatten())!=len(dec_arr.flatten()) :
+            raise ValueError("ra_arr and dec_arr must have the same size")
+
+        if pad==None :
+            pad=20.
+        elif pad<0 :
+            raise ValueError("We need a positive padding")
+
+        # Find median coordinates
+        ramean=0.5*(np.amax(ra_arr)+np.amin(ra_arr))
+        decmean=0.5*(np.amax(dec_arr)+np.amin(dec_arr))
+
+        #Compute projection on the tangent plane
+        w=WCS(naxis=2)
+        w.wcs.crpix=[0,0]
+        w.wcs.cdelt=[-reso,reso]
+        w.wcs.crval=[ramean,decmean]
+        w.wcs.ctype=['RA---TAN','DEC--TAN']
+        ix,iy=np.transpose(w.wcs_world2pix(np.transpose(np.array([ra_arr,dec_arr])),0))
+        #Estimate map size
+        nsidex=int(np.amax(ix))-int(np.amin(ix))+1+2*int(pad)
+        nsidey=int(np.amax(iy))-int(np.amin(iy))+1+2*int(pad)
+        #Off-set to make sure every pixel has positive coordinates
+        # TODO: worry about 2pi wrapping
+        offx=-np.amin(ix)+pad
+        offy=-np.amin(iy)+pad
+        w.wcs.crpix=[offx,offy]
+
+        return FlatMapInfo(w,nx=nsidex,ny=nsidey)
+
+####
 def read_flat_map(filename,i_map=0) :
     """
     Reads a flat-sky map and the details of its pixelization scheme.

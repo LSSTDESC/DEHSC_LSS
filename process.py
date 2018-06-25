@@ -106,30 +106,8 @@ cat.remove_columns(isnull_names)
 cat.remove_rows(~sel) #np.where(~sel)[0])#[sel]
 
 ####
-# Find median coordinates
-#cat['ra'][cat['ra']<0]+=360.
-ramean=0.5*(np.amax(cat['ra'])+np.amin(cat['ra']))
-decmean=0.5*(np.amax(cat['dec'])+np.amin(cat['dec']))
-
-#Compute projection on the tangent plane
-w=wcs.WCS(naxis=2)
-w.wcs.crpix=[0,0]
-w.wcs.cdelt=[-o.res,o.res]
-w.wcs.crval=[ramean,decmean]
-w.wcs.ctype=['RA---TAN','DEC--TAN']
-ix,iy=np.transpose(w.wcs_world2pix(np.transpose(np.array([cat['ra'],cat['dec']])),0))
-if o.pad<=0 :
-  o.pad=20*o.res
-#Estimate map size
-nsidex=int(np.amax(ix))-int(np.amin(ix))+1+2*int(o.pad/o.res)
-nsidey=int(np.amax(iy))-int(np.amin(iy))+1+2*int(o.pad/o.res)
-#Off-set to make sure every pixel has positive coordinates
-# TODO: worry about 2pi wrapping
-offx=-np.amin(ix)+o.pad/o.res
-offy=-np.amin(iy)+o.pad/o.res
-w.wcs.crpix=[offx,offy]
-
-fsk=fm.FlatMapInfo(w,nx=nsidex,ny=nsidey)
+# Generate flat-sky information object
+fsk=fm.FlatMapInfo.from_coords(cat['ra'],cat['dec'],o.res,pad=o.pad/o.res)
 
 ####
 # Generate systematics maps
@@ -234,8 +212,8 @@ if o.sv_mask :
   #dmp[dmp>100]=-1 #Remove nans
   msk_depth=np.zeros_like(dmp); msk_depth[dmp>=o.depth_cut]=1
   msk_depth=removeDisconnected(msk_depth,fsk)
+  name_plot='_DepthMask_'+depth_methods[o.depth_method]+'_'+o.band+'%.2lf'%o.depth_cut
   if o.gen_plot :
-    name_plot='_DepthMask_'+depth_methods[o.depth_method]+'_'+o.band+'%.2lf'%o.depth_cut
     fsk.view_map(msk_depth,posColorbar=True,title='%s>%.2lf mask'%(o.band,o.depth_cut),
                  xlabel='ra',ylabel='dec',colorMin=0,colorMax=1,
                  fnameOut=o.out_prefix+name_plot+'.png')
@@ -261,7 +239,8 @@ prm_hdu=fits.PrimaryHDU(header=hdr)
 cat_hdu=fits.table_to_hdu(cat)
 # 3- Actual writing
 hdul=fits.HDUList([prm_hdu,cat_hdu])
-hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',overwrite=True)
+#hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',overwrite=True)
+hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',clobber=True)
 
 ####
 # Generate plots and exit
