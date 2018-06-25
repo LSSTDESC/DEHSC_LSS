@@ -136,6 +136,19 @@ def write_boxsearch_random(tablename,dec_range,ra_range,fname_out,output_format=
     if submit :
         submit_job(fname_out,output_format)
 
+def write_frames(tablename,fname_out,output_format='fits',submit=False) :
+    stout="-- Run metadata\n"
+    stout+="SELECT *\n"
+    stout+="FROM "+tablename+".frame\n"
+    stout+=";\n"
+
+    f=open(fname_out,"w")
+    f.write(stout)
+    f.close()
+
+    if submit :
+        submit_job(fname_out,output_format)
+
 def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_field=True,submit=False,ra_range=None,do_photoz=False) :
     filters=['g','r','i','z','y']
     stout="-- Run field, "+fname_out+"\n"
@@ -264,6 +277,12 @@ def write_getspecz(tablename,fname_out,output_format='fits',submit=False) :
     if submit :
         submit_job(fname_out,output_format)
 
+#Per-frame metadata
+write_frames("pdr1_wide","frames_wide.sql",submit=True)
+write_frames("pdr1_deep","frames_deep.sql",submit=True)
+write_frames("pdr1_udeep","frames_udeep.sql",submit=True)
+
+#WIDE fields
 for fld in ['gama09h','gama15h','hectomap','wide12h','xmm_lss','aegis'] :
     write_fieldsearch("pdr1_wide",fld,"field_wide_"+fld+"_pz.sql",do_field=True,submit=True,do_photoz=True)
 write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h1.sql",do_field=True,submit=True,ra_range=[330.,336.],do_photoz=True)
@@ -280,6 +299,9 @@ for fld in ['cosmos','sxds'] :
 #WIDE-depth COSMOS
 for see in ['best','median','worst'] :
     write_fieldsearch("pdr1_cosmos_widedepth_"+see,"none","field_cosmo_wide_"+see+".sql",do_field=False,submit=True,do_photoz=False)
+
+#Frames table
+
 
 exit(1)
 
