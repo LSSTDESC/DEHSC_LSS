@@ -48,7 +48,7 @@ for field in fields :
 
     #Read catalog and cut based on BO mask
     cat=fits.open(predir+field+"/"+field+'_Catalog_i%.2lf.fits'%mlim)[1].data
-    mskob=~(cat['iflags_pixel_bright_object_center']*cat['iflags_pixel_bright_object_any'])
+    mskob=(~cat['iflags_pixel_bright_object_center'])*(~cat['iflags_pixel_bright_object_any'])
     cat=cat[mskob]
 
     #Compute ndens map

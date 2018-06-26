@@ -159,7 +159,7 @@ if o.sv_mask :
 #Masked fraction
 masked=np.ones(len(cat))
 masked*=np.logical_not(cat['iflags_pixel_bright_object_center'])
-masked*=np.logical_not(cat['iflags_pixel_bright_object_center'])
+masked*=np.logical_not(cat['iflags_pixel_bright_object_any'])
 masked_fraction,s=createMeanStdMaps(cat['ra'],cat['dec'],masked,fsk)
 masked_fraction_cont=removeDisconnected(masked_fraction,fsk)
 if o.gen_plot :
@@ -223,7 +223,7 @@ if o.sv_mask :
 # Implement final cuts
 # - Mag. limit
 # - Star-galaxy separator
-print("Will lose %d objects to depth and stars"%(np.sum(sel_maglim*sel_gals)))
+print("Will lose %d objects to depth and stars"%(np.sum(~(sel_maglim*sel_gals))))
 cat.remove_rows(~(sel_maglim*sel_gals))
 
 ####
