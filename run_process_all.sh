@@ -2,6 +2,12 @@
 
 predir_out=/global/cscratch1/sd/damonge/HSC
 
+#First clean up the metadata
+for table in WIDE DEEP UDEEP
+do
+    python process_metadata.py --input-file ${predir_out}/HSC_${table}_frames.fits --output-file ${predir_out}/HSC_processed/HSC_${table}_frames_proc.fits
+done
+
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
 do
     dirname=${predir_out}/HSC_processed/${field}

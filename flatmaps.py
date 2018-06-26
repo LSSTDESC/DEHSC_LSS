@@ -82,6 +82,37 @@ class FlatMapInfo(object) :
             return np.squeeze(ipix)
         return ipix
 
+    def pos2pix2d(self,ra,dec) :
+        """
+        Returns pixel indices for arrays of x and y coordinates.
+        """
+        ra=np.asarray(ra)
+        scalar_input=False
+        if ra.ndim==0 :
+            ra=x[None]
+            scalar_input=True
+
+        dec=np.asarray(dec)
+        if dec.ndim==0 :
+            dec=dec[None]
+
+        if len(ra)!=len(dec) :
+            raise ValueError("ra and dec must have the same size!")
+
+        ix,iy=np.transpose(self.wcs.wcs_world2pix(np.transpose(np.array([ra,dec])),0))
+        ix_out=np.where(np.logical_or(ix<-self.nx,ix>=2*self.nx))[0]
+        iy_out=np.where(np.logical_or(iy<-self.ny,iy>=2*self.ny))[0]
+        
+        is_in=np.ones(len(ix),dtype=bool)
+        is_in[ix_out]=False
+        is_in[iy_out]=False
+        is_in[np.isnan(ix)]=False
+        is_in[np.isnan(iy)]=False
+
+        if scalar_input :
+            return np.squeeze(ix),np.squeeze(iy),np.squeeze(is_in)
+        return ix,iy,is_in
+
     def pix2pos(self,ipix) :
         """
         Returns x,y coordinates of pixel centres for a set of pixel indices.

@@ -53,13 +53,14 @@ fields_save=['frame_id','frame_num','exp_id','exp_num','ccd_id','ccd','ccdname',
              'pa','insrot','mjd','azimuth','elevation','airmass','exptime',
              'gain1','gain2','gain3','gain4',
              'skylevel','sigma_sky','seeing','ellipt','ell_pa','wcs_nobj','wcs_rms',
-             'fluxmag0','fluxmag0err','zeropt','zeropt_err','nobj_bright','flag_auto']
+             'fluxmag0','fluxmag0err','zeropt','zeropt_err','nobj_bright','flag_auto','filter']
 to_remove=[]
 for key in data.keys() :
   if key not in fields_save :
     to_remove.append(key)
-
 data.remove_columns(to_remove)
+
+print(len(data),len(data.keys()))
 
 # Write out
 hdr=fits.Header()
