@@ -1,5 +1,7 @@
 *pyc
 *.py~
+*.pdf
+*.png
 .ipynb_checkpoints/
-
+sql_utils/*.sql
 

@@ -100,7 +100,8 @@ for key in cat.keys() :
     sel[cat[key]]=0
     isnull_names.append(key)
   else :
-    sel[np.isnan(cat[key])]=0
+    if not key.startswith("pz_") : #Keep photo-z's even if they're NaNs
+      sel[np.isnan(cat[key])]=0
 print("Will drop %d rows"%(len(sel)-np.sum(sel)))
 cat.remove_columns(isnull_names)
 cat.remove_rows(~sel) #np.where(~sel)[0])#[sel]
