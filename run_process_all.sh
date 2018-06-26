@@ -1,7 +1,6 @@
 #!/bin/bash
 
 predir_out=/global/cscratch1/sd/damonge/HSC
-predir_out=./data
 
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
 do

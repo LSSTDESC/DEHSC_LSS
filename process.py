@@ -11,7 +11,6 @@ from optparse import OptionParser
 import flatmaps as fm
 import sys
 import time
-import rotate as rtt
 import os
 
 bands = ['g','r','i','z','y']
@@ -38,7 +37,7 @@ parser.add_option('--gen-plots', dest='gen_plot', default=False, action='store_t
                   help='If selected create and save some plots')
 parser.add_option('--show-plots', dest='show_plot', default=False, action='store_true',
                   help='If selected show some plots')
-parser.add_option('--depth-cut', dest='depth_cut', default=25.0, type=float,
+parser.add_option('--depth-cut', dest='depth_cut', default=24.5, type=float,
                   help='Minimum depth to consider in your footprint')
 parser.add_option('--resolution', dest='res', default=0.0285, type=float,
                   help='Map/mask resolution (in degrees)')
