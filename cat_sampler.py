@@ -20,7 +20,7 @@ parser.add_option('--input-prefix', dest='prefix_in', default='NONE', type=str,
 parser.add_option('--output-file', dest='fname_out',default=None,type=str,
                   help='Output file name. If None, I\'ll use input-prefix + _bins_ + fname_bins + .fits')
 parser.add_option('--no-bo-cut',dest='no_bo_cut',default=False,action='store_true',
-                  help='Remove objects within bright-object mask')
+                  help='Do not remove objects within bright-object mask')
 parser.add_option('--pz-type',dest='pz_type',default='nnpz',type=str,
                   help='Photo-z to use')
 parser.add_option('--pz-mark',dest='pz_mark',default='best',type=str,

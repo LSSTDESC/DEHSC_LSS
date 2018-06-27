@@ -25,10 +25,17 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Maps are generated per-band.
    - The currently mapped quantities are given in line 13 of `map_obscond.py`.
    All this is done with the script `map_obscond.py`. Run `python map_obscond.py -h` to see all available command-line options. The maps are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in the sub-directories created above for each field.
-3. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
-4. The bash script `run_process_all.sh` runs 2, 3 and 4 above for all the WIDE fields.
-5. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
-6. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
+5. Create galaxy count maps in a number of redshift bins for each field. This implies:
+   - Reading in the processed catalogs.
+   - Binning them in terms of a given photo-z marker (e.g. ML, mean etc.) for a particular photo-z code.
+   - Generating a map of the number of objects in a given bin found per pixel.
+   - Generating an estimate of the redshift distribution for objects in a given bin. We currently do this as a histogram of the MC redshift value stored for each object.
+   - Save all maps and redshift distributions to file. These are currently collected into a single FITS file that alternates image HDUs (containing the maps) and table HDUs (containing the binned N(z)).
+   All this is done with the script `cat_sampler.py`. Run `python cat_sampler.py -h` to see all possible command-line options. The results are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in the sub-directories created above for each field.
+6. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
+7. The bash script `run_process_all.sh` runs 2, 3, 4 and 5 above for all the WIDE fields.
+8. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
+9. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
 
 The scripts described above make use of some dependencies and python modules written explicitly for this work. The most relevant ones are:
 - `flatmaps.py`: contains routines to construct and manipulate flat-sky maps (mimicking as much as possible the functionality implemented in HEALPix for curved skies).

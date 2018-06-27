@@ -25,6 +25,13 @@ do
     python map_obscond.py --input-frames ${predir_out}/HSC_processed/HSC_WIDE_frames_proc.fits --map-sample ${dirname}/${field}_MaskedFraction.fits --output-prefix ${dirname}/${field}
 done
 
+#Compute galaxy count maps for each field
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
+do
+    dirname=${predir_out}/HSC_processed/${field}
+    python cat_sampler.py --input-prefix ${dirname}/${field} --output-filename ${dirname}/${field}_Ngal_bins_eab_best_single.fits --pz-type ephor_ab --pz-mark best --pz-bins bins_z_single.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5
+done
+
 #So far we've only looked at the WIDE fields
 exit
 
