@@ -239,8 +239,7 @@ prm_hdu=fits.PrimaryHDU(header=hdr)
 cat_hdu=fits.table_to_hdu(cat)
 # 3- Actual writing
 hdul=fits.HDUList([prm_hdu,cat_hdu])
-#hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',overwrite=True)
-hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',clobber=True)
+hdul.writeto(o.out_prefix+'_Catalog_'+o.band+'%.2lf'%(o.depth_cut)+'.fits',overwrite=True)
 
 ####
 # Generate plots and exit

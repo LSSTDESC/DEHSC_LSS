@@ -208,8 +208,7 @@ class FlatMapInfo(object) :
                 hdu=fits.ImageHDU(data=m.reshape([self.ny,self.nx]),header=head)
             hdus.append(hdu)
         hdulist=fits.HDUList(hdus)
-        #hdulist.writeto(filename,overwrite=True)
-        hdulist.writeto(filename,clobber=True)
+        hdulist.writeto(filename,overwrite=True)
 
     def compute_power_spectrum(self,map1,mask1,map2=None,mask2=None,l_bpw=None,
                                return_bpw=False,wsp=None,return_wsp=False,

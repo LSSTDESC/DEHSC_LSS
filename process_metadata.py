@@ -68,4 +68,4 @@ hdr['PREPROC']='yes'
 prm_hdu=fits.PrimaryHDU(header=hdr)
 dat_hdu=fits.table_to_hdu(data)
 hdul=fits.HDUList([prm_hdu,dat_hdu])
-hdul.writeto(o.fname_out,clobber=True)
+hdul.writeto(o.fname_out,overwrite=True)

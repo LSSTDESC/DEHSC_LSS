@@ -120,4 +120,4 @@ for im,m in enumerate(maps) :
         fits.Column(name='n_z',array=nzs[im,2,:],format='E')]
   hdus.append(fits.BinTableHDU.from_columns(cols))
 hdulist=fits.HDUList(hdus)
-hdulist.writeto(o.fname_out,clobber=True)
+hdulist.writeto(o.fname_out,overwrite=True)

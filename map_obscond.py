@@ -1,4 +1,4 @@
-from __future__ import print_funciton
+from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -21,11 +21,10 @@ parser.add_option('--input-frames', dest='fname_frames', default='NONE', type=st
                   help='Path to input processed metadata (FITS table)')
 parser.add_option('--output-prefix', dest='output_prefix', default='NONE', type=str,
                   help='Files will be saved into output_prefix_oc_<systematic name>.fits')
-parser.add_option('--map-sample',dest='map_sample',default='NONE',type=str,
+parser.add_option('--map-sample',dest='fname_map_sample',default='NONE',type=str,
                   help='Sample map used to determine the pixelization that will be used.')
 parser.add_option('--histogram-nbins',dest='nbin_hist',default=40,type=int,
                   help='Number of bins for each systematic (used to compute mean and median maps)')
-print(o.nbin_hist)
 
 ####
 # Read options
@@ -71,10 +70,12 @@ indpix=np.arange(fsk.nx*fsk.ny).reshape([fsk.ny,fsk.nx])
 print("Getting pixel intersects and areas")
 pix_indices=[]
 pix_areas=[]
+percent_next=0
 for ip,pfr in enumerate(polyframe) :
     percent_done=int(100*(ip+0.)/nframes)
-    if percent_done%10==0 :
+    if percent_done==percent_next :
         print("%d%% done"%percent_done)
+        percent_next+=10
     c=np.array(pfr.exterior.coords)
 
     #Pick only pixels in range
