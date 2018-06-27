@@ -1,3 +1,4 @@
+from __future__ import print_funciton
 import numpy as np
 
 class ObsCond(object):
