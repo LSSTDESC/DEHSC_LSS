@@ -8,6 +8,7 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Removing all the unnecessary clutter from the raw files
    - Filter out all unnecessary columns (see line 50 of `process_metadata.py` for the columns we actually keep).
    - Writing the reduced tables into new files.
+   
    All this is done with the script `process_metadata.py`. Run `python process_metadata.py -h` to see all available command-line options. The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/HSC_*_frames_proc.fits`.
 3. Reduce the catalog data. This implies:
    - Removing all the unnecessary clutter from the raw files
@@ -15,6 +16,7 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Constructing maps of all relevant catalog-based systematics (X-sigma depth, extinction, stars, B.O. mask).
    - Applying a magnitude cut and the star-galaxy separator.
    - Writing the reduced catalog into new files.
+   
    All this is done with the script `process.py`. Run `python process.py -h` to see all available command-line options.
    The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in per-field sub-directories.
 4. Use the metadata to generate maps of the per-frame systematics (i.e. observing conditions) in each field. This implies:
@@ -24,6 +26,7 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Compress those histograms into maps of summary statistics (currently only computing the mean of each quantity).
    - Maps are generated per-band.
    - The currently mapped quantities are given in line 13 of `map_obscond.py`.
+   
    All this is done with the script `map_obscond.py`. Run `python map_obscond.py -h` to see all available command-line options. The maps are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in the sub-directories created above for each field.
 5. Create galaxy count maps in a number of redshift bins for each field. This implies:
    - Reading in the processed catalogs.
@@ -31,6 +34,7 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Generating a map of the number of objects in a given bin found per pixel.
    - Generating an estimate of the redshift distribution for objects in a given bin. We currently do this as a histogram of the MC redshift value stored for each object.
    - Save all maps and redshift distributions to file. These are currently collected into a single FITS file that alternates image HDUs (containing the maps) and table HDUs (containing the binned N(z)).
+   
    All this is done with the script `cat_sampler.py`. Run `python cat_sampler.py -h` to see all possible command-line options. The results are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in the sub-directories created above for each field.
 6. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
 7. The bash script `run_process_all.sh` runs 2, 3, 4 and 5 above for all the WIDE fields.
