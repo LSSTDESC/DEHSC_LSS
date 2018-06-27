@@ -181,8 +181,7 @@ class FlatMapInfo(object) :
 
     def write_flat_map(self,filename,maps,descript=None) :
         """
-        Saves a set of maps in npz format.
-        We'll try to implement other more standard formats with proper WCS coordinates etc. ASAP.
+        Saves a set of maps in FITS format wit WCS.
         """
 
         if maps.ndim<1 :
