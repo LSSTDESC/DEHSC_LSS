@@ -1,19 +1,32 @@
 # HSC LSS analyses
 
 We have processed the HSC data for clustering analyses following a number of steps:
-1. Download the relevant data from the DR1 database. This was done using submit_job.py. This script starts all the necessary jobs in your HSC space.
+1. Download the relevant data from the DR1 database. This was done using the scripts in the directory sql_utils. The script submit_job.py starts all the necessary jobs in your HSC space.
    All the different fields are then downloaded using the script dwl.py with data from urls.txt.
-   The full dataset is currently stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_*.fits`
-2. Reduce the data. This implies:
+   The full dataset is currently stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_*.fits`. This includes both the forced photometry catalog and the metadata.
+2. Reduce the metadata. This implies:
+   - Removing all the unnecessary clutter from the raw files
+   - Filter out all unnecessary columns (see line 50 of `process_metadata.py` for the columns we actually keep).
+   - Writing the reduced tables into new files.
+   All this is done with the script `process_metadata.py`. Run `python process_metadata.py -h` to see all available command-line options. The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/HSC_*_frames_proc.fits`.
+3. Reduce the catalog data. This implies:
    - Removing all the unnecessary clutter from the raw files
    - Applying sanity cuts (duplicates, etc. see description in 1705.06745).
-   - Constructing maps of all relevant systematics (X-sigma depth, extinction, stars, B.O. mask).
+   - Constructing maps of all relevant catalog-based systematics (X-sigma depth, extinction, stars, B.O. mask).
    - Applying a magnitude cut and the star-galaxy separator.
    - Writing the reduced catalog into new files.
    All this is done with the script `process.py`. Run `python process.py -h` to see all available command-line options.
-   The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in per-field directories.
+   The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in per-field sub-directories.
+4. Use the metadata to generate maps of the per-frame systematics (i.e. observing conditions) in each field. This implies:
+   - Selecting the frames that fall within the field region.
+   - Computing the map pixels each frame intersects and their corresponding areas (this is the most time-consuming part).
+   - For each map pixel, build a histogram of the values of each relevant systematic in each exposure touching that pixel.
+   - Compress those histograms into maps of summary statistics (currently only computing the mean of each quantity).
+   - Maps are generated per-band.
+   - The currently mapped quantities are given in line 13 of `map_obscond.py`.
+   All this is done with the script `map_obscond.py`. Run `python map_obscond.py -h` to see all available command-line options. The maps are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in the sub-directories created above for each field.
 3. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
-4. The bash script `run_process_all.sh` processes all the WIDE fields.
+4. The bash script `run_process_all.sh` runs 2, 3 and 4 above for all the WIDE fields.
 5. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
 6. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
 
