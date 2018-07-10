@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -38,6 +39,9 @@ class FlatMapInfo(object) :
         self.dy=self.ly/self.ny
 
         self.npix=self.nx*self.ny
+
+    def is_map_compatible(self,mp) :
+        return self.npix==len(mp)
 
     def get_dims(self) :
         """
@@ -125,7 +129,7 @@ class FlatMapInfo(object) :
 
         i_out=np.where(np.logical_or(ipix<0,ipix>=self.npix))[0]
         if len(i_out)>0 :
-            print ipix[i_out]
+            print(ipix[i_out])
             raise ValueError("Pixels outside of range")
 
         ix=ipix%self.nx
@@ -173,7 +177,7 @@ class FlatMapInfo(object) :
         image= ax.imshow(map_in.reshape([self.ny,self.nx]),
 			origin='lower', interpolation='nearest')
         if addColorbar :
-	    plt.colorbar(image)
+            plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
         ax.set_ylabel(ylabel,fontsize=15)
         if fnameOut is not None :
@@ -394,24 +398,34 @@ class FlatMapInfo(object) :
         return FlatMapInfo(w,nx=nsidex,ny=nsidey)
 
 ####
-def read_flat_map(filename,i_map=0) :
+def read_flat_map(filename,i_map=0,hdu=None) :
     """
     Reads a flat-sky map and the details of its pixelization scheme.
     The latter are returned as a FlatMapInfo object.
     i_map : map to read. If -1, all maps will be read.
     """
-    hdul=fits.open(filename)
-    w=WCS(hdul[0].header)
+    if hdu is None :
+        hdul=fits.open(filename)
+        w=WCS(hdul[0].header)
 
-    if i_map==-1 :
-        maps=np.array([hdu.data for hdu in hdul])
-        nm,ny,nx=maps.shape
-        maps=maps.reshape([nm,ny*nx])
+        if i_map==-1 :
+            maps=np.array([h.data for h in hdul])
+            nm,ny,nx=maps.shape
+            maps=maps.reshape([nm,ny*nx])
+        else :
+            maps=hdul[i_map].data
+            ny,nx=maps.shape
+            maps=maps.flatten()
     else :
-        maps=hdul[i_map].data
+        w=WCS(hdu.header)
+        maps=hdu.data
         ny,nx=maps.shape
         maps=maps.flatten()
 
     fmi=FlatMapInfo(w,nx=nx,ny=ny)
 
     return fmi,maps
+
+def compare_infos(fsk1,fsk2) :
+    if (fsk1.nx!=fsk2.nx) or (fsk1.ny!=fsk2.ny) or (fsk1.lx!=fsk2.lx) or (fsk1.ly!=fsk2.ly) :
+        raise ValueError("Map infos are incompatible")
