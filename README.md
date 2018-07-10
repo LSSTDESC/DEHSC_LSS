@@ -35,11 +35,18 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Generating an estimate of the redshift distribution for objects in a given bin. We currently do this as a histogram of the MC redshift value stored for each object.
    - Save all maps and redshift distributions to file. These are currently collected into a single FITS file that alternates image HDUs (containing the maps) and table HDUs (containing the binned N(z)).
    
-   All this is done with the script `cat_sampler.py`. Run `python cat_sampler.py -h` to see all possible command-line options. The results are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in the sub-directories created above for each field.
-6. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
-7. The bash script `run_process_all.sh` runs 2, 3, 4 and 5 above for all the WIDE fields.
-8. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
-9. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
+   All this is done with the script `cat_sampler.py`. Run `python cat_sampler.py -h` to see all possible command-line options. 
+6. Compute tomographic cross-power spectrum. This implies, for each field:
+   - Reading in the maps generated in the previous stage.
+   - Reading in masks and systematics maps.
+   - Computing all possible power spectra, including systematics deprojection, using NaMaster
+   - Saving all power spectra into a SACC file
+   
+   All this is done with the script `power_specter.py`. Run `python power_specter.py -h` to see all possible command-line options.
+7. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
+8. The bash script `run_process_all.sh` runs 2, 3, 4 and 5 above for all the WIDE fields.
+9. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
+10. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
 
 The scripts described above make use of some dependencies and python modules written explicitly for this work. The most relevant ones are:
 - `flatmaps.py`: contains routines to construct and manipulate flat-sky maps (mimicking as much as possible the functionality implemented in HEALPix for curved skies).
@@ -49,5 +56,6 @@ The scripts described above make use of some dependencies and python modules wri
 - `flatMask.py`: describes the method used to generate the bright-object mask from the catalog data.
 - `rotate.py`: contains routines to rotate a given field onto the equator.
 - `NaMaster` (https://github.com/damonge/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies.
+- `SACC` (https://github.com/LSSTDESC/sacc): a file format to store generic two-point functions.
 
 The repo currently also hosts a number of ipython notebooks that were used to carry out the first analyses on the data. These also illustrate the use that has been made of the database information.
