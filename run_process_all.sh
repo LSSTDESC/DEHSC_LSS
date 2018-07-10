@@ -2,6 +2,10 @@
 
 predir_out=/global/cscratch1/sd/damonge/HSC
 
+module swap PrgEnv-gnu PrgEnv-intel
+module unload python/3.6-anaconda-4.4
+module load python/2.7-anaconda-4.4
+
 #First clean up the metadata
 for table in WIDE DEEP UDEEP
 do
@@ -27,15 +31,17 @@ done
 #Compute galaxy count maps for each field
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
 do
+    echo $field
     dirname=${predir_out}/HSC_processed/${field}
-    python cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_two.fits --pz-type ephor_ab --pz-mark best --pz-bins bins_z_two.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5
+    python cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_single.fits --pz-type ephor_ab --pz-mark best --pz-bins bins_z_single.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5
 done
 
 #Compute cross-power spectra for each field
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
 do
     dirname=${predir_out}/HSC_processed/${field}
-    echo python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_two.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_two.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field} --hsc-field HSC_${field} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky
+    python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_single_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_single.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field}_mcm.dat --hsc-field HSC_${field} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky
+    python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_single_nocont.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_single.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field}_mcm.dat --hsc-field HSC_${field}
 done
 
 #So far we've only looked at the WIDE fields

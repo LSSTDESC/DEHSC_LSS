@@ -73,6 +73,9 @@ fm.compare_infos(fsk,fskb)
 msk_bo=np.zeros_like(mskfrac); msk_bo[mskfrac>o.mask_thr]=1
 msk_t=msk_bo*msk_depth
 
+#Area
+area_patch=np.sum(msk_t*mskfrac)*np.radians(fsk.dx)*np.radians(fsk.dy)
+
 #Read contaminants
 print("Reading contaminant templates")
 temps=[]
@@ -149,6 +152,7 @@ class Tracer(object) :
     self.weight=masked_fraction*mask_binary
     goodpix=np.where(mask_binary>0.1)[0]
     ndens=np.sum(nmap*mask_binary)/np.sum(self.weight)
+    self.ndens_perad=ndens/(np.radians(self.fsk.dx)*np.radians(self.fsk.dy))
     self.delta=np.zeros_like(self.weight)
     self.delta[goodpix]=nmap[goodpix]/(ndens*masked_fraction[goodpix])-1
 
@@ -199,6 +203,7 @@ for i_t,t in enumerate(tracers) :
   z=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5
   nz=t.nz_data['n_z']
   T=sacc.Tracer('bin_%d'%i_t,'point',z,nz,exp_sample=o.hsc_field)
+  T.addColumns({'ndens':t.ndens_perad*np.ones_like(nz)})
   sacc_tracers.append(T)
 #Binning and mean
 type,ell,dell,t1,q1,t2,q2=[],[],[],[],[],[],[]
@@ -215,6 +220,7 @@ for t1i in range(nbins) :
       q2.append('P')
 sacc_binning=sacc.Binning(type,ell,t1,q1,t2,q2,deltaLS=dell)
 sacc_mean=sacc.MeanVec(cls_all.flatten())
-s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean)
+sacc_meta={'Field':o.hsc_field,'Area_rad':area_patch}
+s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,meta=sacc_meta)
 s.printInfo()
 s.saveToHDF(o.fname_out)

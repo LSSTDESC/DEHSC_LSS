@@ -68,8 +68,6 @@ if o.pz_mark  not in ['best','mean','mode','mc'] :
 column_mark='pz_'+o.pz_mark+'_'+pz_code
 column_pdfs='pz_mc_'+pz_code
 
-print(column_mark)
-
 #Read catalog
 cat=fits.open(fname_cat)[1].data
 if not o.no_bo_cut :
