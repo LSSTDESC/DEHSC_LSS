@@ -54,6 +54,18 @@ parser.add_option('--cont-oc',dest='cont_oc',type='string',
                   'list here all observing conditions you want to include')
 parser.add_option('--cont-oc-bands',dest='cont_oc_bands',default=False,action='store_true',
                   help='Marginalize over observing contition templates in all bands.')
+parser.add_option('--covariance-option',dest='covar_opt',default='NONE',type=str,
+                  help='Option to compute the covariance matrix. Options are \'NONE\''+
+                  '(no covariance),  \'theory\' (theoretical Gaussian covariance) or'+
+                  '\'gaus_sim\' (MC over Gaussian simulations)')
+parser.add_option('--covariance-theory-prediction',dest='covar_theory',default='NONE',type=str,
+                  help='If computing the covariance, you must supply a file with a'+
+                  'theory prediction for the power spectra. First column should be a'+
+                  'list of ell values, subsequent columns should contain all unique cross '+
+                  'correlations (11,12,...,1N,22,23,...,NN)')
+parser.add_option('--covariance-coupling-file',dest='covar_coup',default='NONE',type=str,
+                  help='If computing the theory covariance, pass a file name where the '+
+                  'coupling coefficients will be stored. If NONE, they won\'t be saved')
 
 ####
 # Read options
@@ -189,11 +201,80 @@ else :
 print("Computing all cross-power specra")
 print("Warning : deprojection bias still missing")
 cls_all=[]
+ordering=np.zeros([nbins,nbins],dtype=int)
+i_x=0
 for i in range(nbins) :
   for j in range(i,nbins) :
     cl_coupled=nmt.compute_coupled_cell_flat(tracers[i].field,tracers[j].field,bpws)
     cls_all.append(wsp.decouple_cell(cl_coupled)[0])
+    ordering[i,j]=i_x
+    if j!=i :
+      ordering[j,i]=i_x
+    i_x+=1
 cls_all=np.array(cls_all)
+n_cross=len(cls_all)
+n_ell=len(ell_eff)
+
+#Compute covariance matrix
+if o.covar_opt=='NONE' :
+  covar=None
+elif o.covar_opt=='theory' :
+  print("Computing theory covariance")
+  #Read theory power spectra
+  data=np.loadtxt(o.covar_theory,unpack=True)
+  lth=data[0]
+  clth=data[1:]
+  if len(clth)!=n_cross :
+    raise ValueError("Theory power spectra have a wrong shape")
+
+  #Initialize covariance
+  covar=np.zeros([n_cross*n_ell,n_cross*n_ell])
+
+  #Compute coupling coefficients
+  cwsp=nmt.NmtCovarianceWorkspaceFlat();
+  if not os.path.isfile(o.covar_coup) :
+    cwsp.compute_coupling_coefficients(wsp,wsp)
+    if o.covar_coup!='NONE' :
+      cwsp.write_to(o.covar_coup)
+  else :
+    cwsp.read_from(o.covar_coup)
+
+  ix_1=0
+  for i1 in range(nbins) :
+    for j1 in range(i1,nbins) :
+      ix_2=0
+      for i2 in range(nbins) :
+        for j2 in range(i2,nbins) :
+          ca1b1=clth[ordering[i1,i2]]
+          ca1b2=clth[ordering[i1,j2]]
+          ca2b1=clth[ordering[j1,i2]]
+          ca2b2=clth[ordering[j1,j2]]
+          cov_here=nmt.gaussian_covariance_flat(cwsp,lth,ca1b1,ca1b2,ca2b1,ca2b2)
+          covar[ix_1*n_ell:(ix_1+1)*n_ell,:][:,ix_2*n_ell:(ix_2+1)*n_ell]=cov_here
+          ix_2+=1
+      ix_1+=1
+
+elif o.covar_opt=='gaus_sim' :
+  #Read theory power spectra
+  raise ValueError("Gaussian simulations not implemented yet")
+  '''
+  covar=Non
+  data=np.loadtxt(o.covar_theory,unpack=True)
+  lth=data[0]
+  clth=data[1:]
+  if len(clth)!=n_cross :
+    raise ValueError("Theory power spectra have a wrong shape")
+  clmat=np.zeros([len(lth),nbins,nbins])
+  for i in range(nbins) :
+    for j in range(nbins) :
+      clmat[:,i,j]=clth[ordering[i,j]]
+
+  #Initialize covariance
+  covar=np.zeros([n_cross*n_ell,n_cross*n_ell])
+  '''
+else :
+  print("Unknown covariance option "+o.covar_opt+" no covariance computed")
+  covar=None
 
 #Save to SACC format
 print("Saving to SACC")
@@ -207,7 +288,6 @@ for i_t,t in enumerate(tracers) :
   sacc_tracers.append(T)
 #Binning and mean
 type,ell,dell,t1,q1,t2,q2=[],[],[],[],[],[],[]
-i_cross=0
 for t1i in range(nbins) :
   for t2i in range(t1i,nbins) :
     for i_l,l in enumerate(ell_eff) :
@@ -220,7 +300,11 @@ for t1i in range(nbins) :
       q2.append('P')
 sacc_binning=sacc.Binning(type,ell,t1,q1,t2,q2,deltaLS=dell)
 sacc_mean=sacc.MeanVec(cls_all.flatten())
+if covar is None :
+  sacc_precision=None
+else :
+  sacc_precision=sacc.Precision(covar,"dense",is_covariance=True, binning=sacc_binning)
 sacc_meta={'Field':o.hsc_field,'Area_rad':area_patch}
-s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,meta=sacc_meta)
+s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,precision=sacc_precision,meta=sacc_meta)
 s.printInfo()
 s.saveToHDF(o.fname_out)

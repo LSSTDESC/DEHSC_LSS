@@ -36,10 +36,11 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Save all maps and redshift distributions to file. These are currently collected into a single FITS file that alternates image HDUs (containing the maps) and table HDUs (containing the binned N(z)).
    
    All this is done with the script `cat_sampler.py`. Run `python cat_sampler.py -h` to see all possible command-line options. 
-6. Compute tomographic cross-power spectrum. This implies, for each field:
+6. Compute tomographic cross-power spectrum and covariance matrix. This implies, for each field:
    - Reading in the maps generated in the previous stage.
    - Reading in masks and systematics maps.
    - Computing all possible power spectra, including systematics deprojection, using NaMaster
+   - Estimating the covariance matrix. Currently only theoretical Gaussian estimate is implemented.
    - Saving all power spectra into a SACC file
    
    All this is done with the script `power_specter.py`. Run `python power_specter.py -h` to see all possible command-line options.
@@ -55,7 +56,7 @@ The scripts described above make use of some dependencies and python modules wri
 - `estDepth.py`: contains routines to create depth maps using 3 different methods. All routines are wrapped into a single one called `get_depth`.
 - `flatMask.py`: describes the method used to generate the bright-object mask from the catalog data.
 - `rotate.py`: contains routines to rotate a given field onto the equator.
-- `NaMaster` (https://github.com/damonge/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies.
+- `NaMaster` (https://github.com/damonge/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies. The current state of the pipeline requires the use of the `validation` branch instead of `master`.
 - `SACC` (https://github.com/LSSTDESC/sacc): a file format to store generic two-point functions.
 
 The repo currently also hosts a number of ipython notebooks that were used to carry out the first analyses on the data. These also illustrate the use that has been made of the database information.

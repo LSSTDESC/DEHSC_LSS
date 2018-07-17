@@ -40,8 +40,8 @@ done
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
 do
     dirname=${predir_out}/HSC_processed/${field}
-    python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_single_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_single.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field}_mcm.dat --hsc-field HSC_${field} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky
-    python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_single_nocont.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_single.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field}_mcm.dat --hsc-field HSC_${field}
+    python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_single_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_single.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field}_mcm.dat --hsc-field HSC_${field} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --covariance-option theory --covariance-theory-prediction cl_th_single.txt --covariance-coupling-file ${dirname}/${field}_cov_mcm.dat
+    python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_single_nocont.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_single.fits --ell-bins ell_bins.txt --mcm-output ${dirname}/${field}_mcm.dat --hsc-field HSC_${field} --covariance-option theory --covariance-theory-prediction cl_th_single.txt --covariance-coupling-file ${dirname}/${field}_cov_mcm.dat
 done
 
 #So far we've only looked at the WIDE fields
