@@ -49,6 +49,8 @@ parser.add_option('--analysis-band', dest='band', default='i', type=str,
                   help='Band considered for your analysis (g,r,i,z,y)')
 parser.add_option('--depth-method', dest='depth_method', default='0', type=int,
                   help='Method to construct depth maps: 0-> DR1-like, 1-DESC, 2-Flux-error')
+parser.add_option('--flat-project',dest='flat_project',default='TAN',type=str,
+                  help='Flat-sky projection: use TAN or CAR')
 
 ####
 # Read options
@@ -107,7 +109,7 @@ cat.remove_rows(~sel) #np.where(~sel)[0])#[sel]
 
 ####
 # Generate flat-sky information object
-fsk=fm.FlatMapInfo.from_coords(cat['ra'],cat['dec'],o.res,pad=o.pad/o.res)
+fsk=fm.FlatMapInfo.from_coords(cat['ra'],cat['dec'],o.res,pad=o.pad/o.res,projection=o.flat_project)
 
 ####
 # Generate systematics maps

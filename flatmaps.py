@@ -12,7 +12,7 @@ class FlatMapInfo(object) :
         Creates a flat map
         wcs : WCS object containing information about reference point and resolution
         nx,ny : Number of pixels in the x/y axes. If None, dx/dy must be provided
-        lx,ly : Extent of themap in the x/y axes. If None, nx/ny must be provided
+        lx,ly : Extent of the map in the x/y axes. If None, nx/ny must be provided
         """
         self.wcs=wcs.copy()
 
@@ -359,12 +359,14 @@ class FlatMapInfo(object) :
         return fm_dg,mp_dg
 
     @classmethod
-    def from_coords(FlatMapInfo,ra_arr,dec_arr,reso,pad=None) :
+    def from_coords(FlatMapInfo,ra_arr,dec_arr,reso,pad=None,projection='TAN') :
         """
         Generates a FlatMapInfo object that can encompass all points with coordinates
         given by ra_arr (R.A.) and dec_arr (dec.) with pixel resolution reso.
         The parameter pad should correspond to the number of pixel sizes you want
         to leave as padding around the edges of the map. If None, it will default to 20.
+        The flat-sky maps will use a spherical projection given by the corresponding
+        parameter. Tested values are 'TAN' (gnomonic) and 'CAR' (Plate carree).
         """
 
         if len(ra_arr.flatten())!=len(dec_arr.flatten()) :
@@ -384,7 +386,7 @@ class FlatMapInfo(object) :
         w.wcs.crpix=[0,0]
         w.wcs.cdelt=[-reso,reso]
         w.wcs.crval=[ramean,decmean]
-        w.wcs.ctype=['RA---TAN','DEC--TAN']
+        w.wcs.ctype=['RA---'+projection,'DEC--'+projection]
         ix,iy=np.transpose(w.wcs_world2pix(np.transpose(np.array([ra_arr,dec_arr])),0))
         #Estimate map size
         nsidex=int(np.amax(ix))-int(np.amin(ix))+1+2*int(pad)
