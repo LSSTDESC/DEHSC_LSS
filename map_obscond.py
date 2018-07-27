@@ -88,14 +88,14 @@ for ip,pfr in enumerate(polyframe) :
 
     #Estimate which ones actually have been touched
     pprep=prep(pfr)
-    touched=map(pprep.intersects,pix_in_range)
+    touched=list(map(pprep.intersects,pix_in_range))
     indices=ipix_in_range[touched]
     pix_indices.append(indices)
 
     #Estimate intersection area
     def get_intersect_area(px) :
         return pfr.intersection(px).area
-    areas=map(get_intersect_area,pix_in_range[touched])
+    areas=list(map(get_intersect_area,pix_in_range[touched]))
     pix_areas.append(areas)
 
 print("Computing systematics maps")

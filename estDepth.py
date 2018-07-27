@@ -162,7 +162,7 @@ def get_depth(method,ra,dec,band,arr1,arr2,flatSkyGrid,SNRthreshold=5,
               plotMaps=True,prefixOut=None) :
     
     SNRthreshold= int(SNRthreshold)
-    print 'Creating %s-band %ssigma depth maps'%(band, SNRthreshold)
+    print('Creating %s-band %ssigma depth maps'%(band, SNRthreshold))
     if method=='dr1' :
         depth,depth_std=dr1_method(ra,dec,band,mags=arr1,snr=arr2,flatSkyGrid=flatSkyGrid,
                                    SNRthreshold=SNRthreshold)

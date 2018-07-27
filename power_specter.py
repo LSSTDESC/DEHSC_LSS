@@ -100,7 +100,7 @@ def read_map_bands(fname,read_bands) :
   fm.compare_infos(fsk,fskb)
   if i_map!=-1 :
     temp=[temp]
-
+    
   return temp
 # 1- Depth
 if o.cont_depth :
@@ -132,6 +132,9 @@ if temps==[] :
   temps=None
 else :
   print(" - Will marginalize over a total of %d contaminant templates"%(len(temps)))
+  #Remove mean
+  for i_t,t in enumerate(temps) :
+    temps[i_t]-=np.sum(msk_t*mskfrac*t)/np.sum(msk_t*mskfrac)
 
 #Set binning scheme
 lini,lend=np.loadtxt(o.fname_ellbins,unpack=True)
@@ -182,8 +185,8 @@ class Tracer(object) :
 hdul=fits.open(o.fname_maps)
 if len(hdul)%2!=0 :
   raise ValueError("Input file should have two HDUs per map")
-nbins=len(hdul)/2
-tracers=[Tracer(hdul,i,fsk,msk_t,mskfrac,contaminants=temps) for i in np.arange(nbins)]
+nbins=len(hdul)//2
+tracers=[Tracer(hdul,i,fsk,msk_t,mskfrac,contaminants=temps) for i in range(nbins)]
 hdul.close()
 
 #Compute MCM
