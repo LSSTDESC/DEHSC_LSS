@@ -80,8 +80,8 @@ def get_PIT(pdfreader, cachefile = './data/cache/PIT_cache.dat'):
 
         for x in tqdm(xrange(len(match_indices))):
 
-            part = np.trapz(pdf.pdf[match_indices[x]][pdf.bins < hsc_cat.ephor_mc[hsc_indices[x]]], x = pdf.bins[pdf.bins < hsc_cat.ephor_mc[hsc_indices[x]]])
-            total = np.trapz(pdf.pdf[match_indices[0]], x = pdf.bins)
+            part = np.trapz(pdfreader.pdf[match_indices[x]][pdfreader.bins < hsc_cat.ephor_mc[hsc_indices[x]]], x = pdfreader.bins[pdfreader.bins < hsc_cat.ephor_mc[hsc_indices[x]]])
+            total = np.trapz(pdfreader.pdf[match_indices[0]], x = pdfreader.bins)
             integrals.append(part/total)
 
         integrals = np.array(integrals)
