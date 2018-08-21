@@ -62,31 +62,33 @@ def get_PIT(pdfreader, cachefile = './data/cache/PIT_cache.dat'):
 
                 match_indices.append(index)
 
-        mod_bins = [pdfreader.bins,] * len(hsc_indices)
-        mod_pdfs = []
+        # mod_bins = [pdfreader.bins,] * len(hsc_indices)
+        # mod_pdfs = []
 
-        for x in tqdm(xrange(len(hsc_indices))):
+        # for x in tqdm(xrange(len(hsc_indices))):
 
-            mod_bins[x] = mod_bins[x][mod_bins[x] < hsc_cat.ephor_median[hsc_indices[x]]]
-            mod_pdfs.append(pdfreader.pdf[index][:len(mod_bins[x])])
+        #     mod_bins[x] = mod_bins[x][mod_bins[x] < hsc_cat.ephor_median[hsc_indices[x]]]
+        #     mod_pdfs.append(pdfreader.pdf[match_indices[x]][:len(mod_bins[x])])
 
-        mod_pdfs = np.array(mod_pdfs)
+        # mod_pdfs = np.array(mod_pdfs)
+        # mod_bins = np.array(mod_bins)
         match_indices = np.array(match_indices)
-        mod_bins = np.array(mod_bins)
 
         integrals = []
 
         # Calculate the cumulative integral from the lower bound to the estimated redshift
 
-        # integrals = np.trapz(mod_pdfs, x = mod_bins)/np.trapz(pdfreader.pdf[match_indices], x = pdfreader.bins[match_indices])
+        for x in tqdm(xrange(len(match_indices))):
 
-        for x in tqdm(xrange(len(mod_bins))):
-            integrals.append(np.trapz(mod_pdfs[x], x = mod_bins[x])/np.trapz(pdfreader.pdf[match_indices[x]], x = pdfreader.bins))
+            part = np.trapz(pdf.pdf[match_indices[x]][pdf.bins < hsc_cat.ephor_mc[hsc_indices[x]]], x = pdf.bins[pdf.bins < hsc_cat.ephor_mc[hsc_indices[x]]])
+            total = np.trapz(pdf.pdf[match_indices[0]], x = pdf.bins)
+            integrals.append(part/total)
 
         integrals = np.array(integrals)
 
         tabledata = np.array((hsc_indices, match_indices, integrals)).T
-        os.mkdir('./data/cache/')
+        if not os.path.isdir('./data/cache/'):
+            os.mkdir('./data/cache/')
         np.savetxt(cachefile, tabledata, header = 'hsc_index pdf_index integrals \n', fmt = '  %8i  %8i  %8f')
 
     return hsc_indices, match_indices, integrals
@@ -99,5 +101,7 @@ def plot_PIT(pdfreader):
     fig = plt.figure(figsize = (8,8))
     sp = fig.add_subplot(111)
 
-    sp.hist(integrals, bins = 50, normed = True, histtype = 'step', color = 'k')
+    sp.hist(integrals, bins = 50, normed = True, range = [0,1], histtype = 'step', color = 'k')
     sp.plot([0,1],[1,1], color = 'r')
+    sp.set_xlim(0,1)
+    sp.set_ylim(0,5)
