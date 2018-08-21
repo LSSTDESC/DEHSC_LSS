@@ -2,6 +2,8 @@ import urllib
 import gzip
 import os
 
+if not os.path.isdir('./data/'):
+    os.mkdir('./data/')
 
 def get_COSMOS_photoz_cat(url = 'ftp://ftp.iap.fr/pub/from_users/hjmcc/COSMOS2015/COSMOS2015_Laigle+_v1.1.fits.gz'):
 
