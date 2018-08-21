@@ -2,6 +2,7 @@
 *.py~
 *.pdf
 *.png
+*.sublime-workspace
 .ipynb_checkpoints/
 sql_utils/*.sql
 
