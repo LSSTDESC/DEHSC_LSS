@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 class reader:
 
-    def __init__(self, inputfp = './pdr1_ephor_deep_cosmos/'):
+    def __init__(self, inputfp = './data/pdr1_ephor_deep_cosmos/'):
 
         file_list = sorted(glob(inputfp + '*'))
 

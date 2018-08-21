@@ -15,7 +15,7 @@ font = {'family':'Roboto', 'weight':'light'}
 
 
 
-def build_cosmos_cat(inputfp = 'COSMOS2015_Laigle+_v1.1.fits', outputfp = 'photoz_COSMOS.dat', hsc_paper_cuts = True):
+def build_cosmos_cat(inputfp = './data/COSMOS2015_Laigle+_v1.1.fits', outputfp = './data/photoz_COSMOS.dat', hsc_paper_cuts = True):
 
     hdulist = fits.open(inputfp)
     data = hdulist[1].data
@@ -45,7 +45,7 @@ def build_cosmos_cat(inputfp = 'COSMOS2015_Laigle+_v1.1.fits', outputfp = 'photo
 
 class cosmos_reader:
 
-    def __init__(self, inputfp = './photoz_COSMOS.dat'):
+    def __init__(self, inputfp = './data/photoz_COSMOS.dat'):
 
         if not isfile(inputfp):
             build_cosmos_cat()
