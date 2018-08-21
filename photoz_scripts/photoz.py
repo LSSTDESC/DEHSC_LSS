@@ -56,11 +56,12 @@ class cosmos_reader:
 
 class hsc_reader:
 
-    def __init__(self, inputfp = './hscdeep_zcosmos.csv'):
+    def __init__(self, inputfp = './data/hscdeep_zcosmos.csv'):
 
         (self.object_id, self.specz_id, self.ra, self.dec, 
             self.mag_g, self.mag_r, self.mag_i, self.mag_z, self.mag_y, 
-            self.z_spec, self.flag_zcosmos, self.flag_cosmos_fmos) = pd.read_csv(inputfp).values.T
+            self.z_spec, self.ephor_mc, self.ephor_median, self.ephor_best,
+            self.flag_zcosmos, self.flag_cosmos_fmos) = pd.read_csv(inputfp).values.T
 
 
 hsc_cat = hsc_reader()
