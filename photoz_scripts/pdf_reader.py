@@ -36,3 +36,8 @@ class reader:
         self.pdf = np.concatenate(tuple(pdflist))
 
         self.object_id = np.array(idlist)
+
+
+
+def plot_PIT():
+    pass
