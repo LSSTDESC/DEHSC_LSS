@@ -177,10 +177,12 @@ def plot_PIT_fit(pdfreader):
 
     new_heights, new_bins = np.histogram(new_integrals, bins = 50, range = [0,1], normed = True)
 
-    sp2.step(bins[:-1] + 0.5*(bins[1] - bins[0]), heights, color = 'k')
+    sp2.step(new_bins[:-1] + 0.5*(new_bins[1] - new_bins[0]), new_heights, color = 'k')
     sp2.plot([0,1],[1,1], color = 'r')
     sp2.set_xlim(0,1)
     sp2.set_ylim(0,5)
+
+    sp2.text(0.02, 0.98, 'Stretch: %.2f\nShift: %.2f' % (fit_stretch, fit_shift), family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top')
 
 
 
