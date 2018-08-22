@@ -122,7 +122,7 @@ def get_integrals(hsc_indices, match_indices, pdfreader, stretch = 1., shift = 1
         if shift != 1.:
             mod_bins = mod_bins + shift
 
-        part = np.trapz(mod_pdf[pdfreader.bins < z_mc[hsc_indices[x]]], x = mod_bins[pdfreader.bins < z_mc[hsc_indices[x]]])
+        part = np.trapz(mod_pdf[mod_bins < z_mc[hsc_indices[x]]], x = mod_bins[mod_bins < z_mc[hsc_indices[x]]])
         total = np.trapz(mod_pdf, x = mod_bins)
         integrals.append(part/total)
 
@@ -158,13 +158,13 @@ def plot_PIT_fit(pdfreader):
 
     heights, bins = np.histogram(integrals, bins = 50, range = [0,1], normed = True)
 
-    sp1.step(bins[-1] + 0.5*(bins[1]-bins[0]), heights, color = 'k')
+    sp1.step(bins[:-1] + 0.5*(bins[1]-bins[0]), heights, color = 'k')
     sp1.plot([0,1],[1,1], color = 'r')
     sp1.set_xlim(0,1)
     sp1.set_ylim(0,5)
 
 
-    def calchist(stretch, shift):
+    def calchist((stretch, shift)):
 
         mod_integrals = get_integrals(hsc_indices, match_indices, pdfreader, stretch, shift)
         mod_heights, mod_bins = np.histogram(mod_integrals, bins = 50, range = [0,1], normed = True)
@@ -177,7 +177,7 @@ def plot_PIT_fit(pdfreader):
 
     new_heights, new_bins = np.histogram(new_integrals, bins = 50, range = [0,1], normed = True)
 
-    sp2.step(bins[-1] + 0.5*(bins[1] - bins[0]), heights, color = 'k')
+    sp2.step(bins[:-1] + 0.5*(bins[1] - bins[0]), heights, color = 'k')
     sp2.plot([0,1],[1,1], color = 'r')
     sp2.set_xlim(0,1)
     sp2.set_ylim(0,5)
