@@ -14,7 +14,11 @@ hsc_cat = photoz.hsc_cat
 
 class reader:
 
-    def __init__(self, inputfp = './data/pdr1_ephor_deep_cosmos/'):
+    def __init__(self, name = 'ephor'):
+
+        self.name = name
+
+        inputfp = './data/pdr1_' + name + '_deep_cosmos/'
 
         file_list = sorted(glob(inputfp + '*'))
 
@@ -40,11 +44,6 @@ class reader:
         self.pdf = np.concatenate(tuple(pdflist))
 
         self.object_id = np.array(idlist)
-
-        self.name = inputfp.split('_')[-3]
-
-        if self.name == 'ab':
-            self.name = 'ephor_ab'
 
 
 
