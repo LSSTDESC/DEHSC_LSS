@@ -47,7 +47,9 @@ class reader:
 
 
 
-def get_matches(pdfreader, cachefile = './data/cache/PIT_cache.dat'):
+def get_matches(pdfreader, cachefolder = './data/cache/'):
+
+    cachefile = cachefolder + pdfreader.name + '_PIT_cache.dat'
 
     if os.path.isfile(cachefile):
         hsc_indices, match_indices = np.loadtxt(cachefile, unpack = True)
@@ -88,7 +90,7 @@ def get_matches(pdfreader, cachefile = './data/cache/PIT_cache.dat'):
 
 
 
-def get_integrals(hsc_indices, match_indices, pdfreader, stretch = 1., shift = 1.):
+def get_integrals(hsc_indices, match_indices, pdfreader, stretch = 1., shift = 0.):
 
     if pdfreader.name == 'ephor':
         z_mc = hsc_cat.ephor_mc
@@ -119,7 +121,7 @@ def get_integrals(hsc_indices, match_indices, pdfreader, stretch = 1., shift = 1
             mod_pdf = mod_pdf[mod_bins > 0]
             mod_bins = mod_bins[mod_bins > 0]
 
-        if shift != 1.:
+        if shift != 0.:
             mod_bins = mod_bins + shift
 
         part = np.trapz(mod_pdf[mod_bins < z_mc[hsc_indices[x]]], x = mod_bins[mod_bins < z_mc[hsc_indices[x]]])
@@ -132,10 +134,10 @@ def get_integrals(hsc_indices, match_indices, pdfreader, stretch = 1., shift = 1
 
 
 
-def plot_PIT(pdfreader):
+def plot_PIT(pdfreader, shift = 1, stretch = 1):
 
     hsc_indices, match_indices = get_matches(pdfreader)
-    integrals = get_integrals(hsc_indices, match_indices, pdfreader)
+    integrals = get_integrals(hsc_indices, match_indices, pdfreader, stretch, shift)
 
     fig = plt.figure(figsize = (8,8))
     sp = fig.add_subplot(111)
@@ -169,9 +171,13 @@ def plot_PIT_fit(pdfreader):
         mod_integrals = get_integrals(hsc_indices, match_indices, pdfreader, stretch, shift)
         mod_heights, mod_bins = np.histogram(mod_integrals, bins = 50, range = [0,1], normed = True)
 
-        return sum((mod_heights-1)**2)
+        return sum((mod_heights-1.)**2.)
 
-    fit_stretch, fit_shift = minimize(calchist, [1,1]).x
+    result = minimize(calchist, [1,0], method = 'Nelder-Mead')
+
+    fit_stretch, fit_shift = result.x
+
+    print result
 
     new_integrals = get_integrals(hsc_indices, match_indices, pdfreader, fit_stretch, fit_shift)
 
@@ -182,7 +188,14 @@ def plot_PIT_fit(pdfreader):
     sp2.set_xlim(0,1)
     sp2.set_ylim(0,5)
 
-    sp2.text(0.02, 0.98, 'Stretch: %.2f\nShift: %.2f' % (fit_stretch, fit_shift), family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top')
+    sp1.set_ylabel('Norm Frequency', family = 'Roboto', weight = 'light', fontsize = 20)
 
+    sp2.text(0.02, 0.98, 'Stretch: %.3f\nShift: %.3f' % (fit_stretch, fit_shift), family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top', transform = sp2.transAxes)
+    fig.text(0.5,0.98, pdfreader.name.capitalize(), ha = 'center', va = 'center', family = 'Roboto', weight = 'light', fontsize = 24)
+    fig.text(0.5, 0.02, 'PIT', family = 'Roboto', weight = 'light', fontsize = 20)
+
+    sp2.set_yticklabels([])
+
+    plt.subplots_adjust(wspace = 0)
 
 
