@@ -209,7 +209,7 @@ class reader:
 
         print result
 
-        new_integrals = get_integrals(fit_stretch, fit_shift)
+        new_integrals = self.get_integrals(fit_stretch, fit_shift)
 
         new_heights, new_bins = np.histogram(new_integrals, bins = 50, range = [0,1], normed = True)
 
