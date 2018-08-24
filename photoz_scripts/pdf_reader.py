@@ -106,7 +106,10 @@ class reader:
             # Extract only the PDFs which have matching IDs with HSC
 
             pdflist.append(hdulist[1].data['PDF'][temp_match_indices])
-            binlist.append(hdulist[2].data['BINS'])
+            if self.name == 'frankenz':
+                binlist.append(hdulist[2].data['zgrid'])
+            else:
+                binlist.append(hdulist[2].data['BINS'])
 
             if all([all(binlist[0] == rest) for rest in binlist]):
                 self.bins = binlist[0]
