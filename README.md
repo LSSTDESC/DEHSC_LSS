@@ -4,6 +4,8 @@ We have processed the HSC data for clustering analyses following a number of ste
 1. Download the relevant data from the DR1 database. This was done using the scripts in the directory sql_utils. The script submit_job.py starts all the necessary jobs in your HSC space.
    All the different fields are then downloaded using the script dwl.py with data from urls.txt.
    The full dataset is currently stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_*.fits`. This includes both the forced photometry catalog and the metadata.
+   
+   We have also downloaded the COSMOS 30-band photometry data (Laigle et al. 2016). These data can be downloaded with `get_COSMOS_photoz.py`, and is currently stored and available at `/global/cscratch1/sd/damonge/HSC/COSMOS2015_Laigle+_v1.1.fits\`.
 2. Reduce the metadata. This implies:
    - Removing all the unnecessary clutter from the raw files
    - Filter out all unnecessary columns (see line 50 of `process_metadata.py` for the columns we actually keep).
