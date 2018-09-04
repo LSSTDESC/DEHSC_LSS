@@ -85,6 +85,21 @@ def match_cat():
 
 
 
+def dist_hist():
+
+    cosmos_index, dist_2d = match_cat()
+
+    fig = plt.figure(figsize = (8,8))
+    sp = fig.add_subplot(111)
+
+    sp.hist(np.log10(dist_2d), bins = 30, histtype = 'step', color = 'k', linewidth = 2)
+
+    sp.set_xlabel('$log_{10}$[Separation (Arcsec)]', fontdict = font, fontsize = 24)
+    sp.set_ylabel('Frequency', fontdict = font, fontsize = 24)
+
+
+
+
 def redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4]):
 
     rmaglims = [-np.inf] + rmaglims + [np.inf]
