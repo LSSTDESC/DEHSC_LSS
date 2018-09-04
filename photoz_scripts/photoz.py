@@ -119,8 +119,39 @@ def dist_hist():
 
     sp.hist(np.log10(dist_2d), bins = 30, histtype = 'step', color = 'k', linewidth = 2)
 
-    sp.set_xlabel('$log_{10}$[Separation (Arcsec)]', fontdict = font, fontsize = 24)
+    sp.set_xlabel('$log_{10}$[Separation/Arcsec]', fontdict = font, fontsize = 24)
     sp.set_ylabel('Frequency', fontdict = font, fontsize = 24)
+
+
+
+def sep_mag_diff():
+
+    """
+        Plot the 2d separation between galaxy matches and the difference in their magnitudes in r-band.
+    """
+    
+    cosmos_index, dist_2d = match_cat()
+
+    fig = plt.figure(figsize = (8,8))
+    sp = fig.add_subplot(111)
+
+    cosmos_r = cosmos_cat.mag_r[cosmos_index]
+    hsc_r = hsc_cat.mag_r
+
+    # Make sure r-band magnitude is a valid value
+
+    dist_2d = dist_2d[cosmos_r < 50]
+    hsc_r = hsc_r[cosmos_r < 50]
+    cosmos_r = cosmos_r[cosmos_r < 50]
+
+    magdiff = hsc_r - cosmos_r
+
+    sp.scatter(np.log10(dist_2d), magdiff, edgecolors = 'None', facecolors = 'k', marker = '.')
+
+    sp.set_ylabel('$r_{HSC} - r_{COSMOS}$', fontdict = font, fontsize = 24)
+    sp.set_xlabel('$log_{10}$[Separation/Arcsec]', fontdict = font, fontsize = 24)
+
+
 
 
 
