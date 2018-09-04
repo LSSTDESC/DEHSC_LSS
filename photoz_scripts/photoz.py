@@ -17,6 +17,12 @@ font = {'family':'Roboto', 'weight':'light'}
 
 def build_cosmos_cat(inputfp = './data/COSMOS2015_Laigle+_v1.1.fits', outputfp = './data/photoz_COSMOS.dat', hsc_paper_cuts = True):
 
+    """
+        This function reads in the full COSMOS catalog from inputfp and rewrites it in a more easily usable form at outputfp.
+        Additionally, it excludes stars (z=0), X-ray detected sources (z=9) and objects with poor fits (z<0).
+    """
+
+
     hdulist = fits.open(inputfp)
     data = hdulist[1].data
 
@@ -45,6 +51,10 @@ def build_cosmos_cat(inputfp = './data/COSMOS2015_Laigle+_v1.1.fits', outputfp =
 
 class cosmos_reader:
 
+    """
+        Generates the file at inputfp if it does not exist, or otherwise reads it in.  Object attributes are named according to their columns.
+    """
+
     def __init__(self, inputfp = './data/photoz_COSMOS.dat'):
 
         if not isfile(inputfp):
@@ -55,6 +65,11 @@ class cosmos_reader:
 
 
 class hsc_reader:
+
+    """
+        Reads in the data from an HSC csv file generated from a SQL query.  Values can be added to this object, but be careful about taking them
+        out because lots of the other methods require the values already put here.
+    """
 
     def __init__(self, inputfp = './data/11473.csv'):
 
@@ -71,6 +86,12 @@ cosmos_cat = cosmos_reader()
 
 def match_cat():
 
+    """
+        Matches indices between the HSC catalog and the COSMOS photometric catalog.  The first returned item is the indices in the cosmos_reader object
+        which will match them to each object in the HSC catalog.  The second returned item is the distance between each pair of matched objects in 
+        arcseconds.
+    """
+
     #Force to match only to galaxies
 
     gals = np.where((cosmos_cat.z_phot > 0.001) & (cosmos_cat.z_phot < 9.9))[0]
@@ -86,6 +107,10 @@ def match_cat():
 
 
 def dist_hist():
+
+    """
+        Plot a histogram of all of the (logged) distances between matched galaxies.
+    """
 
     cosmos_index, dist_2d = match_cat()
 
