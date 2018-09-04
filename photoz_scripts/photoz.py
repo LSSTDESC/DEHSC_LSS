@@ -132,7 +132,7 @@ def redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4]):
 
 
 
-def delta_redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4], fit = False):
+def delta_redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4], fit = True):
 
     rmaglims = [-np.inf] + rmaglims + [np.inf]
     seplims = [-np.inf] + seplims + [np.inf]
@@ -160,6 +160,10 @@ def delta_redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4], fit = Fal
             subplots[x][y].set_xlim(-0.21, 0.21)
             subplots[x][y].set_ylim(0.01, 35)
 
+            # f_in = float(len(np.where(abs(hsc_redshift - cosmos_redshift) < 0.1*(1+hsc_redshift))[0]))/float(len(hsc_redshift))
+            # sigma = np.std(bias[(bias > -0.6) & (bias < 0.6)])
+            sigma = np.std(bias)
+
             if fit:
                 def gaussfit(x,a,b):
                     return a * (b*np.sqrt(2*np.pi))**-1 * np.exp(-0.5*x**2/b**2)
@@ -171,11 +175,6 @@ def delta_redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4], fit = Fal
 
             else:            
                 subplots[x][y].text(0.98, 0.98, r'$\sigma = ' + '%.2f$' % sigma, fontdict = font, fontsize = 15, ha = 'right', va = 'top', transform = subplots[x][y].transAxes)
-
-
-            # f_in = float(len(np.where(abs(hsc_redshift - cosmos_redshift) < 0.1*(1+hsc_redshift))[0]))/float(len(hsc_redshift))
-            # sigma = np.std(bias[(bias > -0.6) & (bias < 0.6)])
-            sigma = np.std(bias)
 
             if x != len(rmaglims) - 2:
                 subplots[x][y].set_xticklabels([])
@@ -192,5 +191,5 @@ def delta_redshift_compare_grid(rmaglims = [24,25], seplims = [1,2,4], fit = Fal
     subplots[0][2].set_title('2" < Sep < 4"', family = 'Roboto', weight = 'light', fontsize = 20)
     subplots[0][3].set_title('Sep > 4"', family = 'Roboto', weight = 'light', fontsize = 20)
 
-    fig.text(0.5, 0.03, 'Bias', family = 'Roboto', weight = 'light', fontsize = 24)
+    fig.text(0.5, 0.03, 'Redshift Error', family = 'Roboto', weight = 'light', fontsize = 24)
     fig.text(0.03, 0.5, 'Normalized Frequency', fontsize = 24, fontdict = font, ha = 'center', va = 'center', rotation = 'vertical')
