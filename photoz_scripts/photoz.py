@@ -79,6 +79,12 @@ class hsc_reader:
             self.frankenz_mc, self.mizuki_mc, self.mlz_mc, self.nnpz_mc,
             self.flag_zcosmos, self.flag_cosmos_fmos) = pd.read_csv(inputfp).values.T
 
+        self.mag_g = self.mag_g.astype('float64')
+        self.mag_r = self.mag_r.astype('float64')
+        self.mag_i = self.mag_i.astype('float64')
+        self.mag_z = self.mag_z.astype('float64')
+        self.mag_y = self.mag_y.astype('float64')
+
 
 hsc_cat = hsc_reader()
 cosmos_cat = cosmos_reader()
@@ -117,7 +123,9 @@ def dist_hist():
     fig = plt.figure(figsize = (8,8))
     sp = fig.add_subplot(111)
 
-    sp.hist(np.log10(dist_2d), bins = 30, histtype = 'step', color = 'k', linewidth = 2)
+    heights, bins = np.histogram(np.log10(dist_2d), bins = 30)
+
+    sp.step(bins[:-1] + (0.5*(bins[1] - bins[0])), heights, color = 'k', linewidth = 2)
 
     sp.set_xlabel('$log_{10}$[Separation/Arcsec]', fontdict = font, fontsize = 24)
     sp.set_ylabel('Frequency', fontdict = font, fontsize = 24)
@@ -140,16 +148,35 @@ def sep_mag_diff():
 
     # Make sure r-band magnitude is a valid value
 
-    dist_2d = dist_2d[cosmos_r < 50]
-    hsc_r = hsc_r[cosmos_r < 50]
-    cosmos_r = cosmos_r[cosmos_r < 50]
+    valid_indices = np.where((cosmos_r < 50) & (dist_2d > 0))[0]
+
+    dist_2d = dist_2d[valid_indices]
+    hsc_r = hsc_r[valid_indices]
+    cosmos_r = cosmos_r[valid_indices]
 
     magdiff = hsc_r - cosmos_r
 
-    sp.scatter(np.log10(dist_2d), magdiff, edgecolors = 'None', facecolors = 'k', marker = '.')
+    notnan = np.where(np.logical_not(np.isnan(magdiff)))[0]
+    magdiff = magdiff[notnan]
+    dist_2d = dist_2d[notnan]
+
+    # sp.scatter(np.log10(dist_2d), magdiff, edgecolors = 'None', facecolors = 'k', marker = '.')
+
+    heatmap, xedges, yedges = np.histogram2d(np.log10(dist_2d), magdiff, bins = 75, range = [[-4,4], [-15,15]])
+    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+    plotdata = np.log10(heatmap.T)
+    colors = sp.imshow(plotdata, extent = extent, origin = 'lower', interpolation = 'nearest', vmin = 0, cmap = 'inferno_r', aspect = 4./15.)
+
+    cbar_ax = fig.add_axes([0.9, 0.1, 0.02, 0.8])
+
+    fig.colorbar(colors, cax = cbar_ax)
+
+    plt.subplots_adjust(wspace = 0.0, right = 0.88, left = 0.08)
 
     sp.set_ylabel('$r_{HSC} - r_{COSMOS}$', fontdict = font, fontsize = 24)
     sp.set_xlabel('$log_{10}$[Separation/Arcsec]', fontdict = font, fontsize = 24)
+
+    fig.text(0.98, 0.5, 'Frequency', fontsize = 24, fontdict = font, ha = 'center', va = 'center', rotation = 'vertical')
 
 
 
