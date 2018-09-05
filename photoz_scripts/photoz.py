@@ -132,6 +132,25 @@ def dist_hist():
 
 
 
+def skymap_plot():
+    """
+        Plots the RA and DEC for the 30-band catalog and the HSC catalog
+    """
+
+    fig = plt.figure(figsize = (8,8))
+    sp = fig.add_subplot(111)
+
+    sp.scatter(hsc_cat.ra, hsc_cat.dec, edgecolors = 'None', marker = '.', color = 'r', label = 'HSC')
+    sp.scatter(cosmos_cat.ra, cosmos_cat.dec, edgecolors = 'None', marker = '.', color = 'b', alpha = 0.015)
+    sp.scatter([], [], edgecolors = 'None', marker = '.', color = 'b', label = '30-band')
+
+    sp.set_xlabel('RA', fontdict = font, fontsize = 24)
+    sp.set_ylabel('DEC', fontdict = font, fontsize = 24)
+
+    sp.legend(loc = 'upper right', fontsize = 18)
+
+
+
 def sep_mag_diff():
 
     """
