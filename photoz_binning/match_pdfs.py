@@ -8,30 +8,55 @@ import time
 from astropy.io import fits
 import pandas as pd
 
-startTime = time.time()
-
-datapath = '/global/cscratch1/sd/damonge/HSC/HSC_processed' 
+##############################################################################################################################
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option('--data_main_path', dest='data_main_path',
+                  help='Path to the processed data.',
+                  default='/global/cscratch1/sd/damonge/HSC/HSC_processed')
+parser.add_option('--pdfs_main_path', dest='pdfs_main_path',
+                  help='Path to the PDFs.',
+                  default='/global/cscratch1/sd/awan/hsc_pdfs/')
+parser.add_option('--fields', dest='fields',
+                  help='List of fields to consider',
+                  default='aegis, gama09h, gama15h, hectomap, vvds, wide12h, xmmlss')
+parser.add_option('--outDir', dest='outDir',
+                  help='Path to the folder where all the matched files should be stored; directory should exist already.',
+                  default='/global/cscratch1/sd/awan/hsc_matched_pdfs')
 
 ##############################################################################################################################
+startTime = time.time()
+(options, args) = parser.parse_args()
+print('\nOptions: %s'%options)
+
+# read in the inputs
+data_main_path = options.data_main_path
+pdfs_main_path = options.pdfs_main_path
+fields = options.fields
+outDir = options.outDir
+
+# format the fields
+fields = [f.strip() for f in list(fields.split(','))]
+##############################################################################################################################
+
 # run over all field
-for field in ['aegis', 'gama09h', 'gama15h', 'hectomap', 'vvds', 'wide12h', 'xmmlss']:
+for field in fields:
     print('\nStarting with %s'%field)
-    pdfs_path = '/global/cscratch1/sd/awan/hsc_pdfs/%s'%field
+    pdfs_path = '%s/%s'%(pdfs_main_path, field)
 
     # ------------------------------------------------------------------------------------------------------------------------
     # read in the cleaned catalog to get the object IDs
-    for j, folder in enumerate([f for f in os.listdir(datapath) \
-                                if not f.__contains__('.fits') and f.__contains__(field.upper
-                                                                                  ())]):
+    for j, folder in enumerate([f for f in os.listdir(data_main_path) \
+                                if not f.__contains__('.fits') and f.__contains__(field.upper())]):
         # read only the Catalog fits file for the field
-        for i, cat_file in enumerate([f for f in os.listdir('%s/%s'%(datapath, folder)) if f.__contains__('Catalog')]):
-            if i>0 : raise ValueError('Something is wrong. Have more than one Catalog file in %s/%s'%(datapath, folder))
+        for i, cat_file in enumerate([f for f in os.listdir('%s/%s'%(data_main_path, folder)) if f.__contains__('Catalog')]):
+            if i>0 : raise ValueError('Something is wrong. Have more than one Catalog file in %s/%s'%(data_main_path, folder))
 
             print('\nReading in %s'%cat_file)
-            dat = Table.read('%s/%s/%s'%(datapath, folder, cat_file), format='fits')
+            dat = Table.read('%s/%s/%s'%(data_main_path, folder, cat_file), format='fits')
         if j==0:
             hscdata = dat.to_pandas()
-            print('No concatenation needed. Shape: %s'%(np.shape(hscdata),))
+            print('Data read in. Shape: %s'%(np.shape(hscdata),))
         else:
             raise ValueError('Something is not right. Have more than one folder for %s: %s'%(field, folder))
 
@@ -92,7 +117,7 @@ for field in ['aegis', 'gama09h', 'gama15h', 'hectomap', 'vvds', 'wide12h', 'xmm
     # save it
     hdul = fits.HDUList([prm_hdu, cat_hdu, ids_hdu, bins_hdu])
 
-    filename = '/global/cscratch1/sd/awan/hsc_matched_pdfs/matched_pdfs_ids_bins_%s.fits'%field
+    filename = '%s/matched_pdfs_ids_bins_%s.fits'%(outDir, field)
     hdul.writeto(filename, overwrite=True)
 
     print('\nSaved %s'%filename)
