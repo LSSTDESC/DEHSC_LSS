@@ -6,6 +6,7 @@ import os
 from astropy.table import Table
 import time
 from astropy.io import fits
+import pandas as pd
 
 startTime = time.time()
 
@@ -23,26 +24,24 @@ for field in ['aegis', 'gama09h', 'gama15h', 'hectomap', 'vvds', 'wide12h', 'xmm
                                 if not f.__contains__('.fits') and f.__contains__(field.upper
                                                                                   ())]):
         # read only the Catalog fits file for the field
-        for i, file in enumerate([f for f in os.listdir('%s/%s'%(datapath, folder)) if f.__contains__('Catalog')]):
+        for i, cat_file in enumerate([f for f in os.listdir('%s/%s'%(datapath, folder)) if f.__contains__('Catalog')]):
             if i>0 : raise ValueError('Something is wrong. Have more than one Catalog file in %s/%s'%(datapath, folder))
 
-            print('\nReading in %s'%file)
-            dat = Table.read('%s/%s/%s'%(datapath, folder,file), format='fits')
+            print('\nReading in %s'%cat_file)
+            dat = Table.read('%s/%s/%s'%(datapath, folder, cat_file), format='fits')
         if j==0:
             hscdata = dat.to_pandas()
             print('No concatenation needed. Shape: %s'%(np.shape(hscdata),))
         else:
             raise ValueError('Something is not right. Have more than one folder for %s: %s'%(field, folder))
-            #hscdata = pd.concat([hscdata, dat.to_pandas()])
-            #print('Data read in. Shape: ', np.shape(dat.to_pandas()))
-            #print('Concatenated data. Shape: ', np.shape(hscdata))
+
         print('')
     
     ##############################################################################################################################
     # read in the pdfs.
-    files = [f for f in os.listdir(pdfs_path)]
-    print('\n%s patch fits files for %s'%(len(files), field))
-    for i, file in enumerate([f for f in files if f.__contains__('.fits')]):  # files for different patches
+    patch_files = [f for f in os.listdir(pdfs_path) if f.__contains__('.fits')]
+    print('\n%s patch fits files for %s'%(len(patch_files), field))
+    for i, file in enumerate(patch_files):  # files for different patches
         print('Reading in %s'%file)
         hdul = fits.open('%s/%s'%(pdfs_path,file)) 
         data_readin = np.array(hdul[1].data)   # pdfs
@@ -81,22 +80,21 @@ for field in ['aegis', 'gama09h', 'gama15h', 'hectomap', 'vvds', 'wide12h', 'xmm
 
     ##############################################################################################################################
     # save data
-    hdu = fits.PrimaryHDU(pdfs_cat)
-    hdul = fits.HDUList([hdu])
-    filename = '/global/cscratch1/sd/awan/hsc_matched_pdfs/matched_pdfs_%s.fits'%field
-    hdul.writeto(filename)
-    print('\nSaved %s'%filename)
+    hdr = fits.Header()
+    hdr['FIELD'] = field
+    hdr['MatchCat'] = cat_file
+    hdr['nPatch'] = len(patch_files)
+    prm_hdu = fits.PrimaryHDU(header=hdr)
+    # data to save
+    cat_hdu = fits.table_to_hdu(Table(pd.DataFrame(pdfs_cat).values))
+    ids_hdu = fits.table_to_hdu(Table(pd.DataFrame(ids).values))
+    bins_hdu = fits.table_to_hdu(Table(pd.DataFrame(bins).values))
+    # save it
+    hdul = fits.HDUList([prm_hdu, cat_hdu, ids_hdu, bins_hdu])
 
-    hdu = fits.PrimaryHDU(ids)
-    hdul = fits.HDUList([hdu])
-    filename = '/global/cscratch1/sd/awan/hsc_matched_pdfs/matched_ids_%s.fits'%field
-    hdul.writeto(filename)
-    print('\nSaved %s'%filename)
+    filename = '/global/cscratch1/sd/awan/hsc_matched_pdfs/matched_pdfs_ids_bins_%s.fits'%field
+    hdul.writeto(filename, overwrite=True)
 
-    hdu = fits.PrimaryHDU(bins)
-    hdul = fits.HDUList([hdu])
-    filename = '/global/cscratch1/sd/awan/hsc_matched_pdfs/matched_bins_%s.fits'%field
-    hdul.writeto(filename)
     print('\nSaved %s'%filename)
 
     print('\nTime taken (s): ', (time.time()-startTime))
