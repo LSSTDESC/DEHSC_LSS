@@ -2,22 +2,25 @@
 
 cd /global/cscratch1/sd/awan/hsc_pdfs
 
-for i in aegis gama09h gama15h hectomap vvds wide12h xmmlss
+for i in wide_aegis wide_gama09h wide_gama15h wide_hectomap wide_vvds wide_wide12h wide_xmmlss deep_cosmos deep_elaisn1 deep_xmmlss deep_deep23
 do
-        echo starting with: $i
-        mkdir $i
-        cd $i
-        wget https://hsc-release.mtk.nao.ac.jp/archive/photoz/pdr1/pdf/ephor_ab/pdr1_ephor_ab_wide_$i.tar.xz
+    # create a new folder for this field
+    echo starting with: $i
+    mkdir $i
+    cd $i
+    # get PDFs from different PZ algorithsm
+    for j in ephor ephor_ab demp frankenz
+    do
+        # create a new folder for this algorithm
+        mkdir $j
+        cd $j
+        echo Getting $j/pdr1_"$j"_$i.tar.xz
+        wget https://hsc-release.mtk.nao.ac.jp/archive/photoz/pdr1/pdf/$j/pdr1_"$j"_$i.tar.xz
         echo upzipping file
-        tar -xf pdr1_ephor_ab_wide_$i.tar.xz
-        
-        #wget https://hsc-release.mtk.nao.ac.jp/archive/photoz/pdr1/pdf/nnpz/pdr1_nnpz_wide_$i.tar.xz
-        #tar -xf pdr1_nnpz_wide_$i.tar.xz
-        
-        #wget https://hsc-release.mtk.nao.ac.jp/archive/photoz/pdr1/pdf/frankenz/pdr1_frankenz_wide_$i.tar.xz
-        #tar -xf pdr1_frankenz_wide_$i.tar.xz
-        
-        cd /global/cscratch1/sd/awan/hsc_pdfs
+        tar -xf pdr1_"$j"_$i.tar.xz
+        cd /global/cscratch1/sd/awan/hsc_pdfs/$i
+    done
+    cd /global/cscratch1/sd/awan/hsc_pdfs
 done
 
 
