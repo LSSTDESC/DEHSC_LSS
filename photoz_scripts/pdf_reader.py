@@ -5,46 +5,73 @@ import pandas as pd
 from glob import glob
 from astropy.io import fits
 from tqdm import tqdm
-import photoz
 import os
 from scipy.optimize import minimize
 
-hsc_cat = photoz.hsc_cat
+class hsc_reader:
+
+    """
+        UPDATE
+    """
+
+    def __init__(self, inputfp = './data/deep_cats/*'):
+
+        catlist = sorted(glob(inputfp))
+
+        self.object_id = []
+        self.ra = []
+        self.dec = []
+
+        self.mag_g = []
+        self.mag_r = []
+        self.mag_i = []
+        self.mag_z = []
+        self.mag_y = []
+
+        self.ephor_ab_mc = []
+        self.frankenz_mc = []
+        self.nnpz_mc = []
+
+        self.catname = []
+
+        for x in tqdm(xrange(len(catlist))):
+
+            this_data = fits.open(catlist[x])[1].data
+            self.object_id = self.object_id + list(this_data['object_id'])
+            self.ra = self.ra + list(this_data['ra'])
+            self.dec = self.dec + list(this_data['dec'])
+
+            self.mag_g = self.mag_g + list(this_data['gcmodel_flux'])
+            self.mag_r = self.mag_r + list(this_data['rcmodel_flux'])
+            self.mag_i = self.mag_i + list(this_data['icmodel_flux'])
+            self.mag_z = self.mag_z + list(this_data['zcmodel_flux'])
+            self.mag_y = self.mag_y + list(this_data['ycmodel_flux'])
+
+            self.ephor_ab_mc = self.ephor_ab_mc + list(this_data['pz_mc_eab'])
+            self.frankenz_mc = self.frankenz_mc + list(this_data['pz_mc_frz'])
+            self.nnpz_mc = self.nnpz_mc + list(this_data['pz_mc_nnz'])
+
+            self.catname = self.catname + [catlist[x].split('_')[-3],]*len(this_data['object_id'])
+
+        self.object_id = np.array(self.object_id, dtype = int)
+        self.ra = np.array(self.ra, dtype = float)
+        self.dec = np.array(self.dec, dtype = float)
+
+        self.mag_g = np.array(self.mag_g, dtype = float)
+        self.mag_r = np.array(self.mag_r, dtype = float)
+        self.mag_i = np.array(self.mag_i, dtype = float)
+        self.mag_z = np.array(self.mag_z, dtype = float)
+        self.mag_y = np.array(self.mag_y, dtype = float)
+
+        self.ephor_ab_mc = np.array(self.ephor_ab_mc, dtype = float)
+        self.frankenz_mc = np.array(self.frankenz_mc, dtype = float)
+        self.nnpz_mc = np.array(self.nnpz_mc, dtype = float)
+
+        self.catname = np.array(self.catname, dtype = str)
+
 
 
 class reader:
-
-    # def __init__(self, name = 'ephor'):
-
-    #     self.name = name
-
-    #     inputfp = './data/pdr1_' + name + '_deep_cosmos/'
-
-    #     file_list = sorted(glob(inputfp + '*'))
-
-    #     self.object_id = np.array([])
-    #     self.pdf = []
-    #     self.bins = np.array([])
-
-    #     idlist = []
-    #     pdflist = []
-    #     binlist = []
-
-    #     for filename in tqdm(file_list):
-
-    #         hdulist = fits.open(filename)
-
-    #         idlist = idlist + list(hdulist[1].data['ID'])
-    #         pdflist.append(hdulist[1].data['PDF'])
-    #         binlist.append(hdulist[2].data['BINS'])
-
-    #     if all([all(binlist[0] == rest) for rest in binlist]):
-    #         self.bins = binlist[0]
-
-    #     self.pdf = np.vstack(pdflist)
-
-    #     self.object_id = np.array(idlist)
-
 
     def __init__(self, name = 'ephor', cachefolder = './data/cache/'):
 
