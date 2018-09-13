@@ -8,6 +8,7 @@ from astropy.io import fits
 from os.path import isfile
 from tqdm import tqdm
 from scipy.optimize import curve_fit
+import pdf_reader
 
 font = {'family':'Roboto', 'weight':'light'}
 
@@ -63,64 +64,7 @@ class cosmos_reader:
         self.id, self.ra, self.dec, self.mag_r, self.z_phot = pd.read_csv(inputfp, header = None, comment = '#', delimiter = '\s+').values.T
         self.valid_index = np.where(self.z_phot > 0)[0]
 
-
-# class hsc_reader:
-
-#     """
-#         Reads in the data from an HSC csv file generated from a SQL query.  Values can be added to this object, but be careful about taking them
-#         out because lots of the other methods require the values already put here.
-#     """
-
-#     def __init__(self, inputfp = './data/11473.csv'):
-
-#         (self.object_id, self.specz_id, self.ra, self.dec, 
-#             self.mag_g, self.mag_r, self.mag_i, self.mag_z, self.mag_y, 
-#             self.z_spec, self.ephor_mc, self.ephor_ab_mc, self.demp_mc,
-#             self.frankenz_mc, self.mizuki_mc, self.mlz_mc, self.nnpz_mc,
-#             self.flag_zcosmos, self.flag_cosmos_fmos) = pd.read_csv(inputfp).values.T
-
-#         self.mag_g = self.mag_g.astype('float64')
-#         self.mag_r = self.mag_r.astype('float64')
-#         self.mag_i = self.mag_i.astype('float64')
-#         self.mag_z = self.mag_z.astype('float64')
-#         self.mag_y = self.mag_y.astype('float64')
-
-
-
-class hsc_reader:
-
-    """
-        Reads in the data from an HSC csv file generated from a SQL query.  Values can be added to this object, but be careful about taking them
-        out because lots of the other methods require the values already put here.
-
-        THIS IS DEPRECATED, DO NOT USE UNLESS YOU KNOW WHAT YOU'RE DOING!
-    """
-
-    def __init__(self, inputfp = './data/DEEP_COSMOS_Catalog_i24.50.fits'):
-
-        print 'THIS IS DEPRECATED, DO NOT USE UNLESS YOU KNOW WHAT YOU\'RE DOING!'
-
-        hdulist = fits.open(inputfp)
-        data = hdulist[1].data
-
-        self.object_id = data['object_id']
-        self.ra = data['ra']
-        self.dec = data['dec']
-        
-
-        self.mag_g = data['gcmodel_flux']
-        self.mag_r = data['rcmodel_flux']
-        self.mag_i = data['icmodel_flux']
-        self.mag_z = data['zcmodel_flux']
-        self.mag_y = data['ycmodel_flux']
-
-        self.ephor_ab_mc = data['pz_mc_eab']
-        self.frankenz_mc = data['pz_mc_frz']
-        self.nnpz_mc = data['pz_mc_nnz']
-
-
-
-hsc_cat = hsc_reader()
+hsc_cat = pdf_reader.hsc_reader()
 cosmos_cat = cosmos_reader()
 
 
