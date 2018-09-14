@@ -29,8 +29,8 @@ class hsc_reader:
         self.mag_z = []
         self.mag_y = []
 
-        self.demp_mc = []
-        self.ephor_mc = []
+        # self.demp_mc = []
+        # self.ephor_mc = []
         self.ephor_ab_mc = []
         self.frankenz_mc = []
         self.nnpz_mc = []
@@ -50,8 +50,8 @@ class hsc_reader:
             self.mag_z = self.mag_z + list(this_data['zcmodel_flux'])
             self.mag_y = self.mag_y + list(this_data['ycmodel_flux'])
 
-            self.demp_mc = self.demp_mc + list(this_data['pz_mc_dem'])
-            self.ephor_mc = self.ephor_mc + list(this_data['pz_mc_eph'])
+            # self.demp_mc = self.demp_mc + list(this_data['pz_mc_dem'])
+            # self.ephor_mc = self.ephor_mc + list(this_data['pz_mc_eph'])
             self.ephor_ab_mc = self.ephor_ab_mc + list(this_data['pz_mc_eab'])
             self.frankenz_mc = self.frankenz_mc + list(this_data['pz_mc_frz'])
             self.nnpz_mc = self.nnpz_mc + list(this_data['pz_mc_nnz'])
@@ -68,8 +68,8 @@ class hsc_reader:
         self.mag_z = np.array(self.mag_z, dtype = float)
         self.mag_y = np.array(self.mag_y, dtype = float)
 
-        self.demp_mc = np.array(self.demp_mc, dtype = float)
-        self.ephor_mc = np.array(self.ephor_mc, dtype = float)
+        # self.demp_mc = np.array(self.demp_mc, dtype = float)
+        # self.ephor_mc = np.array(self.ephor_mc, dtype = float)
         self.ephor_ab_mc = np.array(self.ephor_ab_mc, dtype = float)
         self.frankenz_mc = np.array(self.frankenz_mc, dtype = float)
         self.nnpz_mc = np.array(self.nnpz_mc, dtype = float)
@@ -325,18 +325,11 @@ class reader:
 
     def plot_PIT_fit(self, codename):
 
-        fig = plt.figure(figsize = (16,8))
-        sp1 = fig.add_subplot(121)
-        sp2 = fig.add_subplot(122)
-
         integrals = self.get_integrals(codename)
 
         heights, bins = np.histogram(integrals, bins = 50, range = [0,1], normed = True)
 
-        sp1.step(bins[:-1] + 0.5*(bins[1]-bins[0]), heights, color = 'k')
-        sp1.plot([0,1],[1,1], color = 'r')
-        sp1.set_xlim(0,1)
-        sp1.set_ylim(0,5)
+
 
 
         def calchist((stretch, shift)):
@@ -355,6 +348,15 @@ class reader:
         new_integrals = self.get_integrals(codename, fit_stretch, fit_shift)
 
         new_heights, new_bins = np.histogram(new_integrals, bins = 50, range = [0,1], normed = True)
+
+        fig = plt.figure(figsize = (16,8))
+        sp1 = fig.add_subplot(121)
+        sp2 = fig.add_subplot(122)
+
+        sp1.step(bins[:-1] + 0.5*(bins[1]-bins[0]), heights, color = 'k')
+        sp1.plot([0,1],[1,1], color = 'r')
+        sp1.set_xlim(0,1)
+        sp1.set_ylim(0,5)
 
         sp2.step(new_bins[:-1] + 0.5*(new_bins[1] - new_bins[0]), new_heights, color = 'k')
         sp2.plot([0,1],[1,1], color = 'r')
