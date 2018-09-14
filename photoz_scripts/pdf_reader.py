@@ -29,8 +29,8 @@ class hsc_reader:
         self.mag_z = []
         self.mag_y = []
 
-        # self.demp_mc = []
-        # self.ephor_mc = []
+        self.demp_mc = []
+        self.ephor_mc = []
         self.ephor_ab_mc = []
         self.frankenz_mc = []
         self.nnpz_mc = []
@@ -50,8 +50,8 @@ class hsc_reader:
             self.mag_z = self.mag_z + list(this_data['zcmodel_flux'])
             self.mag_y = self.mag_y + list(this_data['ycmodel_flux'])
 
-            # self.demp_mc = self.demp_mc + list(this_data['pz_mc_dem'])
-            # self.ephor_mc = self.ephor_mc + list(this_data['pz_mc_eph'])
+            self.demp_mc = self.demp_mc + list(this_data['pz_mc_dem'])
+            self.ephor_mc = self.ephor_mc + list(this_data['pz_mc_eph'])
             self.ephor_ab_mc = self.ephor_ab_mc + list(this_data['pz_mc_eab'])
             self.frankenz_mc = self.frankenz_mc + list(this_data['pz_mc_frz'])
             self.nnpz_mc = self.nnpz_mc + list(this_data['pz_mc_nnz'])
@@ -68,8 +68,8 @@ class hsc_reader:
         self.mag_z = np.array(self.mag_z, dtype = float)
         self.mag_y = np.array(self.mag_y, dtype = float)
 
-        # self.demp_mc = np.array(self.demp_mc, dtype = float)
-        # self.ephor_mc = np.array(self.ephor_mc, dtype = float)
+        self.demp_mc = np.array(self.demp_mc, dtype = float)
+        self.ephor_mc = np.array(self.ephor_mc, dtype = float)
         self.ephor_ab_mc = np.array(self.ephor_ab_mc, dtype = float)
         self.frankenz_mc = np.array(self.frankenz_mc, dtype = float)
         self.nnpz_mc = np.array(self.nnpz_mc, dtype = float)
@@ -98,7 +98,7 @@ def fits_converter(inputfp, outputfp):
     # The IDs and pdfs can go in the same table because they are both length N
 
     col1 = fits.Column(name = 'object_id', format = 'K', array = np.array(ids, dtype = int))
-    col2 = fits.Column(name = 'pdf', format = '601E', array = new_pdfs)
+    col2 = fits.Column(name = 'pdf', format = '%iE' % len(bins), array = new_pdfs)
     cols = fits.ColDefs([col1, col2])
     pdf_hdu = fits.BinTableHDU.from_columns(cols)
 
@@ -195,9 +195,9 @@ class reader:
 
 
 
-    def __init__(self, inputfp = './data/match_pdfs/*cosmos*'):
+    def __init__(self, inputfp = './data/readable_match_pdfs/*cosmos*'):
 
-        if inputfp != './data/match_pdfs/*cosmos*':
+        if inputfp != './data/readable_match_pdfs/*cosmos*':
             print 'WARNING: This code may have bugs when not run on one catalog.'
 
         self.hsc_cat = hsc_reader()
@@ -217,9 +217,9 @@ class reader:
         for x in tqdm(xrange(len(file_list))):
 
             hdulist = fits.open(file_list[x])
-            pdfs = hdulist[1].data
-            ids = hdulist[2].data
-            bins = hdulist[3].data
+            pdfs = hdulist[1].data['pdf']
+            ids = hdulist[1].data['object_id']
+            bins = hdulist[2].data['bins']
 
             if file_list[x].split('_')[-1] == 'demp.fits':
                 # Add to demp pdfs
