@@ -73,7 +73,7 @@ for field in fields:
     for alg in PZalg:
         print('\nStarting with %s'%alg)
         pdfs_path = '%s/%s/%s'%(pdfs_main_path, field, alg)
-        ##############################################################################################################################
+        ######################################################################################################################
         # read in the pdfs.
         patch_files = [f for f in os.listdir(pdfs_path) if f.__contains__('.fits')]
         print('\n%s patch fits files for %s'%(len(patch_files), field))
@@ -102,7 +102,7 @@ for field in fields:
 
         bins = np.array(bins)
 
-        ##############################################################################################################################
+        ######################################################################################################################
         # match using IDs
         print('\nMatching IDs now ... ')
         ids, pdfs_cat = [], []
@@ -114,20 +114,35 @@ for field in fields:
                 ids.append(objID)
                 pdfs_cat.append(pdfs[objID])
 
-        ##############################################################################################################################
+        ######################################################################################################################
         # save data
+        # restructure the data
+        df = pd.DataFrame(pdfs_cat)
+        pdfs = df.values
+        pdf_cols = df.columns
+        new_pdfs = np.vstack([pdfs[pdf_cols[x]] for x in range(len(pdf_cols))]).T
+
+        # set up the header
         hdr = fits.Header()
         hdr['FIELD'] = field
         hdr['MatchCat'] = cat_file
         hdr['nPatch'] = len(patch_files)
-        prm_hdu = fits.PrimaryHDU(header=hdr)
-        # data to save
-        cat_hdu = fits.table_to_hdu(Table(pd.DataFrame(pdfs_cat).values))
-        ids_hdu = fits.table_to_hdu(Table(pd.DataFrame(ids).values))
-        bins_hdu = fits.table_to_hdu(Table(pd.DataFrame(bins).values))
-        # save it
-        hdul = fits.HDUList([prm_hdu, cat_hdu, ids_hdu, bins_hdu])
+        primary_hdu = fits.PrimaryHDU(header=hdr)
 
+        # data to save
+        # one table for pdfs and object ids
+        col1 = fits.Column(name='object_id', format='K', array=np.array(ids, dtype=int))
+        col2 = fits.Column(name='pdf', format = '%iE' % len(bins), array = new_pdfs)
+        cols = fits.ColDefs([col1, col2])
+        pdf_hdu = fits.BinTableHDU.from_columns(cols)
+
+        # a separate table for bins
+        bincol = fits.Column(name='bins', format='E', array=np.array(bins, dtype=float))
+        bincols = fits.ColDefs([bincol])
+        bin_hdu = fits.BinTableHDU.from_columns(bincols)
+
+        # save it
+        hdul = fits.HDUList([primary_hdu, pdf_hdu, bin_hdu])
         filename = '%s/matched_pdfs_ids_bins_%s_%s.fits'%(outDir, field, alg)
         hdul.writeto(filename, overwrite=True)
 
