@@ -25,3 +25,7 @@ EOF
         echo Job submitted for ${i}_${j}
     done
 done
+
+# change permissions on the saved output. need to run these when the jobs are finished.
+# chgrp -R lsst /global/cscratch1/sd/awan/hsc_matched_pdfs
+# chmod -R g-w /global/cscratch1/sd/awan/hsc_matched_pdfs
