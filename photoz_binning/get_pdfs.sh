@@ -6,10 +6,10 @@ for i in wide_aegis wide_gama09h wide_gama15h wide_hectomap wide_vvds wide_wide1
 do
     # create a new folder for this field
     echo starting with: $i
-    mkdir $i
+    #mkdir $i
     cd $i
     # get PDFs from different PZ algorithsm
-    for j in ephor ephor_ab demp frankenz
+    for j in nnpz #ephor ephor_ab demp frankenz
     do
         # create a new folder for this algorithm
         mkdir $j
@@ -23,5 +23,7 @@ do
     cd /global/cscratch1/sd/awan/hsc_pdfs
 done
 
-
+# add group permissions
+chgrp -R lsst /global/cscratch1/sd/awan/hsc_pdfs
+chmod -R g-w /global/cscratch1/sd/awan/hsc_pdfs
 
