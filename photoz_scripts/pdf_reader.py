@@ -9,6 +9,9 @@ import os
 from scipy.optimize import minimize
 from astropy.table import Table
 
+frankenz_PIT_fit = [0.853, -0.009]
+ephor_ab_PIT_fit = [0.682, -0.016]
+
 class hsc_reader:
 
     """
@@ -117,83 +120,6 @@ def fits_converter(inputfp, outputfp):
 
 class reader:
 
-    # def __init__(self, name = 'ephor', cachefolder = './data/cache/'):
-
-    #     self.name = name
-
-    #     inputfp = './data/pdr1_' + name + '_deep_cosmos/'
-
-    #     file_list = sorted(glob(inputfp + '*'))
-
-    #     self.object_id = np.array([])
-    #     self.pdf = []
-    #     self.bins = np.array([])
-
-    #     idlist = []
-    #     pdflist = []
-    #     binlist = []
-    #     hsc_indices = []
-
-    #     # This loop goes through each of the files in the PDF directory
-
-    #     for filename in tqdm(file_list):
-
-    #         temp_hsc_indices = []
-    #         temp_match_indices = []
-
-    #         hdulist = fits.open(filename)
-
-    #         # Set the cache file name for every file in the PDF directory
-
-    #         cachefile = cachefolder + self.name + '_' + filename.split('/')[-1]
-    #         cachefile = cachefile[:-5] + '.dat'
-
-    #         # If the cache file doesn't exist, create it
-
-    #         if not os.path.isfile(cachefile):
-    #             for x in tqdm(xrange(len(hsc_cat.object_id))):
-
-    #                 # Find which IDs in the PDF file match HSC IDs
-
-    #                 index = np.where(hsc_cat.object_id[x] == hdulist[1].data['ID'])[0]
-
-    #                 # If there is an ID match, add it to hsc_indices and match_indices
-
-    #                 if len(index) != 0:
-    #                     index = index[0]
-    #                     temp_hsc_indices.append(x)
-    #                     temp_match_indices.append(index)
-
-    #             tabledata = np.array((temp_hsc_indices, temp_match_indices)).T
-    #             if not os.path.isdir('./data/cache/'):
-    #                 os.mkdir('./data/cache/')
-    #             np.savetxt(cachefile, tabledata, header = 'hsc_index pdf_index \n', fmt = '  %8i')
-
-    #         else:
-    #             temp_hsc_indices, temp_match_indices = np.loadtxt(cachefile, unpack = True, dtype = int)
-
-    #         hsc_indices = hsc_indices + list(temp_hsc_indices)
-
-    #         # Extract only the PDFs which have matching IDs with HSC
-
-    #         pdflist.append(hdulist[1].data['PDF'][temp_match_indices])
-    #         if self.name == 'frankenz':
-    #             binlist.append(hdulist[2].data['zgrid'])
-    #         else:
-    #             binlist.append(hdulist[2].data['BINS'])
-
-    #         if all([all(binlist[0] == rest) for rest in binlist]):
-    #             self.bins = binlist[0]
-
-    #     # Store an attribute which says which objects in the PDF catalog correspond with what objects in the HSC catalog
-
-    #     self.hsc_indices = np.array(hsc_indices)
-
-    #     # Turn self.pdf in to an array composed of many PDFs along axis 0
-
-    #     self.pdf = np.vstack(pdflist)
-
-
 
     def __init__(self, inputfp = './data/readable_match_pdfs/*cosmos*'):
 
@@ -208,11 +134,13 @@ class reader:
         self.ephor_pdf = []
         self.ephor_ab_pdf = []
         self.frankenz_pdf = []
+        self.nnpz_pdf = []
 
         self.demp_bins = None
         self.ephor_bins = None
         self.ephor_ab_bins = None
         self.frankenz_bins = None
+        self.nnpz_bins = None
 
         for x in tqdm(xrange(len(file_list))):
 
@@ -248,6 +176,13 @@ class reader:
                 self.frankenz_pdf = pdfs
                 if self.frankenz_bins == None:
                     self.frankenz_bins = bins
+
+            elif file_list[x].split('_')[-1] == 'nnpz.fits':
+                # Add to nnpz pdfs
+                # self.nnpz_pdf = self.nnpz_pdf + list(pdfs)
+                self.nnpz_pdf = pdfs
+                if self.nnpz_bins == None:
+                    self.nnpz_bins = bins
 
         # self.demp_pdf = np.array(self.demp_pdf)
         # self.ephor_pdf = np.array(self.ephor_pdf)
@@ -298,6 +233,8 @@ class reader:
 
             if shift != 0.:
                 mod_bins = mod_bins + shift
+                mod_pdf = mod_pdf[mod_bins > 0]
+                mod_bins = mod_bins[mod_bins > 0]
 
             part = np.trapz(mod_pdf[mod_bins < this_montecarlo], x = mod_bins[mod_bins < this_montecarlo])
             total = np.trapz(mod_pdf, x = mod_bins)
@@ -366,7 +303,7 @@ class reader:
         sp1.set_ylabel('Norm Frequency', family = 'Roboto', weight = 'light', fontsize = 20)
 
         sp2.text(0.02, 0.98, 'Stretch: %.3f\nShift: %.3f' % (fit_stretch, fit_shift), family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top', transform = sp2.transAxes)
-        fig.text(0.5,0.98, self.name.capitalize(), ha = 'center', va = 'center', family = 'Roboto', weight = 'light', fontsize = 24)
+        fig.text(0.5,0.98, codename.capitalize(), ha = 'center', va = 'center', family = 'Roboto', weight = 'light', fontsize = 24)
         fig.text(0.5, 0.02, 'PIT', family = 'Roboto', weight = 'light', fontsize = 20)
 
         sp2.set_yticklabels([])
@@ -374,3 +311,67 @@ class reader:
         plt.subplots_adjust(wspace = 0)
 
 
+
+    def plot_nz(self, codename, stretch = 1., shift = 0., n_z_bins = np.arange(0, 7, 0.1), chunksize = 2*10**5):
+
+        if codename == 'ephor':
+            z_mc = self.hsc_cat.ephor_mc
+            pdf = self.ephor_pdf
+            pdf_bins = self.ephor_bins
+        elif codename == 'ephor_ab':
+            z_mc = self.hsc_cat.ephor_ab_mc
+            pdf = self.ephor_ab_pdf
+            pdf_bins = self.ephor_ab_bins
+        elif codename == 'demp':
+            z_mc = self.hsc_cat.demp_mc
+            pdf = self.demp_pdf
+            pdf_bins = self.demp_bins
+        elif codename == 'frankenz':
+            z_mc = self.hsc_cat.frankenz_mc
+            pdf = self.frankenz_pdf
+            pdf_bins = self.frankenz_bins
+        # elif codename == 'mizuki':
+        #     z_mc = hsc_cat.mizuki_mc
+        # elif codename == 'mlz':
+        #     z_mc = hsc_cat.mlz_mc
+        # elif codename == 'nnpz':
+        #     z_mc = hsc_cat.nnpz_mc
+
+        n_z = np.zeros(len(n_z_bins)-1)
+
+
+        for x in tqdm(xrange(0, len(pdf), chunksize)):
+
+            chunk_z = z_mc[x:x+chunksize]
+            chunk_pdf = pdf[x:x+chunksize]
+            chunk_bins = np.array([pdf_bins,]*len(chunk_pdf))
+
+            if stretch != 1:
+                chunk_bins = (((chunk_bins.T - chunk_z) * stretch) + chunk_z).T
+            if shift != 0:
+                chunk_bins = chunk_bins + shift
+
+            chunk_pdf = chunk_pdf[chunk_bins > 0]
+            chunk_bins = chunk_bins[chunk_bins > 0]
+
+            norms = np.trapz(chunk_pdf, x = chunk_bins)
+
+            chunk_pdf = chunk_pdf / norms
+
+            #NEEDS FIXING TO ADD PDFS TO N(Z)
+
+            for y in tqdm(xrange(len(n_z_bins) - 1)):
+
+                n_z[y] = n_z[y] + sum(chunk_pdf[(chunk_bins > n_z_bins[y]) & (chunk_bins < n_z_bins[y+1])])
+
+        n_z = n_z * (n_z_bins[1]-n_z_bins[0])**-1.
+
+        fig = plt.figure(figsize = (8,8))
+        sp = fig.add_subplot(111)
+
+        sp.step(n_z_bins[:-1], n_z, color = 'k', linewidth = 2)
+
+        sp.set_title(codename.capitalize(), family = 'Roboto', weight = 'light', fontsize = 26)
+
+        sp.set_xlabel('Redshift (z)', family = 'Roboto', weight = 'light', fontsize = 24)
+        sp.set_ylabel('N(z)', family = 'Roboto', weight = 'light', fontsize = 24)
