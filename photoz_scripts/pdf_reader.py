@@ -375,3 +375,122 @@ class reader:
 
         sp.set_xlabel('Redshift (z)', family = 'Roboto', weight = 'light', fontsize = 24)
         sp.set_ylabel('N(z)', family = 'Roboto', weight = 'light', fontsize = 24)
+
+
+    def plot_all_n_z(self, codenames = ['ephor_ab', 'frankenz'], n_z_bins = np.arange(0,7,0.1)):
+
+        fig = plt.figure(figsize = (8,8))
+        sp = fig.add_subplot(111)
+
+        colors = ['#1f77b4', '#ff7f0e']
+
+        for z in tqdm(xrange(len(codenames))):
+
+            n_z_bins, n_z = self.get_n_z(codenames[z], fit = False, n_z_bins = n_z_bins)
+            sp.step(n_z_bins[:-1], n_z, color = colors[z], linewidth = 2, linestyle = '--', label = codenames[z].capitalize())
+
+            n_z_bins, n_z = self.get_n_z(codenames[z], fit = True, n_z_bins = n_z_bins)
+            sp.step(n_z_bins[:-1], n_z, color = colors[z], linewidth = 2, label = codenames[z].capitalize() + '+PIT')
+
+        sp.legend(loc = 'upper right')
+
+        sp.set_xlabel('Redshift (z)', family = 'Roboto', weight = 'light', fontsize = 24)
+        sp.set_ylabel('N(z)', family = 'Roboto', weight = 'light', fontsize = 24)
+
+
+
+
+    def get_n_z(self, codename, fit = False, foldername = './data/n_z_cache/', n_z_bins = np.arange(0,7,0.1), chunksize = 2*10**5):
+
+        if codename == 'ephor_ab':
+            z_mc = self.hsc_cat.ephor_ab_mc
+            pdf = self.ephor_ab_pdf
+            pdf_bins = self.ephor_ab_bins
+            fit_params = ephor_ab_PIT_fit
+        elif codename == 'frankenz':
+            z_mc = self.hsc_cat.frankenz_mc
+            pdf = self.frankenz_pdf
+            pdf_bins = self.frankenz_bins
+            fit_params = frankenz_PIT_fit
+        elif codename == 'nnpz':
+            z_mc = self.hsc_cat.nnpz_mc
+            pdf = self.nnpz_pdf
+            pdf_bins = self.nnpz_bins
+            fit_params = nnpz_PIT_fit
+
+        if fit:
+            fittxt = '_fit'
+        else:
+            fittxt = ''
+
+        filename = foldername + codename + fittxt + '.dat'
+
+        if not os.path.isdir(foldername):
+            os.mkdir(foldername)
+
+        if os.path.isfile(filename):
+            # Read in the file
+            n_z_bins, n_z = np.loadtxt(filename, unpack = True)
+            n_z = n_z[:-1]
+
+        else:
+
+            n_z = np.zeros(len(n_z_bins))
+            n_z[-1] = np.nan
+            
+            if fit:
+
+                stretch, shift = fit_params
+
+                for x in tqdm(xrange(0, len(pdf), chunksize)):
+
+                    chunk_z = z_mc[x:x+chunksize]
+                    chunk_pdf = pdf[x:x+chunksize]
+                    chunk_bins = np.array([pdf_bins,]*len(chunk_pdf))
+
+                    chunk_bins = (((chunk_bins.T - chunk_z) * stretch) + chunk_z).T
+                    chunk_bins = chunk_bins + shift
+
+                    chunk_bins[chunk_bins < 0] = 0
+
+                    chunk_bin_size = chunk_bins[0][-1] - chunk_bins[0][-2]
+
+                    norms = np.trapz(chunk_pdf, x = chunk_bins)
+
+                    chunk_pdf = (chunk_pdf.T / norms).T
+
+                    for y in tqdm(xrange(len(n_z_bins) - 1)):
+
+                        n_z[y] = n_z[y] + sum(chunk_bin_size * chunk_pdf[(chunk_bins >= n_z_bins[y]) & (chunk_bins < n_z_bins[y+1])])
+
+                n_z = n_z * (n_z_bins[1]-n_z_bins[0])**-1.
+
+                np.savetxt(filename, np.vstack((n_z_bins, n_z)).T, fmt = '  %.4e')
+                n_z = n_z[:-1]
+
+            else:
+
+                for x in tqdm(xrange(0, len(pdf), chunksize)):
+
+                    chunk_z = z_mc[x:x+chunksize]
+                    chunk_pdf = pdf[x:x+chunksize]
+                    chunk_bins = np.array([pdf_bins,]*len(chunk_pdf))
+
+                    chunk_bin_size = chunk_bins[0][-1] - chunk_bins[0][-2]
+
+                    norms = np.trapz(chunk_pdf, x = chunk_bins)
+
+                    chunk_pdf = (chunk_pdf.T / norms).T
+
+                    for y in tqdm(xrange(len(n_z_bins) - 1)):
+
+                        n_z[y] = n_z[y] + sum(chunk_bin_size * chunk_pdf[(chunk_bins >= n_z_bins[y]) & (chunk_bins < n_z_bins[y+1])])
+
+                n_z = n_z * (n_z_bins[1]-n_z_bins[0])**-1.
+
+                np.savetxt(filename, np.vstack((n_z_bins, n_z)).T, fmt = '  %.4e')
+                n_z = n_z[:-1]
+
+                
+
+        return n_z_bins, n_z
