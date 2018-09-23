@@ -93,7 +93,7 @@ for field in fields:
     sns, all_bins = {}, {}
     # ------------------------------------------------------------------------------------------------------------------------
     for alg in PZalg:
-        print('\nStarting with %s'%alg)
+        print('\n######### Working with with %s'%alg)
         filename= 'matched_pdfs_ids_bins_wide_%s_%s.fits'%(field, alg)
         print('Reading in %s'%filename)
         hdul = fits.open('%s/%s'%(pdfs_path, filename))
@@ -106,7 +106,13 @@ for field in fields:
 
         # stack the pdfs to estimate N(z)
         n_z = np.sum(pdfs, axis=0)
-
+        # plot the N(z)
+        plt.clf()
+        plt.plot(bins, n_z)
+        plt.xlabel('z')
+        plt.ylabel('N(z)')
+        plt.title('From %s PDF Stacking'%alg)
+        plt.show()
         # --------------------------------------------------------------
         ### Find the bin edges to consider for different number of bins
         z_phots = []
@@ -146,6 +152,6 @@ for field in fields:
     # ------------------------------------------------------------------------------------------------------------------------
     time_taken = time.time()-startTime
     if (time_taken>60.):
-        print('\nTime taken %.2f min '%(time_taken/60.) )
+        print('\nTime taken: %.2f min\n'%(time_taken/60.) )
     else:
-        print('\nTime taken %.2f sec '%time_taken)
+        print('\nTime taken: %.2f sec\n'%time_taken)
