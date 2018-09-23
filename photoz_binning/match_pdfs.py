@@ -119,8 +119,6 @@ for field in fields:
         # restructure the data
         df = pd.DataFrame(pdfs_cat)
         pdfs = df.values
-        pdf_cols = df.columns
-        new_pdfs = np.vstack([pdfs[pdf_cols[x]] for x in range(len(pdf_cols))]).T
 
         # set up the header
         hdr = fits.Header()
@@ -132,7 +130,7 @@ for field in fields:
         # data to save
         # one table for pdfs and object ids
         col1 = fits.Column(name='object_id', format='K', array=np.array(ids, dtype=int))
-        col2 = fits.Column(name='pdf', format = '%iE' % len(bins), array = new_pdfs)
+        col2 = fits.Column(name='pdf', format='%iE'%len(bins), array=pdfs)
         cols = fits.ColDefs([col1, col2])
         pdf_hdu = fits.BinTableHDU.from_columns(cols)
 
