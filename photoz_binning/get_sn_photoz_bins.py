@@ -124,9 +124,11 @@ for field in fields:
                             matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_sr=patch_area,
                             plot_cls=False)
 
+        fsky = patch_area/(4*np.pi)  # total sky area: 4pi Sr
+        print('\n## fsky: %s\n'%fsky)
         # plot SN as a function of Nbin
         plt.clf()
-        plt.plot(n_bin_list, sn, 'o-')
+        plt.plot(n_bin_list, (fsky/2.)*np.sqrt(sn), 'o-')
         plt.xlabel('Nbin')
         plt.ylabel('S/N')
         plt.gca().ticklabel_format(style='sci', scilimits=(-3,4),axis='y')
