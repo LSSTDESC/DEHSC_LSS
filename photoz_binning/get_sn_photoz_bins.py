@@ -90,6 +90,7 @@ for field in fields:
             fskb, mskfrac = fm.read_flat_map('%s/%s/%s'%(datapath, folder, maskedfrac_file))
             patch_area = np.sum(mskfrac)*np.radians(fskb.dx)*np.radians(fskb.dy)   # in Sr
 
+    sns, all_bins = {}, {}
     # ------------------------------------------------------------------------------------------------------------------------
     for alg in PZalg:
         print('\nStarting with %s'%alg)
@@ -126,15 +127,22 @@ for field in fields:
 
         fsky = patch_area/(4*np.pi)  # total sky area: 4pi Sr
         print('\n## fsky: %s\n'%fsky)
-        # plot SN as a function of Nbin
-        plt.clf()
-        plt.plot(n_bin_list, (fsky/2.)*np.sqrt(sn), 'o-')
-        plt.xlabel('Nbin')
-        plt.ylabel('S/N')
-        plt.gca().ticklabel_format(style='sci', scilimits=(-3,4),axis='y')
-        plt.xticks(n_bin_list, n_bin_list)#, rotation=70)
-        plt.show()
+        sns[alg] = (fsky/2.)*np.sqrt(sn)
+        all_bins[alg] = z_phots
 
+    # plot SN as a function of Nbin
+    plt.clf()
+    for key in sns:
+        plt.plot(n_bin_list, sns[key], 'o-', label=key)
+    plt.xlabel('Nbin')
+    plt.ylabel('S/N')
+    plt.gca().ticklabel_format(style='sci', scilimits=(-3,4),axis='y')
+    plt.xticks(n_bin_list, n_bin_list)#, rotation=70)
+    plt.legend()
+    plt.show()
+
+    print('S/N: %s'%sns)
+    print('all_bins: %s'%all_bins)
     # ------------------------------------------------------------------------------------------------------------------------
     time_taken = time.time()-startTime
     if (time_taken>60.):
