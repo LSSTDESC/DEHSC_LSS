@@ -16,6 +16,9 @@ import time
 from astropy.io import fits
 from photoz_bin_sn_utils import get_bin_edges, calc_sn
 import matplotlib.pyplot as plt
+import sys
+sys.path.append('%s/..'%os.getcwd())
+import flatmaps as fm
 
 ##############################################################################################################################
 from optparse import OptionParser
@@ -56,7 +59,6 @@ PZalg = [f.strip() for f in list(PZalg.split(','))]
 # set up some things
 z_phot_key = 'pz_mc_eab'
 ell = np.arange(2, 2000)
-area_in_deg = 108./7. #  for each field. sq deg: based on https://arxiv.org/pdf/1702.08449.pdf
 
 ##############################################################################################################################
 # run over all field
@@ -78,6 +80,15 @@ for field in fields:
             print('Data read in. Shape: %s'%(np.shape(hscdata),))
         else:
             raise ValueError('Something is not right. Have more than one folder for %s: %s'%(field, folder))
+
+        ##########################################################################################
+        # read the mask fraction file
+        for i, maskedfrac_file in enumerate([f for f in os.listdir('%s/%s'%(datapath, folder)) if f.__contains__('MaskedFraction')]):
+            if i>0 : raise ValueError('Something is wrong. Have more than one MaskedFraction file in %s/%s'%(datapath, folder))
+
+            print('\nReading in %s'%maskedfrac_file)
+            fskb, mskfrac = fm.read_flat_map('%s/%s/%s'%(datapath, folder, maskedfrac_file))
+            patch_area = np.sum(mskfrac)*np.radians(fskb.dx)*np.radians(fskb.dy)   # in Sr
 
     # ------------------------------------------------------------------------------------------------------------------------
     for alg in PZalg:
@@ -110,7 +121,7 @@ for field in fields:
         sn = np.zeros(len(z_phots))
         for i, z_phot in enumerate(z_phots):
             sn[i] = calc_sn(z_phot=z_phot, z_bins=bins, hsc_z_phot=hscdata[z_phot_key], hsc_ids=hscdata['object_id'],
-                            matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_deg=area_in_deg,
+                            matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_sr=patch_area,
                             plot_cls=False)
 
         # plot SN as a function of Nbin

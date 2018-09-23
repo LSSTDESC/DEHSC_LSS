@@ -85,12 +85,11 @@ def get_bin_edges(nbin, hsc_z_phot, z_bins):
 
         return bin_ends
 # --------------------------------------------------------------------------------------------------------
-def get_surface_number_density(n_objs, area_in_deg):  # in 1/Sr
-    area_in_sr = area_in_deg*(np.pi/180.)**2
+def get_surface_number_density(n_objs, area_in_sr):  # in 1/Sr
     return n_objs/area_in_sr
 
 # --------------------------------------------------------------------------------------------------------
-def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, n_z, ell, area_in_deg, plot_cls=True):
+def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, n_z, ell, area_in_sr, plot_cls=True):
     print('-----------------------------------------\nRunning calc_sn ... ')
 
     z_all = [min(z_bins)] + list(z_phot) + [max(z_bins)]   # cover the entire range, even outside the target bins
@@ -138,7 +137,7 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
         zmin, zmax = all_bin_ends[bin_key]
         n_obj = len(np.where((hsc_z_phot > zmin) & (hsc_z_phot < zmax))[0])
         print('%s objects in %s'%(n_obj, bin_key))
-        num_density = get_surface_number_density(n_objs=n_obj, area_in_deg=area_in_deg)
+        num_density = get_surface_number_density(n_objs=n_obj, area_in_sr=area_in_sr)
         N[:, i, i] = 1./num_density
 
     ###############################################################################################
