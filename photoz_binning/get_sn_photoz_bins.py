@@ -39,6 +39,9 @@ parser.add_option('--PZalg', dest='PZalg',
 parser.add_option('--outDir', dest='outDir',
                   help='Path to the folder where the plots will be saved.',
                   default='/global/cscratch1/sd/awan/lsst_output/hsc_output/')
+parser.add_option('--nbin', dest='max_n_bin', type='int',
+                  help='Maxinum number of bins to consider.',
+                  default=6)
 
 ##############################################################################################################################
 startTime = time.time()
@@ -51,6 +54,7 @@ pdfs_path = options.pdfs_main_path
 fields = options.fields
 PZalg = options.PZalg
 outDir = options.outDir
+max_n_bin = options.max_n_bin
 
 # format the fields
 fields = [f.strip() for f in list(fields.split(','))]
@@ -115,7 +119,7 @@ for field in fields:
         ### Find the bin edges to consider for different number of bins
         z_phots = []
         n_bin_list = []
-        for i in range(1,7):
+        for i in range(1,max_n_bin+1):
             n_bin_list.append(i)
             print('----------------------------------\nnbin=%s'%i)
             out = get_bin_edges(nbin=i, hsc_z_phot=hscdata[z_phot_key], z_bins=bins)
