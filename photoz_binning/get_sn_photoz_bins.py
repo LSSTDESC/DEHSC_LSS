@@ -28,7 +28,7 @@ parser.add_option('--cat_data_main_path', dest='data_main_path',
                   default='/global/cscratch1/sd/damonge/HSC/HSC_processed')
 parser.add_option('--pdfs_main_path', dest='pdfs_main_path',
                   help='Path to the matched PDFs.',
-                  default='/global/cscratch1/sd/awan/hsc_matched_pdfs_old/')
+                  default='/global/cscratch1/sd/awan/hsc_matched_pdfs/')
 parser.add_option('--fields', dest='fields',
                   help='List of fields to consider',
                   default='wide_aegis, wide_gama09h, wide_gama15h, wide_hectomap, wide_vvds, \
@@ -98,11 +98,9 @@ for field in fields:
         print('Reading in %s'%filename)
         hdul = fits.open('%s/%s'%(pdfs_path, filename))
 
-        pdfs = np.array(Table(hdul[1].data))
-        pdfs = np.array(pd.DataFrame(pdfs))  # somehow np.array isnt enough to make the table come out nice
-
-        ids = np.array(Table(hdul[2].data)['col0'])
-        bins = np.array(Table(hdul[3].data)['col0'])
+        pdfs = hdul[1].data['pdf']
+        ids = hdul[1].data['object_id']
+        bins = hdul[2].data['bins']
 
         # stack the pdfs to estimate N(z)
         n_z = np.sum(pdfs, axis=0)
