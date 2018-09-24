@@ -70,11 +70,12 @@ def get_bin_edges(nbin, hsc_z_phot, z_bins):
                     n_obj = len(np.where((hsc_z_phot > bin_ends[i]) & (hsc_z_phot < z_edge))[0])
                     #print('## %s objects in %s<z<%s'%(n_obj, bin_ends[i], z_edge))
                     j += 1
-                if abs(n_obj-wanted_n_obj_in_bin)>obj_thres:
-                    print('Something is wrong.')
 
                 if (z_edge==bin_ends[-1]):
-                    print('Need to change the threshold on the number of galaxies: %s currently'%(obj_thres))
+                    raise ValueError('Need to change the threshold on the number of galaxies: %s currently'%(obj_thres))
+
+                if n_obj==0:
+                    raise ValueError('Something is wrong. No objects found in this bin.')
 
                 bin_ends[i+1] = float('%.2f'%z_edge)
 
