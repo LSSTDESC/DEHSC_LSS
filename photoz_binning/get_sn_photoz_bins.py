@@ -35,7 +35,7 @@ parser.add_option('--fields', dest='fields',
                            wide_wide12h, wide_xmmlss, deep_cosmos, deep_elaisn1, deep_xmmlss, deep_deep23')
 parser.add_option('--PZalg', dest='PZalg',
                   help='List of PZ algorithms to consider',
-                  default='ephor, ephor_ab, demp, frankenz')
+                  default='ephor_ab, nnpz, frankenz')
 parser.add_option('--outDir', dest='outDir',
                   help='Path to the folder where the plots will be saved.',
                   default='/global/cscratch1/sd/awan/lsst_output/hsc_output/')
@@ -61,8 +61,12 @@ fields = [f.strip() for f in list(fields.split(','))]
 PZalg = [f.strip() for f in list(PZalg.split(','))]
 
 # set up some things
-z_phot_key = 'pz_mc_eab'
 ell = np.arange(2, 2000)
+
+# check some things
+for alg in PZalg:
+    if alg not in ['ephor_ab', 'nnpz', 'frankenz']:
+        raise ValueError('PZalg value in invalid: %s. Only allowed: ephor_ab, nnpz, frankenz'%PZalg)
 
 ##############################################################################################################################
 # run over all field
@@ -116,6 +120,13 @@ for field in fields:
         plt.title('From %s PDF Stacking'%alg)
         plt.show()
         # --------------------------------------------------------------
+        ### Decide on the photo-z esimate
+        if alg=='ephor_ab': tag = 'eab'
+        elif alg=='nnpz': tag = 'nnz'
+        elif alg=='frankenz': tag = 'frz'
+        # now set up the key to use redshift estimate
+        z_phot_key = 'pz_mc_%s'%tag
+
         ### Find the bin edges to consider for different number of bins
         z_phots = []
         n_bin_list = []
