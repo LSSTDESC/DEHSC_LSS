@@ -98,7 +98,7 @@ for field in fields:
     # ------------------------------------------------------------------------------------------------------------------------
     for alg in PZalg:
         print('\n######### Working with with %s'%alg)
-        filename= 'matched_pdfs_ids_bins_wide_%s_%s.fits'%(field, alg)
+        filename= 'matched_pdfs_ids_bins_%s_%s.fits'%(field, alg)
         print('Reading in %s'%filename)
         hdul = fits.open('%s/%s'%(pdfs_path, filename))
 
