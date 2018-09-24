@@ -41,7 +41,8 @@ def get_bins_ends(z_bin_array):
 def get_bin_edges(nbin, hsc_z_phot, z_bins):
     # decide on bins edges: we look for bin edges that have roughly the same number of galaxies
     zmin, zmax = 0.15, 1.5   # these are fixed since this is the range where z_phot is reliable
-    obj_thres = 3000    # the bins would have galaxies within this threshold of each other
+    z_bins_finer = np.arange(min(z_bins), max(z_bins), 0.001)
+    obj_thres = 1500    # the bins would have galaxies within this threshold of each other
     if nbin==0:
         print('nbin must be greater than one.')
         return
@@ -63,9 +64,9 @@ def get_bin_edges(nbin, hsc_z_phot, z_bins):
                 print('\nLooking for %sth bin egde'%(i+1))
                 n_obj = 0
                 j = 0
-                good_edges = [f for f in z_bins if f>bin_ends[i]]
+                good_edges = [f for f in z_bins_finer if f>bin_ends[i]]
 
-                while abs(n_obj-wanted_n_obj_in_bin)>obj_thres and j<len(good_edges):
+                while (-n_obj+wanted_n_obj_in_bin)>obj_thres and j<len(good_edges):
                     z_edge = good_edges[j]
                     n_obj = len(np.where((hsc_z_phot > bin_ends[i]) & (hsc_z_phot < z_edge))[0])
                     #print('## %s objects in %s<z<%s'%(n_obj, bin_ends[i], z_edge))
