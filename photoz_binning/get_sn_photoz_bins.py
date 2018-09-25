@@ -45,6 +45,9 @@ parser.add_option('--nbin', dest='max_n_bin', type='int',
 parser.add_option('--z_type', dest='z_type',
                   help='The redshift estimate to consider: mc, mode, or best',
                   default='mode')
+parser.add_option('--nz_mc',
+                  action='store_true', dest='nz_mc', default=False,
+                  help= 'Use to estimate N(z) from z_mc histogram, not the pdf stacking.')
 ##############################################################################################################################
 startTime = time.time()
 (options, args) = parser.parse_args()
@@ -58,6 +61,8 @@ PZalg = options.PZalg
 outDir = options.outDir
 max_n_bin = options.max_n_bin
 z_type = options.z_type
+nz_mc = options.nz_mc
+
 # format the fields
 fields = [f.strip() for f in list(fields.split(','))]
 PZalg = [f.strip() for f in list(PZalg.split(','))]
@@ -114,20 +119,44 @@ for field in fields:
         ids = hdul[1].data['object_id']
         bins = hdul[2].data['bins']
 
-        # stack the pdfs to estimate N(z)
-        n_z = np.sum(pdfs, axis=0)
-        # plot the N(z)
-        plt.clf()
-        plt.plot(bins, n_z)
+        # --------------------------------------------------------------
+        ### Decide on the photo-z estimator tag
+        if alg=='ephor_ab': z_type_tag = 'eab'
+        elif alg=='nnpz': z_type_tag = 'nnz'
+        elif alg=='frankenz': z_type_tag = 'frz'
+
+        # --------------------------------------------------------------
+        # estimate N(z)
+        # from pdf stacking
+        n_z = np.nansum(pdfs, axis=0)
+        plt.plot(bins, n_z, '.-', label='PDF Stacking' )
+        # from binning z_mc
+        z_mc_col = 'pz_mc_%s'%(z_type_tag)
+        # figure out the z-bin centers to keep bins array the same.
+        diff = np.unique([round(bins[i+1]-bins[i],2) for i in range(len(bins)-1)])
+        if len(diff)>1:
+            print('Finding multiple $\Delta$z for binning: %s. Using %s '%(diff, diff[0]))
+        hist_bins = list(bins-diff[0]) + [max(bins)+diff[0]]
+        n_z_hist, _, _ = plt.hist(hscdata[z_mc_col][~np.isnan(hscdata[z_mc_col])],
+                                  bins=hist_bins, histtype='step', lw=2, label='%s histogram'%z_mc_col )
+        # set up labels, etc.
         plt.xlabel('z')
         plt.ylabel('N(z)')
-        plt.title('From %s PDF Stacking'%alg)
+        plt.legend()
+        plt.title('%s'%alg)
         plt.show()
+
+        # decide on the N(z) to use to calculate S/N
+        if nz_mc:
+            # check if n_z_hist okay
+            if len(n_z_hist)!=len(bins):
+                raise ValueError('Something is wrong. Have %s entries in n_z_hist, not %s'%(len(n_z_hist), len(bins)))
+            n_z = n_z_hist
+            print('Using N(z) from %s histogram.'%z_mc_col)
+        else:
+            print('Using N(z) from PDF stacking.')
         # --------------------------------------------------------------
-        ### Decide on the photo-z esimate
-        if alg=='ephor_ab': tag = 'eab'
-        elif alg=='nnpz': tag = 'nnz'
-        elif alg=='frankenz': tag = 'frz'
+
         # now set up the key to use redshift estimate
         z_phot_key = 'pz_%s_%s'%(z_type, z_type_tag)
 
@@ -146,7 +175,7 @@ for field in fields:
         for i, z_phot in enumerate(z_phots):
             sns[alg][i] = calc_sn(z_phot=z_phot, z_bins=bins, hsc_z_phot=hscdata[z_phot_key], hsc_ids=hscdata['object_id'],
                                   matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_sr=patch_area,
-                                  plot_cls=False)
+                                  plot_cls=False, hsc_z_mc=hscdata[z_mc_col], nz_mc=nz_mc)
         all_bins[alg] = z_phots
 
     # plot SN as a function of Nbin

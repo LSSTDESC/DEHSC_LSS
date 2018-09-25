@@ -6,24 +6,40 @@ __all__ = ['get_dn_dz', 'get_bins_ends', 'get_bin_edges',
           'get_surface_number_density', 'calc_sn']
 
 # --------------------------------------------------------------------------------------------------------
-def get_dn_dz(z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs):
+def get_dn_dz(z_edges, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, nz_mc=False, hsc_z_mc=None, z_bins=None):
     # to get dn/dz, we first find all the galaxies whose z_phot are in a given bin
-    # then dn/dz is the sum of the pdfs of these galaxies
+    # then dn/dz is the sum of the pdfs of these galaxies or a histogram of their z_mc
     print('Running get_dn_dz ... ')
+    if nz_mc:
+        if hsc_z_mc is None:
+            raise ValueError('Need z_mc to estimate dn/dz.')
+        if z_bins is None:
+            raise ValueError('Need the bins array to estimates dn/dz.')
+        # find the bin centers
+        diff = np.unique([round(z_bins[i+1]-z_bins[i],2) for i in range(len(z_bins)-1)])
+        if len(diff)>1:
+            print('Finding multiple $\Delta$z for binning: %s. Using %s '%(diff, diff[0]))
+        hist_bins = list(z_bins-diff[0]) + [max(z_bins)+diff[0]]
+
+    # calculate dn/dz now
     dndz = {}
-    for i in range(len(z_bins)-1):
-        zmin, zmax = z_bins[i], z_bins[i+1]
+    for i in range(len(z_edges)-1):
+        zmin, zmax = z_edges[i], z_edges[i+1]
         bin_key = '%s<z<%s'%(zmin, zmax)
         dndz[bin_key] = []
         ind = np.where((hsc_z_phot >= zmin) & (hsc_z_phot < zmax))[0]
-        print('Considering pdfs of %s objects for %s'%(len(ind), bin_key))
-
-        for j, ID in enumerate(hsc_ids[ind]):
-            row = np.where(matched_pdf_ids==ID)[0][0]
-            if j==0:
-                dndz[bin_key] = matched_pdfs[row]
-            else:
-                dndz[bin_key] += matched_pdfs[row]
+        # decide on the way to get dn/dz
+        if nz_mc:
+            print('Creating the z_mc histogram of %s objects for %s'%(len(ind), bin_key))
+            dndz[bin_key], _, _ = plt.hist(hsc_z_mc[ind], bins=hist_bins)
+        else:
+            print('Summing pdfs of %s objects for %s'%(len(ind), bin_key))
+            for j, ID in enumerate(hsc_ids[ind]):
+                row = np.where(matched_pdf_ids==ID)[0][0]
+                if j==0:
+                    dndz[bin_key] = matched_pdfs[row]
+                else:
+                    dndz[bin_key] += matched_pdfs[row]
     return dndz
 
 # --------------------------------------------------------------------------------------------------------
@@ -91,19 +107,27 @@ def get_surface_number_density(n_objs, area_in_sr):  # in 1/Sr
     return n_objs/area_in_sr
 
 # --------------------------------------------------------------------------------------------------------
-def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, n_z, ell, area_in_sr, plot_cls=True):
-    print('-----------------------------------------\nRunning calc_sn ... ')
+def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, n_z, ell, area_in_sr,
+            plot_cls=True, hsc_z_mc=None, nz_mc=False):
+    print('-----------------------------------------\nRunning calc_sn for %s bins ... '%(len(z_phot)-1))
+    if nz_mc:
+        if hsc_z_mc is None:
+            raise ValueError('Need either the N(z) or z_mc to estimate dn/dz.')
 
-    z_all = [min(z_bins)] + list(z_phot) + [max(z_bins)]   # cover the entire range, even outside the target bins
+    # set up the bins
+    z_edges_all = [min(z_bins)] + list(z_phot) + [max(z_bins)]   # cover the entire range, even outside the target bins
 
     target_bins, target_bin_ends = get_bins_ends(z_bin_array=z_phot)
-    all_bins, all_bin_ends = get_bins_ends(z_bin_array=z_all)
+    all_bins, all_bin_ends = get_bins_ends(z_bin_array=z_edges_all)
 
     print('Target bins: %s'%(target_bins))
     print('All bins: %s\n'%(all_bins))
 
-    dn_dz = get_dn_dz(z_bins=z_all, hsc_z_phot=hsc_z_phot, hsc_ids=hsc_ids,
-                      matched_pdf_ids=matched_pdf_ids, matched_pdfs=matched_pdfs)
+    # get dn/dz
+    dn_dz = get_dn_dz(z_edges=z_edges_all, hsc_z_phot=hsc_z_phot,
+                      hsc_ids=hsc_ids, matched_pdf_ids=matched_pdf_ids, matched_pdfs=matched_pdfs,
+                      nz_mc=nz_mc, hsc_z_mc=hsc_z_mc, z_bins=z_bins)
+    # plot the dn/dz for the different bins
     plt.clf()
     for key in dn_dz:
         if key in target_bin_ends:
