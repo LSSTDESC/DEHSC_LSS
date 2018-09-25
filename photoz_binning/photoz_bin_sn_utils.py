@@ -63,9 +63,9 @@ def get_bin_edges(nbin, hsc_z_phot, z_bins):
         print('nbin must be greater than one.')
         return
     else:
-        n_obj = len(np.where((hsc_z_phot > zmin) & (hsc_z_phot < zmax))[0])
+        n_obj = len(np.where((hsc_z_phot >= zmin) & (hsc_z_phot < zmax))[0])
         if nbin==1:
-            print('%s objects in %s<z<%s'%(n_obj, zmin, zmax))
+            print('%s objects in %s<=z<%s'%(n_obj, zmin, zmax))
             bin_ends = np.array([zmin, zmax])
         else:
             # want the same number of objects in the bins
@@ -81,25 +81,23 @@ def get_bin_edges(nbin, hsc_z_phot, z_bins):
                 n_obj = 0
                 j = 0
                 good_edges = [f for f in z_bins_finer if f>bin_ends[i]]
-
-                while (-n_obj+wanted_n_obj_in_bin)>obj_thres and j<len(good_edges):
+                # loop over the bins until have the target number of galaxies
+                while ((wanted_n_obj_in_bin-n_obj) > obj_thres) and (j<len(good_edges)):
                     z_edge = good_edges[j]
-                    n_obj = len(np.where((hsc_z_phot > bin_ends[i]) & (hsc_z_phot < z_edge))[0])
-                    #print('## %s objects in %s<z<%s'%(n_obj, bin_ends[i], z_edge))
+                    n_obj = len(np.where((hsc_z_phot >= bin_ends[i]) & (hsc_z_phot < z_edge))[0])
                     j += 1
-
+                # some checks
                 if (z_edge==bin_ends[-1]):
                     raise ValueError('Need to change the threshold on the number of galaxies: %s currently'%(obj_thres))
-
                 if n_obj==0:
                     raise ValueError('Something is wrong. No objects found in this bin.')
-
+                # things look ok. store.
                 bin_ends[i+1] = float('%.2f'%z_edge)
 
             print('\nFinal:')
             for i in range(nbin):
-                n_obj = len(np.where((hsc_z_phot > bin_ends[i]) & (hsc_z_phot < bin_ends[i+1]))[0])
-                print('%s objects in %s<z<%s'%(n_obj, bin_ends[i], bin_ends[i+1]))
+                n_obj = len(np.where((hsc_z_phot >= bin_ends[i]) & (hsc_z_phot < bin_ends[i+1]))[0])
+                print('%s objects in %s<=z<%s'%(n_obj, bin_ends[i], bin_ends[i+1]))
 
         return bin_ends
 # --------------------------------------------------------------------------------------------------------
