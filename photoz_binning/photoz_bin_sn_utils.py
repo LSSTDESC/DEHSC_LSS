@@ -181,12 +181,14 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
     ###############################################################################################
     # (2*ell+1) Tr(S_ell . C_ell^-1 . S_ell . C_ell^-1)
     C = S+N
-    sn = 0
+    sn_sq = 0
     for j in range(len(ell)):
         inv = np.linalg.inv(C[j, :, :])
         mat = np.dot(S[j, :, :], inv)
         mat = np.dot(inv, mat)
         mat = np.dot(S[j, :, :], mat)
-        sn += (2*ell[j]+1)*np.trace(mat)
+        sn_sq += (2*ell[j]+1)*np.trace(mat)
 
-    return sn
+    fsky = area_in_sr/(4*np.pi)  # total sky area: 4pi Sr
+    print('\n## fsky: %.2e\n'%fsky)
+    return (fsky/2.)*np.sqrt(sn_sq)

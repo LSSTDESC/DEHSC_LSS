@@ -142,15 +142,11 @@ for field in fields:
 
         # --------------------------------------------------------------
         ### Run CCL and calculate S/N for each Nbin
-        sn = np.zeros(len(z_phots))
+        sns[alg] = np.zeros(len(z_phots))
         for i, z_phot in enumerate(z_phots):
-            sn[i] = calc_sn(z_phot=z_phot, z_bins=bins, hsc_z_phot=hscdata[z_phot_key], hsc_ids=hscdata['object_id'],
-                            matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_sr=patch_area,
-                            plot_cls=False)
-
-        fsky = patch_area/(4*np.pi)  # total sky area: 4pi Sr
-        print('\n## fsky: %s\n'%fsky)
-        sns[alg] = (fsky/2.)*np.sqrt(sn)
+            sns[alg][i] = calc_sn(z_phot=z_phot, z_bins=bins, hsc_z_phot=hscdata[z_phot_key], hsc_ids=hscdata['object_id'],
+                                  matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_sr=patch_area,
+                                  plot_cls=False)
         all_bins[alg] = z_phots
 
     # plot SN as a function of Nbin
