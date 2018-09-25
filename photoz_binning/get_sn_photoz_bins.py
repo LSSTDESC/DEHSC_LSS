@@ -42,7 +42,9 @@ parser.add_option('--outDir', dest='outDir',
 parser.add_option('--nbin', dest='max_n_bin', type='int',
                   help='Maxinum number of bins to consider.',
                   default=6)
-
+parser.add_option('--z_type', dest='z_type',
+                  help='The redshift estimate to consider: mc, mode, or best',
+                  default='mode')
 ##############################################################################################################################
 startTime = time.time()
 (options, args) = parser.parse_args()
@@ -55,7 +57,7 @@ fields = options.fields
 PZalg = options.PZalg
 outDir = options.outDir
 max_n_bin = options.max_n_bin
-
+z_type = options.z_type
 # format the fields
 fields = [f.strip() for f in list(fields.split(','))]
 PZalg = [f.strip() for f in list(PZalg.split(','))]
@@ -68,6 +70,8 @@ for alg in PZalg:
     if alg not in ['ephor_ab', 'nnpz', 'frankenz']:
         raise ValueError('PZalg value in invalid: %s. Only allowed: ephor_ab, nnpz, frankenz'%PZalg)
 
+if z_type not in ['mc', 'mode', 'best']:
+    raise ValueError('z_type value in invalid: %s. Only allowed: mc, mode, best'%z_type)
 ##############################################################################################################################
 # run over all field
 for field in fields:
@@ -105,7 +109,7 @@ for field in fields:
         filename= 'matched_pdfs_ids_bins_%s_%s.fits'%(field, alg)
         print('Reading in %s'%filename)
         hdul = fits.open('%s/%s'%(pdfs_path, filename))
-
+        # read in the relevant arrays
         pdfs = hdul[1].data['pdf']
         ids = hdul[1].data['object_id']
         bins = hdul[2].data['bins']
@@ -125,7 +129,7 @@ for field in fields:
         elif alg=='nnpz': tag = 'nnz'
         elif alg=='frankenz': tag = 'frz'
         # now set up the key to use redshift estimate
-        z_phot_key = 'pz_mc_%s'%tag
+        z_phot_key = 'pz_%s_%s'%(z_type, z_type_tag)
 
         ### Find the bin edges to consider for different number of bins
         z_phots = []
