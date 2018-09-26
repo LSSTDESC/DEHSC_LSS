@@ -8,6 +8,8 @@
 #
 #
 ##############################################################################################################################
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import pandas as pd
 import os
@@ -17,7 +19,7 @@ from astropy.io import fits
 from photoz_bin_sn_utils import get_bin_edges, calc_sn
 import matplotlib.pyplot as plt
 import sys
-sys.path.append('%s/..'%os.getcwd())
+sys.path.append('/global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/')
 import flatmaps as fm
 
 ##############################################################################################################################
