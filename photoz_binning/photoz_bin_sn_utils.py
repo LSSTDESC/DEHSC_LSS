@@ -244,4 +244,4 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
 
     fsky = area_in_sr/(4*np.pi)  # total sky area: 4pi Sr
     print('\n## fsky: %.2e\n'%fsky)
-    return (fsky/2.)*np.sqrt(sn_sq)
+    return np.sqrt((fsky/2.)*sn_sq)
