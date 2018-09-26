@@ -18,7 +18,7 @@ class hsc_reader:
         UPDATE
     """
 
-    def __init__(self, inputfp = './data/deep_cats/DEEP_COSMOS_Catalog_i24.50.fits'):
+    def __init__(self, inputfp = './data/deep_cats/DEEP_COSMOS_Catalog_i24.50.fits', specfp = './data/11473.csv'):
 
         catlist = sorted(glob(inputfp))
 
@@ -37,6 +37,10 @@ class hsc_reader:
         self.ephor_ab_mc = []
         self.frankenz_mc = []
         self.nnpz_mc = []
+
+        self.ephor_ab_peak = []
+        self.frankenz_peak = []
+        self.nnpz_peak = []
 
         self.catname = []
 
@@ -59,6 +63,10 @@ class hsc_reader:
             self.frankenz_mc = self.frankenz_mc + list(this_data['pz_mc_frz'])
             self.nnpz_mc = self.nnpz_mc + list(this_data['pz_mc_nnz'])
 
+            self.ephor_ab_peak = self.ephor_ab_peak + list(this_data['pz_mode_eab'])
+            self.frankenz_peak = self.frankenz_peak + list(this_data['pz_mode_frz'])
+            self.nnpz_peak = self.nnpz_peak + list(this_data['pz_mode_nnz'])
+
             self.catname = self.catname + [catlist[x].split('_')[-3],]*len(this_data['object_id'])
 
         self.object_id = np.array(self.object_id, dtype = int)
@@ -77,7 +85,27 @@ class hsc_reader:
         self.frankenz_mc = np.array(self.frankenz_mc, dtype = float)
         self.nnpz_mc = np.array(self.nnpz_mc, dtype = float)
 
+        self.ephor_ab_peak = np.array(self.ephor_ab_peak, dtype = float)
+        self.frankenz_peak = np.array(self.frankenz_peak, dtype = float)
+        self.nnpz_peak = np.array(self.nnpz_peak, dtype = float)
+
         self.catname = np.array(self.catname, dtype = str)
+
+        self.z_spec = np.ones(len(self.object_id))*-99
+
+        spec_id, spec_z = pd.read_csv(specfp, usecols = ['# object_id', 'specz_redshift']).values.T
+
+        if not os.path.isdir('./data/hsc_cache/'):
+            os.mkdir('./data/hsc_cache/')
+        if os.path.isfile('./data/hsc_cache/specz.txt'):
+            self.z_spec = np.loadtxt('./data/hsc_cache/specz.txt', unpack = True)
+        else:
+
+            for x in tqdm(xrange(len(spec_id))):
+
+                self.z_spec[self.object_id == spec_id[x]] = spec_z[x]
+
+            np.savetxt('./data/hsc_cache/specz.txt', self.z_spec.T, fmt = '%.4e')
 
 
 
@@ -191,30 +219,36 @@ class reader:
 
 
 
-    def get_integrals(self, codename = 'demp', stretch = 1., shift = 0.):
+    def get_integrals(self, codename = 'demp', stretch = 1., shift = 0., ztype = 'zspec', widelims = True):
 
-        if codename == 'ephor':
-            z_mc = self.hsc_cat.ephor_mc
-            pdf = self.ephor_pdf
-            bins = self.ephor_bins
-        elif codename == 'ephor_ab':
-            z_mc = self.hsc_cat.ephor_ab_mc
+
+        if codename == 'ephor_ab':
+            if ztype == 'zmc':
+                redshift = self.hsc_cat.ephor_ab_mc
+            elif ztype == 'zspec':
+                redshift = self.hsc_cat.z_spec
+            elif ztype == 'zpeak':
+                redshift = self.hsc_cat.ephor_ab_peak #Insert peak redshift
             pdf = self.ephor_ab_pdf
             bins = self.ephor_ab_bins
-        elif codename == 'demp':
-            z_mc = self.hsc_cat.demp_mc
-            pdf = self.demp_pdf
-            bins = self.demp_bins
         elif codename == 'frankenz':
-            z_mc = self.hsc_cat.frankenz_mc
+            if ztype == 'zmc':
+                redshift = self.hsc_cat.frankenz_mc
+            elif ztype == 'zspec':
+                redshift = self.hsc_cat.z_spec
+            elif ztype == 'zpeak':
+                redshift = self.hsc_cat.frankenz_peak #Insert peak redshift
             pdf = self.frankenz_pdf
             bins = self.frankenz_bins
-        # elif codename == 'mizuki':
-        #     z_mc = hsc_cat.mizuki_mc
-        # elif codename == 'mlz':
-        #     z_mc = hsc_cat.mlz_mc
-        # elif codename == 'nnpz':
-        #     z_mc = hsc_cat.nnpz_mc
+
+        if widelims:
+            # Implement wide field magnitude limits
+            lim_indices = np.where((self.hsc_cat.mag_r < 26) & (redshift > 0))
+        else:
+            lim_indices = np.where(redshift > 0)
+
+        redshift = redshift[lim_indices]
+        pdf = pdf[lim_indices]
 
         integrals = []
 
@@ -224,7 +258,7 @@ class reader:
 
             mod_pdf = np.array(pdf[x])
             mod_bins = bins
-            this_montecarlo = z_mc[x]
+            this_montecarlo = redshift[x]
 
             if stretch != 1.:
                 mod_bins = ((mod_bins - this_montecarlo) * stretch) + this_montecarlo
@@ -237,6 +271,71 @@ class reader:
                 mod_bins = mod_bins[mod_bins > 0]
 
             part = np.trapz(mod_pdf[mod_bins < this_montecarlo], x = mod_bins[mod_bins < this_montecarlo])
+            total = np.trapz(mod_pdf, x = mod_bins)
+            integrals.append(part/total)
+
+        integrals = np.array(integrals)
+
+        return integrals
+
+
+    def get_integrals2(self, codename = 'demp', power = 1., bias = 0., shift = 0., ztype = 'zspec', widelims = True):
+
+        # This version calculates integrals using power multiplication, bias, and shift
+
+        if codename == 'ephor_ab':
+            if ztype == 'zmc':
+                redshift = self.hsc_cat.ephor_ab_mc
+            elif ztype == 'zspec':
+                redshift = self.hsc_cat.z_spec
+            elif ztype == 'zpeak':
+                redshift = self.hsc_cat.ephor_ab_peak #Insert peak redshift
+            pdf = self.ephor_ab_pdf
+            bins = self.ephor_ab_bins
+        elif codename == 'frankenz':
+            if ztype == 'zmc':
+                redshift = self.hsc_cat.frankenz_mc
+            elif ztype == 'zspec':
+                redshift = self.hsc_cat.z_spec
+            elif ztype == 'zpeak':
+                redshift = self.hsc_cat.frankenz_peak #Insert peak redshift
+            pdf = self.frankenz_pdf
+            bins = self.frankenz_bins
+
+        if widelims:
+            # Implement wide field magnitude limits
+            lim_indices = np.where((self.hsc_cat.mag_r < 26) & (redshift > 0))
+        else:
+            lim_indices = np.where(redshift > 0)
+
+        redshift = redshift[lim_indices]
+        pdf = pdf[lim_indices]
+
+        integrals = []
+
+        # Calculate the cumulative integral from the lower bound to the estimated redshift
+
+        for x in tqdm(xrange(len(pdf))):
+
+            mod_pdf = np.array(pdf[x])
+            mod_bins = bins
+            thisredshift = redshift[x]
+
+            if power != 1.:
+                mod_pdf = np.power(mod_pdf, power)
+
+            if bias != 0.:
+                multipliers = bias * (mod_bins - thisredshift) + 1.
+                multipliers[multipliers < 0] = 0
+                mod_pdf = mod_pdf * multipliers
+
+            if shift != 0.:
+                mod_bins = mod_bins + shift
+                mod_pdf = mod_pdf[mod_bins > 0]
+                mod_bins = mod_bins[mod_bins > 0]
+
+
+            part = np.trapz(mod_pdf[mod_bins < thisredshift], x = mod_bins[mod_bins < thisredshift])
             total = np.trapz(mod_pdf, x = mod_bins)
             integrals.append(part/total)
 
@@ -260,29 +359,43 @@ class reader:
 
 
 
-    def plot_PIT_fit(self, codename):
+    def plot_PIT_fit(self, codename, new_integration = True):
 
         integrals = self.get_integrals(codename)
 
         heights, bins = np.histogram(integrals, bins = 50, range = [0,1], normed = True)
 
+        if not new_integration:
 
+            def calchist((stretch, shift)):
 
+                mod_integrals = self.get_integrals(codename, stretch, shift)
+                mod_heights, mod_bins = np.histogram(mod_integrals, bins = 50, range = [0,1], normed = True)
 
-        def calchist((stretch, shift)):
+                return sum((mod_heights-1.)**2.)
 
-            mod_integrals = self.get_integrals(codename, stretch, shift)
-            mod_heights, mod_bins = np.histogram(mod_integrals, bins = 50, range = [0,1], normed = True)
+            result = minimize(calchist, [1,0], method = 'Nelder-Mead')
 
-            return sum((mod_heights-1.)**2.)
+        else:
 
-        result = minimize(calchist, [1,0], method = 'Nelder-Mead')
+            def calchist((power, bias, shift)):
 
-        fit_stretch, fit_shift = result.x
+                mod_integrals = self.get_integrals2(codename, power, bias, shift)
+                mod_heights, mod_bins = np.histogram(mod_integrals, bins = 50, range = [0,1], normed = True)
+
+                return sum((mod_heights-1.)**2.)
+
+            result = minimize(calchist, [1,0,0], method = 'Nelder-Mead')
+
+        fit_params = tuple(result.x)
 
         print result
 
-        new_integrals = self.get_integrals(codename, fit_stretch, fit_shift)
+
+        if new_integration:
+            new_integrals = self.get_integrals2(codename, *fit_params)
+        else:
+            new_integrals = self.get_integrals(codename, *fit_params)
 
         new_heights, new_bins = np.histogram(new_integrals, bins = 50, range = [0,1], normed = True)
 
@@ -302,7 +415,10 @@ class reader:
 
         sp1.set_ylabel('Norm Frequency', family = 'Roboto', weight = 'light', fontsize = 20)
 
-        sp2.text(0.02, 0.98, 'Stretch: %.3f\nShift: %.3f' % (fit_stretch, fit_shift), family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top', transform = sp2.transAxes)
+        if new_integration:
+            sp2.text(0.02, 0.98, 'Power: %.3f\nBias: %.3f\nShift: %.3f' % fit_params, family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top', transform = sp2.transAxes)
+        else:
+            sp2.text(0.02, 0.98, 'Stretch: %.3f\nShift: %.3f' % fit_params, family = 'Roboto', weight = 'light', fontsize = 20, ha = 'left', va = 'top', transform = sp2.transAxes)
         fig.text(0.5,0.98, codename.capitalize(), ha = 'center', va = 'center', family = 'Roboto', weight = 'light', fontsize = 24)
         fig.text(0.5, 0.02, 'PIT', family = 'Roboto', weight = 'light', fontsize = 20)
 
@@ -313,6 +429,8 @@ class reader:
 
 
     def plot_nz(self, codename, stretch = 1., shift = 0., n_z_bins = np.arange(0, 7, 0.1), chunksize = 2*10**5):
+
+        # NEEDS TO BE UPDATED
 
         if codename == 'ephor':
             z_mc = self.hsc_cat.ephor_mc
