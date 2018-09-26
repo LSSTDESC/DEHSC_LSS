@@ -138,12 +138,12 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
         else:
             plt.plot(z_bins, dn_dz[key], lw=4, label=r'   dn_dz: $%s$: %s galaxies'%(key, num_gals[key]))
     # plot n(z) for reference
-    plt.plot(z_bins, n_z, 'k:', label='   n_z', alpha=0.7)
+    plt.plot(z_bins, n_z, 'k-.', label='   n_z', alpha=0.7)
     # plot bin edges
     ymin, ymax = plt.gca().get_ylim()
     for key in target_bin_ends:
         for z_edge in target_bin_ends[key]:
-            plt.plot([z_edge, z_edge], [0, ymax], 'k-.', alpha=0.7)
+            plt.plot([z_edge, z_edge], [0, ymax], 'k:', alpha=0.7)
     plt.title(filetag, fontsize=fontsize)
     plt.gca().tick_params(axis='both', labelsize=fontsize-2)
     plt.xlabel('z', fontsize=fontsize)
@@ -223,7 +223,7 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
         plt.suptitle(filetag, fontsize=fontsize)
         plt.gcf().set_size_inches(20, 10)
         if save_plots:
-            filename = '%s_dndz_%sbins_spectra.png'%(filetag, len(z_phot)-1)
+            filename = '%s_%sbins_spectra.png'%(filetag, len(z_phot)-1)
             plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
             print('\n## Saved plot: %s\n'%filename)
         if dont_show_plots:
