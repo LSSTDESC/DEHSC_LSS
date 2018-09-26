@@ -35,7 +35,7 @@ parser.add_option('--fields', dest='fields',
                            wide_wide12h, wide_xmmlss, deep_cosmos, deep_elaisn1, deep_xmmlss, deep_deep23')
 parser.add_option('--PZalg', dest='PZalg',
                   help='List of PZ algorithms to consider',
-                  default='ephor_ab, nnpz, frankenz')
+                  default='ephor_ab, frankenz')
 parser.add_option('--nbin', dest='max_n_bin', type='int',
                   help='Maxinum number of bins to consider.',
                   default=6)
@@ -83,6 +83,8 @@ fontsize = 20
 for alg in PZalg:
     if alg not in ['ephor_ab', 'nnpz', 'frankenz']:
         raise ValueError('PZalg value in invalid: %s. Only allowed: ephor_ab, nnpz, frankenz'%PZalg)
+    if alg=='nnpz':
+        raise ValueError('Unable to handle %s right now.'%PZalg)
 
 if z_type not in ['mc', 'mode', 'best']:
     raise ValueError('z_type value in invalid: %s. Only allowed: mc, mode, best'%z_type)
@@ -111,7 +113,6 @@ for field in fields:
         # read the mask fraction file
         for i, maskedfrac_file in enumerate([f for f in os.listdir('%s/%s'%(datapath, folder)) if f.__contains__('MaskedFraction')]):
             if i>0 : raise ValueError('Something is wrong. Have more than one MaskedFraction file in %s/%s'%(datapath, folder))
-
             print('\nReading in %s'%maskedfrac_file)
             fskb, mskfrac = fm.read_flat_map('%s/%s/%s'%(datapath, folder, maskedfrac_file))
             patch_area = np.sum(mskfrac)*np.radians(fskb.dx)*np.radians(fskb.dy)   # in Sr
