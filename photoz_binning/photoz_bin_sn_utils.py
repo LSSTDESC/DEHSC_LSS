@@ -108,7 +108,8 @@ def get_surface_number_density(n_objs, area_in_sr):  # in 1/Sr
 
 # --------------------------------------------------------------------------------------------------------
 def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, n_z, ell, area_in_sr,
-            plot_cls=True, hsc_z_mc=None, nz_mc=False):
+            plot_cls=True, hsc_z_mc=None, nz_mc=False,
+            save_plots=False, dont_show_plots=False, filetag=None, outDir=None):
     print('-----------------------------------------\nRunning calc_sn for %s bins ... '%(len(z_phot)-1))
     if nz_mc:
         if hsc_z_mc is None:
@@ -128,6 +129,7 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
                                 hsc_ids=hsc_ids, matched_pdf_ids=matched_pdf_ids, matched_pdfs=matched_pdfs,
                                 nz_mc=nz_mc, hsc_z_mc=hsc_z_mc, z_bins=z_bins)
     # plot the dn/dz for the different bins
+    fontsize = 20
     plt.clf()
     for key in dn_dz:
         if key in target_bin_ends:
@@ -141,9 +143,19 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
     for key in target_bin_ends:
         for z_edge in target_bin_ends[key]:
             plt.plot([z_edge, z_edge], [0, ymax], 'k-.', alpha=0.7)
-    plt.legend()
-    plt.xlabel('z')
-    plt.show()
+    plt.title(filetag, fontsize=fontsize)
+    plt.gca().tick_params(axis='both', labelsize=fontsize-2)
+    plt.xlabel('z', fontsize=fontsize)
+    plt.gcf().set_size_inches(10, 6)
+    plt.legend(bbox_to_anchor=(1,1), fontsize=fontsize-5)
+    if save_plots:
+        filename = '%s_dndz_%sbins.png'%(filetag, len(z_phot)-1)
+        plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
+        print('\n## Saved plot: %s\n'%filename)
+    if dont_show_plots:
+        plt.close('all')
+    else:
+        plt.show()
 
     # set up ccl
     cosmo_fid= ccl.Cosmology(Omega_c=0.25, Omega_b=0.05, h=0.7, sigma8=0.8, n_s=0.96)
@@ -173,38 +185,50 @@ def calc_sn(z_phot, z_bins, hsc_z_phot, hsc_ids, matched_pdf_ids, matched_pdfs, 
     ###############################################################################################
     # plot all cls
     if plot_cls:
+        plt.clf()
+        nrow, ncol = 2, 2
+        fig, axes = plt.subplots(nrow, ncol)
+        # plot cross spectra
         for i, bin1_key in enumerate(all_bins):
+            # plot auto spectrum and noise
+            p = axes[0, 0].plot(ell, S[:, i, i], 'o-', label=r'$%s$'%(bin1_key))
+            axes[1, 0].plot(ell, N[:, i, i], 'o:', color= p[0].get_color(), label='$%s$'%(bin1_key))
+            # plot cross spectrum
             for j, bin2_key in enumerate(all_bins):
-                if i!=j:
-                    plt.plot(ell, S[:, i, j], 'o-', label='%s-%s'%(bin1_key, bin2_key))
-        plt.xlabel('$\ell$')
-        plt.ylabel('Cross C$_\ell$')
-        plt.gca().set_xscale('log')
-        plt.gca().ticklabel_format(style='sci',scilimits=(-3,4),axis='y')
-        plt.legend(bbox_to_anchor=(1,.5))
-        plt.show()
-
-        # plot all cls
-        for i, bin1_key in enumerate(all_bins):
-            for j, bin2_key in enumerate(all_bins):
-                if i==j:
-                    plt.plot(ell, S[:, i, j], 'o-', label='%s-%s'%(bin1_key, bin2_key))
-        plt.xlabel('$\ell$')
-        plt.ylabel('Auto C$_\ell$')
-        plt.gca().ticklabel_format(style='sci',scilimits=(-3,4),axis='y')
-        plt.gca().set_xscale('log')
-        plt.legend(bbox_to_anchor=(1,.5))
-        plt.show()
-
-        for i, bin1_key in enumerate(all_bins):
-            for j, bin2_key in enumerate(all_bins):
-                plt.plot(ell, N[:, i, j], 'o:', label='%s-%s'%(bin1_key, bin2_key))
-        plt.xlabel('$\ell$')
-        plt.ylabel('Noise C$_\ell$')
-        plt.gca().ticklabel_format(style='sci',scilimits=(-3,4),axis='y')
-        plt.gca().set_xscale('log')
-        plt.legend(bbox_to_anchor=(1,.5))
-        plt.show()
+                if i!=j: # cross spectrum
+                    if j>i:
+                        p = axes[0, 1].plot(ell, S[:, i, j], 'o-', label=r'$%s$ - $%s$'%(bin1_key, bin2_key))
+                        axes[1, 1].plot(ell, N[:, i, j], 'o:', color=p[0].get_color(), label='$%s$ - $%s$'%(bin1_key, bin2_key))
+                    else:
+                        # check to ensure that we really dont need to plot j, i entry.
+                        if (abs(S[:, i, j]-S[:, j, i])>1e-5).any():
+                            print('Somethings wrong. Signal matrix isnt symmetric: S[:, i, j]-S[:, j, i]:\n%s'%(S[:, i, j]-S[:, j, i]))
+                        if (abs(N[:, i, j]-N[:, j, i])>1e-5).any():
+                            print('Somethings wrong. Noise matrix isnt symmetric: N[:, i, j]-N[:, j, i]:\n%s'%(N[:, i, j]-N[:, j, i]))
+        for row in range(nrow):
+            for col in range(ncol):
+                axes[1, col].set_xlabel('$\ell$', fontsize=fontsize)
+                axes[row, col].ticklabel_format(style='sci',scilimits=(-3,4),axis='y')
+                axes[row, col].set_xscale('log')
+                axes[0, col].set_yscale('log')
+                axes[row, col].tick_params(axis='x', labelsize=fontsize-2)
+                axes[row, col].tick_params(axis='y', labelsize=fontsize-2)
+        axes[0, 0].set_ylabel('Auto C$_\ell$', fontsize=fontsize)
+        axes[1, 0].set_ylabel('Auto Noise', fontsize=fontsize)
+        axes[0, 1].set_ylabel('Cross C$_\ell$', fontsize=fontsize)
+        axes[1, 1].set_ylabel('Cross Noise', fontsize=fontsize)
+        axes[0, 0].legend(bbox_to_anchor=(-0.15,1), fontsize=fontsize-4)
+        axes[0, 1].legend(bbox_to_anchor=(1,1), fontsize=fontsize-4)
+        plt.suptitle(filetag, fontsize=fontsize)
+        plt.gcf().set_size_inches(20, 10)
+        if save_plots:
+            filename = '%s_dndz_%sbins_spectra.png'%(filetag, len(z_phot)-1)
+            plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
+            print('\n## Saved plot: %s\n'%filename)
+        if dont_show_plots:
+            plt.close('all')
+        else:
+            plt.show()
 
     ###############################################################################################
     # (2*ell+1) Tr(S_ell . C_ell^-1 . S_ell . C_ell^-1)

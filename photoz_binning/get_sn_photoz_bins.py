@@ -36,9 +36,6 @@ parser.add_option('--fields', dest='fields',
 parser.add_option('--PZalg', dest='PZalg',
                   help='List of PZ algorithms to consider',
                   default='ephor_ab, nnpz, frankenz')
-parser.add_option('--outDir', dest='outDir',
-                  help='Path to the folder where the plots will be saved.',
-                  default='/global/cscratch1/sd/awan/lsst_output/hsc_output/')
 parser.add_option('--nbin', dest='max_n_bin', type='int',
                   help='Maxinum number of bins to consider.',
                   default=6)
@@ -48,6 +45,15 @@ parser.add_option('--z_type', dest='z_type',
 parser.add_option('--nz_mc',
                   action='store_true', dest='nz_mc', default=False,
                   help= 'Use to estimate N(z) from z_mc histogram, not the pdf stacking.')
+parser.add_option('--dont_show_plots',
+                  action='store_true', dest='dont_show_plots', default=False,
+                  help= 'Use to not show plots.')
+parser.add_option('--save_plots',
+                  action='store_true', dest='save_plots', default=False,
+                  help= 'Use to save the plots in outDir.')
+parser.add_option('--outDir', dest='outDir',
+                  help='Path to the folder where the plots will be saved.',
+                  default='/global/cscratch1/sd/awan/lsst_output/hsc_output/')
 ##############################################################################################################################
 startTime = time.time()
 (options, args) = parser.parse_args()
@@ -58,10 +64,12 @@ datapath = options.data_main_path
 pdfs_path = options.pdfs_main_path
 fields = options.fields
 PZalg = options.PZalg
-outDir = options.outDir
 max_n_bin = options.max_n_bin
 z_type = options.z_type
 nz_mc = options.nz_mc
+dont_show_plots = options.dont_show_plots
+save_plots = options.save_plots
+outDir = options.outDir
 
 # format the fields
 fields = [f.strip() for f in list(fields.split(','))]
@@ -69,6 +77,7 @@ PZalg = [f.strip() for f in list(PZalg.split(','))]
 
 # set up some things
 ell = np.arange(2, 2000)
+fontsize = 20
 
 # check some things
 for alg in PZalg:
@@ -125,26 +134,41 @@ for field in fields:
         elif alg=='nnpz': z_type_tag = 'nnz'
         elif alg=='frankenz': z_type_tag = 'frz'
 
+        filetag = '%s_%s_z%s-based'%(field.replace('_', '-'), alg.replace('_', '-'), z_type)
+
         # --------------------------------------------------------------
-        # estimate N(z)
-        # from pdf stacking
+        # estimate N(z) + plot it
+        # N(z)from pdf stacking
         n_z = np.nansum(pdfs, axis=0)
+        # plot
+        plt.clf()
         plt.plot(bins, n_z, '.-', label='PDF Stacking' )
-        # from binning z_mc
+        # N(z) from binning z_mc
         z_mc_col = 'pz_mc_%s'%(z_type_tag)
         # figure out the z-bin centers to keep bins array the same.
         diff = np.unique([round(bins[i+1]-bins[i],2) for i in range(len(bins)-1)])
         if len(diff)>1:
             print('Finding multiple $\Delta$z for binning: %s. Using %s '%(diff, diff[0]))
         hist_bins = list(bins-diff[0]) + [max(bins)+diff[0]]
+        # plot
         n_z_hist, _, _ = plt.hist(hscdata[z_mc_col][~np.isnan(hscdata[z_mc_col])],
                                   bins=hist_bins, histtype='step', lw=2, label='%s histogram'%z_mc_col )
         # set up labels, etc.
-        plt.xlabel('z')
-        plt.ylabel('N(z)')
-        plt.legend()
+        plt.xlabel('z', fontsize=fontsize)
+        plt.ylabel('N(z)', fontsize=fontsize)
         plt.title('%s'%alg)
-        plt.show()
+        plt.gcf().set_size_inches(10, 6)
+        plt.legend(fontsize=fontsize-4)
+        plt.gca().tick_params(axis='both', labelsize=fontsize-2)
+        plt.title(filetag, fontsize=fontsize)
+        if save_plots:
+            filename = '%s_nz.png'%(filetag)
+            plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
+            print('\n## Saved plot: %s\n'%filename)
+        if dont_show_plots:
+            plt.close('all')
+        else:
+            plt.show()
 
         # decide on the N(z) to use to calculate S/N
         if nz_mc:
@@ -153,8 +177,10 @@ for field in fields:
                 raise ValueError('Something is wrong. Have %s entries in n_z_hist, not %s'%(len(n_z_hist), len(bins)))
             n_z = n_z_hist
             print('Using N(z) from %s histogram.'%z_mc_col)
+            filetag = '%s_nz-from-zmcs'%filetag
         else:
             print('Using N(z) from PDF stacking.')
+            filetag = '%s_nz-from-pdfs'%filetag
         # --------------------------------------------------------------
 
         # now set up the key to use redshift estimate
@@ -175,19 +201,30 @@ for field in fields:
         for i, z_phot in enumerate(z_phots):
             sns[alg][i] = calc_sn(z_phot=z_phot, z_bins=bins, hsc_z_phot=hscdata[z_phot_key], hsc_ids=hscdata['object_id'],
                                   matched_pdf_ids=ids.copy(), matched_pdfs=pdfs.copy(), n_z=n_z, ell=ell, area_in_sr=patch_area,
-                                  plot_cls=False, hsc_z_mc=hscdata[z_mc_col], nz_mc=nz_mc)
+                                  plot_cls=True, hsc_z_mc=hscdata[z_mc_col], nz_mc=nz_mc,
+                                  save_plots=save_plots, dont_show_plots=dont_show_plots, filetag=filetag, outDir=outDir)
         all_bins[alg] = z_phots
 
     # plot SN as a function of Nbin
     plt.clf()
     for key in sns:
         plt.plot(n_bin_list, sns[key], 'o-', label=key)
-    plt.xlabel('Nbin')
-    plt.ylabel('S/N')
+    plt.xlabel('Nbin', fontsize=fontsize)
+    plt.ylabel('S/N', fontsize=fontsize)
     plt.gca().ticklabel_format(style='sci', scilimits=(-3,4),axis='y')
-    plt.xticks(n_bin_list, n_bin_list)#, rotation=70)
-    plt.legend()
-    plt.show()
+    plt.xticks(n_bin_list, n_bin_list)
+    plt.legend(fontsize=fontsize-4)
+    plt.title(filetag, fontsize=fontsize)
+    plt.gca().tick_params(axis='both', labelsize=fontsize-2)
+    plt.gcf().set_size_inches(10, 6)
+    if save_plots:
+        filename = '%s_SN_%sbins.png'%(filetag, max_n_bin)
+        plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
+        print('\n## Saved plot: %s.\n'%filename)
+    if dont_show_plots:
+        plt.close('all')
+    else:
+        plt.show()
 
     print('S/N: %s'%sns)
     print('all_bins: %s'%all_bins)
