@@ -80,15 +80,18 @@ for field in fields:
         for i, file in enumerate(patch_files):  # files for different patches
             print('Reading in %s'%file)
             hdul = fits.open('%s/%s'%(pdfs_path, file))
+            # bin record name seems to be different for frankez ('zgrid') vs. others ('BINS').
+            bin_key = hdul[2].data.dtype.names[0]
+            # okay now store the data
             if i==0: # initialize the arrays
                 ids = hdul[1].data['ID']
                 pdfs = hdul[1].data['PDF']
-                bins = hdul[2].data['BINS']
+                bins = hdul[2].data[bin_key]
             else: # stack on the new entries
                 ids = np.hstack([ids, hdul[1].data['ID']])
                 pdfs = np.vstack([pdfs, hdul[1].data['PDF']])
-                if (hdul[2].data['BINS']!=bins).any():
-                    raise ValueError('Bins dont match: %s vs. %s'%(bins, hdul[2].data['BINS']))
+                if (hdul[2].data[bin_key]!=bins).any():
+                    raise ValueError('Bins dont match: %s vs. %s'%(bins, hdul[2].data[bin_key]))
 
         bins = np.array(bins)
 
