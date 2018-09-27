@@ -14,9 +14,9 @@ do
 
 #SBATCH --nodes=1               # Use 1 node; has multiple cores
 #SBATCH --qos=regular
-#SBATCH -t 00:20:00             # Set 30 min time limit
+#SBATCH -t 00:30:00             # Set 30 min limit
 #SBATCH --constraint=haswell    # Use Haswell nodes
-#SBATCH --output=/global/cscratch1/sd/awan/hsc_matched_pdfs/sbatch_output/match_pdfs_${i}_${j}_%j.out
+#SBATCH --output=/global/cscratch1/sd/awan/hsc_matched_pdfs/sbatch_output/%j_match_pdfs_${i}_${j}.out
 #SBATCH --job-name=match_pdfs
 
 srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/match_pdfs.py --fields=$i --PZalg=$j
