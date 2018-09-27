@@ -101,8 +101,8 @@ def get_bin_edges(nbin, hsc_z_phot):
                 start_index = index
 
             # round bin_ends
-            for i in range(nbin):
-                bin_ends[i] = float('%.4f'%bin_ends[i])
+            #for i in range(nbin):
+            #    bin_ends[i] = float('%.4f'%bin_ends[i])
 
             # print finalized bin ends
             print('\nFinalized bin ends:')
