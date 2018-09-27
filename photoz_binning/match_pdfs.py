@@ -80,18 +80,27 @@ for field in fields:
         for i, file in enumerate(patch_files):  # files for different patches
             print('Reading in %s'%file)
             hdul = fits.open('%s/%s'%(pdfs_path, file))
-            # bin record name seems to be different for frankez ('zgrid') vs. others ('BINS').
-            bin_key = hdul[2].data.dtype.names[0]
-            # okay now store the data
-            if i==0: # initialize the arrays
-                ids = hdul[1].data['ID']
-                pdfs = hdul[1].data['PDF']
-                bins = hdul[2].data[bin_key]
-            else: # stack on the new entries
-                ids = np.hstack([ids, hdul[1].data['ID']])
-                pdfs = np.vstack([pdfs, hdul[1].data['PDF']])
-                if (hdul[2].data[bin_key]!=bins).any():
-                    raise ValueError('Bins dont match: %s vs. %s'%(bins, hdul[2].data[bin_key]))
+            data_readin = np.array(hdul[1].data)   # pdfs
+            bins_readin = np.array(hdul[2].data)   # z_bins
+            # find the column numbers for ids, pdfs
+            id_ind = np.where(np.array(data_readin.dtype.names)=='ID')[0][0]
+            pdf_ind = np.where(np.array(data_readin.dtype.names)=='PDF')[0][0]
+            # now need to restructure the data
+            if (i==0):  # first patch
+                bins = []
+                pdfs = {}
+
+            bins_ = []
+            for j in range(len(bins_readin)):
+                bins_.append(bins_readin[j][0])
+            if i==0:
+                bins = bins_
+            else:
+                if bins != bins_:
+                    raise ValueError('Bins dont match: %s vs. %s'%(bins, bins_))
+
+            for i in range(len(data_readin)):
+                pdfs[data_readin[i][id_ind]] = data_readin[i][pdf_ind]
 
         bins = np.array(bins)
 
@@ -100,30 +109,22 @@ for field in fields:
         print('\nMatching IDs now ... ')
         matched_ids, matched_pdfs_cat = [], []
 
-        totIDs = len(hscdata['object_id'])
-        matched_pdfs_cat = np.zeros(shape=(totIDs, len(bins)))
-        print('Created an array of shape %s for the matched pdfs.'%(np.shape(matched_pdfs_cat),))
-        prevPercent = 0.
-        time0 = time.time()
-        #last_ind = 0
         for i, objID in enumerate(hscdata['object_id']):
-            if objID not in ids:
+            if objID not in pdfs.keys():
                 print('\n%s not in the chosen pdfs'%objID)
             else:
-                ind = np.where(ids == objID)[0]
-                if len(ind)>1:
-                    raise ValueError('Something is wrong. Have more than one pdf for %s id?'%objID)
                 matched_ids.append(objID)
-                matched_pdfs_cat[i, :] = pdfs[ind]
-
-            percentDone = 100.*(i+1)/totIDs
-            delPercent = percentDone-prevPercent
-            if (delPercent>5):
-                print('%.2f%% objIDs done. Time since start: %.2f min'%(percentDone, (time.time()-time0)/60.))
-                prevPercent = percentDone
+                matched_pdfs_cat.append(pdfs[objID])
 
         ######################################################################################################################
         # save data
+        # restructure the data
+        df = pd.DataFrame(matched_pdfs_cat)
+        matched_pdfs = df.values
+
+        if np.shape(matched_pdfs)[1]!=len(bins):
+            raise ValuerEror('Somethings wrong. Have %s columns in matched_pdfs and %s bins.'%(np.shape(matched_pdfs)[1],
+                                                                                               len(bins)))
         # set up the header
         hdr = fits.Header()
         hdr['FIELD'] = field
@@ -134,7 +135,7 @@ for field in fields:
         # data to save
         # one table for pdfs and object ids
         col1 = fits.Column(name='object_id', format='K', array=np.array(matched_ids, dtype=int))
-        col2 = fits.Column(name='pdf', format='%iE'%len(bins), array=matched_pdfs_cat)
+        col2 = fits.Column(name='pdf', format='%iE'%len(bins), array=matched_pdfs)
         cols = fits.ColDefs([col1, col2])
         pdf_hdu = fits.BinTableHDU.from_columns(cols)
 
