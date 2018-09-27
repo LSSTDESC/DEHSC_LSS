@@ -221,6 +221,8 @@ for field in fields:
     plt.gca().tick_params(axis='both', labelsize=fontsize-2)
     plt.gcf().set_size_inches(10, 6)
     if save_plots:
+        if len(list(sns.keys()))>1: # i.e. have more than one algorithm
+            filetag = '%s_z%s-based'%(field.replace('_', '-'), z_type)
         filename = '%s_SN_%sbins.png'%(filetag, max_n_bin)
         plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
         print('\n## Saved plot: %s.\n'%filename)
