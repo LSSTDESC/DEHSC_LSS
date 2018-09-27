@@ -217,12 +217,14 @@ for field in fields:
     plt.gca().ticklabel_format(style='sci', scilimits=(-3,4),axis='y')
     plt.xticks(n_bin_list, n_bin_list)
     plt.legend(fontsize=fontsize-4)
+    # update the filetag if have than one algorithm
+    if len(list(sns.keys()))>1: # i.e. have more than one algorithm
+        filetag = filetag.replace('%s_'%alg.replace('_', '-'), "")
+    # now add the title, etc
     plt.title(filetag, fontsize=fontsize)
     plt.gca().tick_params(axis='both', labelsize=fontsize-2)
     plt.gcf().set_size_inches(10, 6)
     if save_plots:
-        if len(list(sns.keys()))>1: # i.e. have more than one algorithm
-            filetag = '%s_z%s-based'%(field.replace('_', '-'), z_type)
         filename = '%s_SN_%sbins.png'%(filetag, max_n_bin)
         plt.savefig('%s/%s'%(outDir, filename), format='png', bbox_inches='tight')
         print('\n## Saved plot: %s.\n'%filename)

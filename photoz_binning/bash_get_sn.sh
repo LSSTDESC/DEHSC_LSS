@@ -44,7 +44,7 @@ do
 #SBATCH --qos=regular
 #SBATCH -t 00:30:00             # Set 30 min time limit
 #SBATCH --constraint=haswell    # Use Haswell nodes
-#SBATCH --output=/global/cscratch1/sd/awan/lsst_output/hsc_output/sbatch_output/%j_get_photoz_sn_${i}_z${j}_nz-mc.out
+#SBATCH --output=/global/cscratch1/sd/awan/lsst_output/hsc_output/sbatch_output/%j_get_photoz_sn_${i}_z${j}_nz-pdf.out
 #SBATCH --job-name=pz_sn
 
 srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/get_sn_photoz_bins.py \
