@@ -195,7 +195,7 @@ for field in fields:
         for i in range(1,max_n_bin+1):
             n_bin_list.append(i)
             print('----------------------------------\nnbin=%s'%i)
-            out = get_bin_edges(nbin=i, hsc_z_phot=hscdata[z_phot_key], z_bins=bins)
+            out = get_bin_edges(nbin=i, hsc_z_phot=hscdata[z_phot_key])
             z_phots.append(out)
 
         # --------------------------------------------------------------

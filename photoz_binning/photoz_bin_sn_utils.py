@@ -58,18 +58,16 @@ def get_bins_ends(z_bin_array):
     return np.array(bin_keys), bin_ends
 
 # --------------------------------------------------------------------------------------------------------
-def get_bin_edges(nbin, hsc_z_phot, z_bins):
+def get_bin_edges(nbin, hsc_z_phot):
     # decide on bins edges: we look for bin edges that have roughly the same number of galaxies
+    # the idea here is to sort the photo-z and take subsets of length ~totN/nbineach
     zmin, zmax = 0.15, 1.5   # these are fixed since this is the range where z_phot is reliable
-    z_bins_finer = np.arange(min(z_bins), max(z_bins), 0.001)
-    obj_thres = 50    # the bins would have galaxies within this threshold of each other
-    print('obj_thres: %s'%obj_thres)
     if nbin==0:
         print('nbin must be greater than one.')
         return
     else:
         n_obj = len(np.where((hsc_z_phot >= zmin) & (hsc_z_phot < zmax))[0])
-        if nbin==1:
+        if nbin==1: # nothing to do here.
             print('%s objects in %s<=z<%s'%(n_obj, zmin, zmax))
             bin_ends = np.array([zmin, zmax])
         else:
@@ -77,34 +75,43 @@ def get_bin_edges(nbin, hsc_z_phot, z_bins):
             wanted_n_obj_in_bin = n_obj/nbin
             print('Looking for bins with about %s galaxies each ... '%wanted_n_obj_in_bin)
 
+            # inititate the bin_ends array and put in zmin, zmax values
             bin_ends = np.zeros(nbin+1)
             bin_ends[0] = zmin
             bin_ends[-1] = zmax
 
+            # sort the photoz
+            sorted_zs = np.sort(hsc_z_phot)
+            # find the first index with z>zmin
+            start_index = np.where(sorted_zs>zmin)[0][0]
             for i in range(nbin-1):
                 print('\nLooking for %sth bin egde'%(i+1))
-                n_obj = 0
-                j = 0
-                good_edges = [f for f in z_bins_finer if f>bin_ends[i]]
-                # loop over the bins until have the target number of galaxies
-                while ((n_obj-wanted_n_obj_in_bin) < obj_thres) and (j<len(good_edges)):
-                    z_edge = good_edges[j]
-                    n_obj = len(np.where((hsc_z_phot >= bin_ends[i]) & (hsc_z_phot < z_edge))[0])
-                    j += 1
-                # some checks
-                if (z_edge==bin_ends[-1]):
-                    raise ValueError('Need to change the threshold on the number of galaxies: %s currently'%(obj_thres))
-                if n_obj==0:
-                    raise ValueError('Something is wrong. No objects found in this bin.')
-                # things look ok. store.
-                bin_ends[i+1] = float('%.2f'%z_edge)
+                # update the index that we will consider
+                index = start_index + int(wanted_n_obj_in_bin)
+                # check to ensure things are working
+                if sorted_zs[index]>zmax:
+                    raise ValuerError('Somethings wrong. Have already reached zmax .. ')
+                # store the bin end
+                if sorted_zs[index] not in bin_ends: # ensure unique bin ends
+                    bin_ends[i+1] = sorted_zs[index]
+                else:
+                    while sorted_zs[index] in bin_ends:
+                        index += 1
+                    bin_ends[i+1] = sorted_zs[index]
+                start_index = index
 
-            print('\nFinal:')
+            # round bin_ends
+            for i in range(nbin):
+                bin_ends[i] = float('%.4f'%bin_ends[i])
+
+            # print finalized bin ends
+            print('\nFinalized bin ends:')
             for i in range(nbin):
                 n_obj = len(np.where((hsc_z_phot >= bin_ends[i]) & (hsc_z_phot < bin_ends[i+1]))[0])
                 print('%s objects in %s<=z<%s'%(n_obj, bin_ends[i], bin_ends[i+1]))
 
         return bin_ends
+
 # --------------------------------------------------------------------------------------------------------
 def get_surface_number_density(n_objs, area_in_sr):  # in 1/Sr
     return n_objs/area_in_sr
