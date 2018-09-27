@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import astropy.io.fits as fits
 from createMaps import createCountsMap
@@ -10,6 +11,7 @@ import time
 import os
 
 prefix_data='/global/cscratch1/sd/damonge/HSC/'
+prefix_pdf='/global/cscratch1/sd/awan/hsc_matched_pdfs/'
 def opt_callback(option, opt, value, parser):
   setattr(parser.values, option.dest, value.split(','))
 
@@ -25,6 +27,8 @@ parser.add_option('--pz-type',dest='pz_type',default='nnpz',type=str,
                   help='Photo-z to use')
 parser.add_option('--pz-mark',dest='pz_mark',default='best',type=str,
                   help='Photo-z summary statistic to use when binning objects')
+parser.add_option('--use-pdf',dest='usepdf',default=False,type=bool,
+                  help='Whether to stack photo-z pdfs to generate N(z)')
 parser.add_option('--pz-bins',dest='fname_bins',default=None,type=str,
                   help='File containing the redshift bins (format: 1 row per bin, 2 columns: z_ini z_end)')
 parser.add_option('--map-sample',dest='map_sample',default=None,type=str,
@@ -82,6 +86,12 @@ fsk,mpdum=fm.read_flat_map(o.map_sample,0)
 zi_arr,zf_arr=np.loadtxt(o.fname_bins,unpack=True,ndmin=2)
 nbins=len(zi_arr)
 
+if usepdf:
+  # Read in pdfs and bins
+  pdf_files = sorted(glob(prefix_pdf + '*' + pz_code + '*'))
+  pdfs = np.vstack([fits.open(thisfile)[1].data['pdf'] for thisfile in pdf_files])
+  bins = fits.open(pdf_files[0]).data['bins']
+
 #Iterate through bins
 maps=[]
 nzs=[]
@@ -89,7 +99,19 @@ for zi,zf in zip(zi_arr,zf_arr) :
   msk=(cat[column_mark]<=zf) & (cat[column_mark]>zi)
   subcat=cat[msk]
   zmcs=subcat[column_pdfs]
-  hz,bz=np.histogram(zmcs,bins=50,range=[0.,4.])
+  if usepdf:
+    binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
+    bz = np.linspace(0,4,51)
+    hz = []
+    for x in xrange(len(bz) - 1):
+      # interpolate at the edges of the bins and then integrate
+      redshift_subset = [bz[x]] + list(bins[bins > bz[x] & bins <= bz[x+1]]) + [bz[x+1]] # The interpolation x-axis
+      interp_pdfs = interp1d(bins, pdfs)(redshift_subset) # Get the PDF values at the interpolation points
+      pdf_area = np.trapz(interp_pdfs, x = redshift_subset, axis = 1)
+      hz.append(sum(pdf_area))
+    hz = np.array(hz)
+  else:
+    hz,bz=np.histogram(zmcs,bins=50,range=[0.,4.])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
   nzs.append([bz[:-1],bz[1:],hz+0.])
   maps.append(nmap)

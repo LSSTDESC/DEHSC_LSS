@@ -38,6 +38,10 @@ class hsc_reader:
         self.frankenz_mc = []
         self.nnpz_mc = []
 
+        self.ephor_ab_best = []
+        self.frankenz_best = []
+        self.nnpz_best = []
+
         self.ephor_ab_peak = []
         self.frankenz_peak = []
         self.nnpz_peak = []
@@ -51,17 +55,21 @@ class hsc_reader:
             self.ra = self.ra + list(this_data['ra'])
             self.dec = self.dec + list(this_data['dec'])
 
-            self.mag_g = self.mag_g + list(this_data['gcmodel_flux'])
-            self.mag_r = self.mag_r + list(this_data['rcmodel_flux'])
-            self.mag_i = self.mag_i + list(this_data['icmodel_flux'])
-            self.mag_z = self.mag_z + list(this_data['zcmodel_flux'])
-            self.mag_y = self.mag_y + list(this_data['ycmodel_flux'])
+            self.mag_g = self.mag_g + list(this_data['gcmodel_mag'])
+            self.mag_r = self.mag_r + list(this_data['rcmodel_mag'])
+            self.mag_i = self.mag_i + list(this_data['icmodel_mag'])
+            self.mag_z = self.mag_z + list(this_data['zcmodel_mag'])
+            self.mag_y = self.mag_y + list(this_data['ycmodel_mag'])
 
             # self.demp_mc = self.demp_mc + list(this_data['pz_mc_dem'])
             # self.ephor_mc = self.ephor_mc + list(this_data['pz_mc_eph'])
             self.ephor_ab_mc = self.ephor_ab_mc + list(this_data['pz_mc_eab'])
             self.frankenz_mc = self.frankenz_mc + list(this_data['pz_mc_frz'])
             self.nnpz_mc = self.nnpz_mc + list(this_data['pz_mc_nnz'])
+
+            self.ephor_ab_best = self.ephor_ab_best + list(this_data['pz_best_eab'])
+            self.frankenz_best = self.frankenz_best + list(this_data['pz_best_frz'])
+            self.nnpz_best = self.nnpz_best + list(this_data['pz_best_nnz'])
 
             self.ephor_ab_peak = self.ephor_ab_peak + list(this_data['pz_mode_eab'])
             self.frankenz_peak = self.frankenz_peak + list(this_data['pz_mode_frz'])
@@ -84,6 +92,10 @@ class hsc_reader:
         self.ephor_ab_mc = np.array(self.ephor_ab_mc, dtype = float)
         self.frankenz_mc = np.array(self.frankenz_mc, dtype = float)
         self.nnpz_mc = np.array(self.nnpz_mc, dtype = float)
+
+        self.ephor_ab_best = np.array(self.ephor_ab_best, dtype = float)
+        self.frankenz_best = np.array(self.frankenz_best, dtype = float)
+        self.nnpz_best = np.array(self.nnpz_best, dtype = float)
 
         self.ephor_ab_peak = np.array(self.ephor_ab_peak, dtype = float)
         self.frankenz_peak = np.array(self.frankenz_peak, dtype = float)
@@ -243,7 +255,7 @@ class reader:
 
         if widelims:
             # Implement wide field magnitude limits
-            lim_indices = np.where((self.hsc_cat.mag_r < 26) & (redshift > 0))
+            lim_indices = np.where((self.hsc_cat.mag_i < 24.5) & (redshift > 0))
         else:
             lim_indices = np.where(redshift > 0)
 
@@ -304,7 +316,7 @@ class reader:
 
         if widelims:
             # Implement wide field magnitude limits
-            lim_indices = np.where((self.hsc_cat.mag_r < 26) & (redshift > 0))
+            lim_indices = np.where((self.hsc_cat.mag_i < 24.5) & (redshift > 0))
         else:
             lim_indices = np.where(redshift > 0)
 
@@ -345,9 +357,9 @@ class reader:
 
 
 
-    def plot_PIT(self, codename, stretch = 1., shift = 0.):
+    def plot_PIT(self, codename, stretch = 1., shift = 0., ztype = 'zspec'):
 
-        integrals = self.get_integrals(codename, stretch, shift)
+        integrals = self.get_integrals(codename, stretch, shift, ztype = ztype)
 
         fig = plt.figure(figsize = (8,8))
         sp = fig.add_subplot(111)
@@ -356,6 +368,20 @@ class reader:
         sp.plot([0,1],[1,1], color = 'r')
         sp.set_xlim(0,1)
         sp.set_ylim(0,5)
+
+
+    def plot_PIT_newint(self, codename, power = 1., bias = 0., shift = 0.):
+
+        integrals = self.get_integrals2(codename, power, bias, shift)
+
+        fig = plt.figure(figsize = (8,8))
+        sp = fig.add_subplot(111)
+
+        sp.hist(integrals, bins = 50, normed = True, range = [0,1], histtype = 'step', color = 'k')
+        sp.plot([0,1],[1,1], color = 'r')
+        sp.set_xlim(0,1)
+        sp.set_ylim(0,5)
+
 
 
 
