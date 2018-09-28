@@ -29,6 +29,10 @@ parser.add_option('--use-pdf',dest='usepdf',default=False,
                   help='Whether to stack photo-z pdfs to generate N(z)')
 parser.add_option('--pz-bins',dest='fname_bins',default=None,type=str,
                   help='File containing the redshift bins (format: 1 row per bin, 2 columns: z_ini z_end)')
+parser.add_option('--nz-bins',dest='nz_bin_num',default=200,type=int,
+                  help='Number of bins to use in the output N(z)\'s')
+parser.add_option('--nz-max',dest='nz_bin_max',default=4.0,type=float,
+                  help='Maximum redshift to use for output N(z)\'s')
 parser.add_option('--map-sample',dest='map_sample',default=None,type=str,
                   help='Sample map used to determine the pixelization that will be used. If None I\'ll try to find the masked fraction map')
 parser.add_option('--analysis-band', dest='band', default='i', type=str,
@@ -100,7 +104,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
   zmcs=subcat[column_pdfs]
   if o.usepdf:
     binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
-    bz = np.linspace(0,4,201)
+    bz = np.linspace(0,nz_bin_max,nz_bin_num+1)
     hz = []
     for x in xrange(len(bz) - 1):
       # interpolate at the edges of the bins and then integrate
@@ -110,7 +114,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
       hz.append(np.nansum(pdf_area))
     hz = np.array(hz)
   else:
-    hz,bz=np.histogram(zmcs,bins=200,range=[0.,4.])
+    hz,bz=np.histogram(zmcs,bins=nz_bin_num,range=[0.,nz_bin_max])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
   nzs.append([bz[:-1],bz[1:],hz+0.])
   maps.append(nmap)
