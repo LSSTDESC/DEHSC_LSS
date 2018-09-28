@@ -146,7 +146,7 @@ for field in fields:
 
         # save it
         hdul = fits.HDUList([primary_hdu, pdf_hdu, bin_hdu])
-        filename = '%s/matched_pdfs_ids_bins_%s_%s.fits'%(outDir, field, alg)
+        filename = '%s/%s_pdfs_%s.fits'%(outDir, field.upper(), alg)
         hdul.writeto(filename, overwrite=True)
 
         print('\nSaved %s'%filename)
