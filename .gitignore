@@ -6,4 +6,3 @@
 *.sublime-project
 .ipynb_checkpoints/
 sql_utils/*.sql
-photoz_scripts/data/

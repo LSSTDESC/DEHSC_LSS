@@ -4,11 +4,15 @@ We have processed the HSC data for clustering analyses following a number of ste
 1. Download the relevant data from the DR1 database. This was done using the scripts in the directory sql_utils. The script submit_job.py starts all the necessary jobs in your HSC space.
    All the different fields are then downloaded using the script dwl.py with data from urls.txt.
    The full dataset is currently stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_*.fits`. This includes both the forced photometry catalog and the metadata.
+   
+   We have also downloaded the COSMOS 30-band photometry data (Laigle et al. 2016). These data can be downloaded with `COSMOS30band/get_COSMOS_photoz.py`, and is currently stored and available at `/global/cscratch1/sd/damonge/HSC/COSMOS2015_Laigle+_v1.1.fits\`.
 2. Reduce the metadata. This implies:
    - Removing all the unnecessary clutter from the raw files
    - Filter out all unnecessary columns (see line 50 of `process_metadata.py` for the columns we actually keep).
    - Writing the reduced tables into new files.
-   
+
+   Additionally, we have downloaded the photo-z pdfs, which are not directly in the HSC database. The data was downloaded with photoz_binning/get_pdfs.sh.
+
    All this is done with the script `process_metadata.py`. Run `python process_metadata.py -h` to see all available command-line options. The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/HSC_*_frames_proc.fits`.
 3. Reduce the catalog data. This implies:
    - Removing all the unnecessary clutter from the raw files
@@ -19,6 +23,7 @@ We have processed the HSC data for clustering analyses following a number of ste
    
    All this is done with the script `process.py`. Run `python process.py -h` to see all available command-line options.
    The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in per-field sub-directories.
+   We match the photo-z pdf data to the clean catalogs to produce reduced pdf files. These are currently stored at in the same directories described above (with hopefully self-explanatory file names). The pdf data is stored as a FITS file containig three data tables. The first table contains the object IDs in one column and the pdf array for each object in the second column. The second table contains a single array with the redshift binning of the pdfs (the same for all pdfs).
 4. Use the metadata to generate maps of the per-frame systematics (i.e. observing conditions) in each field. This implies:
    - Selecting the frames that fall within the field region.
    - Computing the map pixels each frame intersects and their corresponding areas (this is the most time-consuming part).
@@ -50,12 +55,12 @@ We have processed the HSC data for clustering analyses following a number of ste
 10. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
 
 The scripts described above make use of some dependencies and python modules written explicitly for this work. The most relevant ones are:
+- `check_sys.py` and `twoPtCorr.py` are currently orphan files used in the development of the real-space pipeline.
 - `flatmaps.py`: contains routines to construct and manipulate flat-sky maps (mimicking as much as possible the functionality implemented in HEALPix for curved skies).
 - `createMaps.py`: contains routines to generate maps based on information defined on a discrete set of points.
-- `dataCleanUp.py`: summarizes the steps needed to remove all useless clutter from a raw database file.
 - `estDepth.py`: contains routines to create depth maps using 3 different methods. All routines are wrapped into a single one called `get_depth`.
 - `flatMask.py`: describes the method used to generate the bright-object mask from the catalog data.
-- `rotate.py`: contains routines to rotate a given field onto the equator.
+- `obscond.py`: defines an "ObservingCondition" class to handle the generation of observing condition maps from the metadata. Used by `map_obscond.py`.
 - `NaMaster` (https://github.com/damonge/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies. The current state of the pipeline requires the use of the `validation` branch instead of `master`.
 - `SACC` (https://github.com/LSSTDESC/sacc): a file format to store generic two-point functions.
 
