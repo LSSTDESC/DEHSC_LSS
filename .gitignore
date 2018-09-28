@@ -4,4 +4,3 @@
 *.png
 .ipynb_checkpoints/
 sql_utils/*.sql
-
