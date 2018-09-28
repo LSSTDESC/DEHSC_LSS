@@ -55,12 +55,12 @@ We have processed the HSC data for clustering analyses following a number of ste
 10. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
 
 The scripts described above make use of some dependencies and python modules written explicitly for this work. The most relevant ones are:
+- `check_sys.py` and `twoPtCorr.py` are currently orphan files used in the development of the real-space pipeline.
 - `flatmaps.py`: contains routines to construct and manipulate flat-sky maps (mimicking as much as possible the functionality implemented in HEALPix for curved skies).
 - `createMaps.py`: contains routines to generate maps based on information defined on a discrete set of points.
-- `dataCleanUp.py`: summarizes the steps needed to remove all useless clutter from a raw database file.
 - `estDepth.py`: contains routines to create depth maps using 3 different methods. All routines are wrapped into a single one called `get_depth`.
 - `flatMask.py`: describes the method used to generate the bright-object mask from the catalog data.
-- `rotate.py`: contains routines to rotate a given field onto the equator.
+- `obscond.py`: defines an "ObservingCondition" class to handle the generation of observing condition maps from the metadata. Used by `map_obscond.py`.
 - `NaMaster` (https://github.com/damonge/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies. The current state of the pipeline requires the use of the `validation` branch instead of `master`.
 - `SACC` (https://github.com/LSSTDESC/sacc): a file format to store generic two-point functions.
 
