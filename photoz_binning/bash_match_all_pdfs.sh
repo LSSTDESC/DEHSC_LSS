@@ -19,7 +19,11 @@ do
 #SBATCH --output=/global/cscratch1/sd/awan/hsc_matched_pdfs/sbatch_output/%j_match_pdfs_${i}_${j}.out
 #SBATCH --job-name=match_pdfs
 
-srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/match_pdfs.py --fields=$i --PZalg=$j
+srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/match_pdfs.py \
+                    --data_main_path='/global/cscratch1/sd/damonge/HSC/HSC_processed' \
+                    --pdfs_main_path='/global/cscratch1/sd/awan/hsc_pdfs/' \
+                    --outDir='/global/cscratch1/sd/damonge/HSC/HSC_processed/${i^^}' \
+                    --fields=$i --PZalg=$j
 EOF
         sbatch ${i}_${j}.sl
         echo Job submitted for ${i}_${j}
