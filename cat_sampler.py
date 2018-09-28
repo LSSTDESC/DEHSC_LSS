@@ -9,7 +9,6 @@ import flatmaps as fm
 import sys
 import time
 import os
-from glob import glob
 
 prefix_data='/global/cscratch1/sd/damonge/HSC/'
 prefix_pdf='/global/cscratch1/sd/awan/hsc_matched_pdfs/'
@@ -89,9 +88,9 @@ nbins=len(zi_arr)
 
 if o.usepdf:
   # Read in pdfs and bins
-  pdf_files = sorted(glob(prefix_pdf + '*' + o.pz_type + '*'))
-  pdfs = np.vstack([fits.open(thisfile)[1].data['pdf'] for thisfile in pdf_files])
-  bins = fits.open(pdf_files[0])[2].data['bins']
+  pdf_file = sorted(prefix_pdf + 'matched_pdfs_ids_bins_deep_' + o.prefix_in.split('/')[-1].lower() + '.fits')
+  pdfs = fits.open(pdf_file)[1].data['pdf']
+  bins = fits.open(pdf_file)[2].data['bins']
 
 
 #Iterate through bins
