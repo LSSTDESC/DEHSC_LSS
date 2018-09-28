@@ -1,8 +1,10 @@
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
-import astropy.io.fits as fits
-from astropy.table import Table
+try:
+   import fitsio as fits
+except ImportError:
+   from astropy.table import Table as fits
 from createMaps import createCountsMap
 from optparse import OptionParser
 import flatmaps as fm
@@ -12,11 +14,41 @@ import time
 import os
 import treecorr
 
-# We define some convenience functions below
+# We define some convenience functions below (in principle this can be migrated elsewhere)
 
 def runTreeCorr(data_ra, data_dec, random_ra, random_dec, # all in degrees
                 minSep, maxSep, nBins, data2_ra=None, data2_dec=None,
-                random2_ra=None, random2_dec=None):
+                random2_ra=None, random2_dec=None, verbose=True):
+    """
+    Convenience function to compute angular auto and cross-correlations of 
+    galaxy catalogs
+    
+    Args:
+    -----
+    
+    data_ra: (array) RA of the data catalog (degrees)
+    data_dec: (array) DEC of the data catalog (degrees)
+    random_ra: (array) RA of the random catalog (degrees)
+    random_dec: (array) DEC of the random catalog (degrees)
+    minSep: (double) Minimum separation angle for which to compute the 2pcf (degrees)
+    maxSep: (double) Maximum separation angle for which to compute the 2pcf (degrees)
+    nBins: (int) Number of bins in which to compute the 2pcf
+    data2_ra: (array) RA of the data catalog to cross-correlate (degrees)
+              if None, then auto-correlations are computed
+    data2_dec: (array) DEC of the data catalog to cross-correlate (degrees)
+    random2_ra: (array) RA of the random catalog to cross-correlate (degrees)
+                Note: it should be different than the first random catalog
+    random2_dec: (array) DEC of the random catalog to cross-correlate (degrees)
+    verbose: (bool) Increase verbosity/print useful information
+    
+    Returns:
+    --------
+    
+    theta: (array) Angular bins in which the 2pcf has been computed
+    w1: (array) Angular auto-correlation of the first data catalog
+    w12: (array) Angular cross-correlation between the first and second data catalogs
+    w2: (array) Angular auto-correlation of the second data catalog
+    """"
 
     startTime= time.time()
     dataCatalog= treecorr.Catalog(ra= data_ra, dec=  data_dec,
@@ -57,17 +89,56 @@ def runTreeCorr(data_ra, data_dec, random_ra, random_dec, # all in degrees
     else:
         w12 = None
         w2 = None
- 
-    print 'Time taken: %s (s)'%(time.time()-startTime)
+    if verbose:
+        print('Time taken: %s (s)'%(time.time()-startTime))
 
     return theta, w1, w12, w2
 
-def create_randoms(mask, nrnd):
-    """ Function to generate randoms"""
-def compute_cov(ra, dec, ra_rnd, dec_rnd, minSep, maxSep, nBins, ra2=None, dec2=None, ra2_rnd=None, dec2_rnd=None, njk=100):
+def create_randoms(flatSkyGrid, surveyMask nRnd, minRA, maxRA, minSin, maxSin, zdist):
+    """ Function that generates a random catalog following a given z distribution
+
+    Args:
+    -----
+
+    flatSkyGrid: (flat maps sky grid) input sky grid
+    surveyMask: (flat map) input mask
+    nRnd: (int) number of random points to generate 
+    minRA: (double) minimum RA for the random points (degrees)
+    maxRA: (double) maximum RA for the random points (degrees)
+    minSin: (double) minimum value for the sine of the declination of the random points
+    maxSin: (double) maximum value for the sine of the declination of the random points
+    zdist: (array) Input z distribution with shape (N,2) (z_center, P(z))
+ 
+    Returns:
+    --------
+    
+    ra_rnd: (double) RA of random points (degrees)
+    dec_rnd: (double) DEC of random points (degrees)
+    z_rnd: (double) redshift of random points (note that for angular cf this is irrelevant but it is convenient to avoid repeated points in 
+                    cross-correlations)
+
+    """
+
+    ra_rnd = np.random.uniform(minRA,maxRA, nRnd)
+    aux = np.random.uniform(minSin,maxSin, nRnd)
+    dec_rnd = np.rad2deg(np.arcsin(aux))
+    zcent = zdist[0]
+    pz = zdist[1]
+    cdf = np.cumsum(pz)/np.sum(pz)
+    z_rnd = np.random.choice(zcent, size=nRnd, p=cdf) # The returned z will be discrete but this does not matter for angular correlations    
+    # create random catalog with geometry: find pixels coresponding to the random ra, dec. keep only those that
+    # are in the mask
+    # find pixel numbers corresponding to the ra, decs.
+    pixelNums= flatSkyGrid.pos2pix(ra, dec)
+    # find pixel numbers in survey
+    pixelNumsInSurvey= np.where(surveyMask>0)[0]
+
+    # find out whether the random-pixelNum is in survey. mask= True <=> yes
+    mask= np.in1d(pixelNums, pixelNumsInSurvey)
+    return ra_rnd[mask], dec_rnd[mask], z_rnd[mask]
+
+def compute_cov(ra, dec, ra_rnd, dec_rnd, minSep, maxSep, nBins, ra2=None, dec2=None, ra2_rnd=None, dec2_rnd=None, njk=100, n_proc=4, verbose=True):
     """ Function to compute the JK covariance"""
-    import kmeans_radec
-    from kmeans_radec import KMeans
     X = np.zeros((len(ra),2))
     X[:,0] = ra
     X[:,1] = dec
@@ -75,34 +146,65 @@ def compute_cov(ra, dec, ra_rnd, dec_rnd, minSep, maxSep, nBins, ra2=None, dec2=
     X2[:,0] = ra_rnd
     X2[:,1] = dec_rnd
     cen_guess = np.zeros((njk,2))
-    xmin = np.nanmin(ra)
-    xmax = np.nanmax(ra)
-    ymin = np.nanmin(dec)
-    ymax = np.nanmin(dec)
+    xmin = np.nanmin(ra_rnd)
+    xmax = np.nanmax(ra_rnd)
+    ymin = np.nanmin(dec_rnd)
+    ymax = np.nanmin(dec_rnd)
     # Initial guess for the centers
     cen_guess[:,0] = np.linspace(xmin,xmax,njk)
     cen_guess[:,1] = np.linspace(ymin,ymax,njk)
-    km = KMeans(cen_guess,tol=1e-3)
-    km.run(X, maxiter=100)
-    labels = km.find_nearest(X)
-    labels_rnd = km.find_nearest(X2)
+    km = KMeans(cen_guess,tol=1e-2)
+    km.run(X2[::50], maxiter=100) # Use the (subsampled in order to speed up) randoms to find the JK regions (this way we avoid potential problems with clustering)
+    labels = km.find_nearest(X) # We label the data according to the regions found before
+    labels_rnd = km.find_nearest(X2) # We label the randoms
+    if ra2 is not None:
+        X3 = np.zeros((len(ra2),2))
+        X4 = np.zeros((len(ra_rnd2),2))
+        X3[:,0] = ra2
+        X3[:,1] = dec2
+        X4[:,0] = ra2_rnd
+        X4[:,1] = dec2_rnd
+        labels2 = km.find_nearest(X3)
+        labels2_rnd = km.find_nearest(X4)
+    # We define a convenience function to repeat the covariance calculation in a multiprocessing.Pool if needed
     def run_corr(label):
-        theta, w, dw = runTreeCorr(,dec,ra_rnd,o.max_sep,o.nbins)
-        return theta, w, dw
-    print('Starting covariance calculation')
+        msk = labels!=label
+        msk_rnd = labels_rnd!=label
+        if ra2 is not None:
+            msk2 = labels2!=label
+            msk2_rnd = labels2_rnd!=label
+            theta, w1, w12, w2 = runTreeCorr(ra[msk],dec[msk],ra_rnd[msk_rnd],dec_rnd[msk_rnd],minSep,maxSep,nBins,ra2[msk2],dec2[msk2],ra2_rnd[msk2_rnd],dec2_rnd[msk2_rnd])
+        else:
+            theta, w1, w12, w2 = runTreeCorr(ra[msk],dec[msk],ra_rnd[msk_rnd],dec_rnd[msk_rnd],minSep,maxSep,nBins)
+        return theta, w1, w12, w2
     t0 = time()
-    pool = multiprocessing.Pool(processes=o.n_proc)
-    # We are going to perform a take one out JK
     param = np.unique(labels)
-    th_list, w_list, dw_list = pool.map(run_corr,param)
-    w_list = np.array(w_list)
-    cov = np.covariance(w_list,rowvar=False)
 
+    if n_proc > 1:
+        pool = multiprocessing.Pool(processes=n_proc)
+        # We are going to perform a take one out JK
+        th_list, w1_list, w12_list, w2_list = pool.map(run_corr,param)
+    else:
+        w1_list, w12_list, w2_list = [],[],[]
+        for label in param:
+            _, w1_aux, w12_aux, w2_aux = run_corr(label)
+            w1_list.append(w1_aux)
+            w12_list.append(w12_aux)
+            w2_list.append(w2_aux) 
+    w1_list = np.array(w1_list)
+    w12_list = np.array(w12_list)
+    w2_list = np.array(w2_list)
+    cov1 = np.covariance(w1_list,rowvar=False)
+    cov12 = np.covariance(w12_list, rowvar=False)
+    cov2 = np.covariance(w2_list, rowvar=False)
+    t1 = time()
+    if verbose:
+        print('Elapsed time: ', t1-t0)
+    return cov1, cov12, cov2
 
 ##################################################
 
 # Setting options and path
-
 
 prefix_data='/global/cscratch1/sd/damonge/HSC/'
 def opt_callback(option, opt, value, parser):
@@ -159,13 +261,25 @@ parser.add_option('--do-cross', dest='do_cross', default=False, action='store_tr
                   help='Compute angular cross-correlations')
 parser.add_option('--n-jk', dest='njk', default=100, type=int,
                   help='Number of JK regions to compute the covariances')
-
+parser.add_option('--do-cov', dest='do_cov', default=False, action='store_true',
+                  help='Compute covariance matrix')
+parser.add_option('--verbose', dest='verbose', default=False, action='store_true',
+                  help='Increase verbosity')
 
 ######################################################
 
 
 # Read options
 (o, args) = parser.parse_args()
+
+# Check if we are going to compute the covariance
+
+if o.do_cov:
+    try:
+        import kmeans_radec
+        from kmeans_radec import KMeans
+    except ImportError:
+        o.do_cov=False
 
 print("Reading mask")
 #Create depth-based mask
@@ -257,14 +371,14 @@ nbins=len(zi_arr)
 
 # Read catalog produced by process.py
 
-cat = Table.read(o.fname_catalog)
+cat = fits.read(o.fname_catalog)
 
 # Read randoms or create them
 
 if o.fname_randoms=='NONE':
     ra_rnd, dec_rnd, z_rnd = create_randoms(mask)
 else:
-    rnd =  Table.read(o.fname_randoms)
+    rnd =  fits.read(o.fname_randoms)
     ra_rnd = rnd['ra']
     dec_rnd = rnd['dec']
     z_rnd = rnd[column_mark_rnd]
