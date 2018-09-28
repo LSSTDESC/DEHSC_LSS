@@ -90,8 +90,10 @@ nbins=len(zi_arr)
 if o.usepdf:
   # Read in pdfs and bins
   pdf_files = sorted(glob(prefix_pdf + '*' + pz_code + '*'))
+  print(repr(pdf_files))
   pdfs = np.vstack([fits.open(thisfile)[1].data['pdf'] for thisfile in pdf_files])
   bins = fits.open(pdf_files[0]).data['bins']
+
 
 #Iterate through bins
 maps=[]
