@@ -79,19 +79,19 @@ if not o.no_bo_cut :
   msk*=np.logical_not(cat['iflags_pixel_bright_object_any'])
   cat=cat[msk]
 
+if o.usepdf:
+  # Read in pdfs and bins
+  pdf_file = prefix_pdf + 'matched_pdfs_ids_bins_' + o.prefix_in.split('/')[-1].lower() + '_' + o.pz_type + '.fits'
+  pdfs = fits.open(pdf_file)[1].data['pdf']
+  bins = fits.open(pdf_file)[2].data['bins']
+  pdfs = pdfs[msk]
+
 #Read map information
 fsk,mpdum=fm.read_flat_map(o.map_sample,0)
 
 #Read bins
 zi_arr,zf_arr=np.loadtxt(o.fname_bins,unpack=True,ndmin=2)
 nbins=len(zi_arr)
-
-if o.usepdf:
-  # Read in pdfs and bins
-  pdf_file = prefix_pdf + 'matched_pdfs_ids_bins_' + o.prefix_in.split('/')[-1].lower() + '_' + o.pz_type + '.fits'
-  pdfs = fits.open(pdf_file)[1].data['pdf']
-  bins = fits.open(pdf_file)[2].data['bins']
-
 
 #Iterate through bins
 maps=[]
