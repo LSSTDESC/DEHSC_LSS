@@ -9,6 +9,7 @@ import flatmaps as fm
 import sys
 import time
 import os
+from glob import glob
 
 prefix_data='/global/cscratch1/sd/damonge/HSC/'
 prefix_pdf='/global/cscratch1/sd/awan/hsc_matched_pdfs/'
