@@ -24,6 +24,7 @@ do
 srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/get_sn_photoz_bins.py \
                                     --fields=$i --nbin=10 --z_type=$j \
                                     --dont_show_plots --save_plots --nz_mc \
+                                    --pdfs_main_path='/global/cscratch1/sd/damonge/HSC/HSC_processed/${i^^}' \
                                     --outDir='/global/cscratch1/sd/awan/lsst_output/hsc_output'
 EOF
         sbatch ${i}_z${j}_nz-mc.sl
@@ -50,6 +51,7 @@ do
 srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/get_sn_photoz_bins.py \
                                     --fields=$i --nbin=10 --z_type=$j \
                                     --dont_show_plots --save_plots \
+                                    --pdfs_main_path='/global/cscratch1/sd/damonge/HSC/HSC_processed/${i^^}' \
                                     --outDir='/global/cscratch1/sd/awan/lsst_output/hsc_output'
 EOF
         sbatch ${i}_z${j}_nz-pdfs.sl
@@ -58,5 +60,5 @@ EOF
 done
 
 # change permissions on the saved output. need to run these when the jobs are finished.
-# chgrp -R lsst /global/cscratch1/sd/awan/hsc_matched_pdfs
-# chmod -R g-w /global/cscratch1/sd/awan/hsc_matched_pdfs
+# chgrp -R lsst /global/cscratch1/sd/awan/lsst_output/hsc_output
+# chmod -R g-w /global/cscratch1/sd/awan/lsst_output/hsc_output
