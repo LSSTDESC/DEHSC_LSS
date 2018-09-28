@@ -10,8 +10,6 @@ import sys
 import time
 import os
 
-prefix_data='/global/cscratch1/sd/damonge/HSC/'
-prefix_pdf='/global/cscratch1/sd/awan/hsc_matched_pdfs/'
 def opt_callback(option, opt, value, parser):
   setattr(parser.values, option.dest, value.split(','))
 
@@ -81,7 +79,7 @@ if not o.no_bo_cut :
 
 if o.usepdf:
   # Read in pdfs and bins
-  pdf_file = prefix_pdf + 'matched_pdfs_ids_bins_' + o.prefix_in.split('/')[-1].lower() + '_' + o.pz_type + '.fits'
+  pdf_file = o.prefix_in+'_pdfs_'+o.pz_type+'.fits'
   pdfs = fits.open(pdf_file)[1].data['pdf']
   bins = fits.open(pdf_file)[2].data['bins']
   pdfs = pdfs[msk]
@@ -102,7 +100,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
   zmcs=subcat[column_pdfs]
   if o.usepdf:
     binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
-    bz = np.linspace(0,4,51)
+    bz = np.linspace(0,4,201)
     hz = []
     for x in xrange(len(bz) - 1):
       # interpolate at the edges of the bins and then integrate
@@ -112,7 +110,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
       hz.append(np.nansum(pdf_area))
     hz = np.array(hz)
   else:
-    hz,bz=np.histogram(zmcs,bins=50,range=[0.,4.])
+    hz,bz=np.histogram(zmcs,bins=200,range=[0.,4.])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
   nzs.append([bz[:-1],bz[1:],hz+0.])
   maps.append(nmap)
