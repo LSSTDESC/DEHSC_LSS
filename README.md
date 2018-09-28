@@ -10,7 +10,9 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Removing all the unnecessary clutter from the raw files
    - Filter out all unnecessary columns (see line 50 of `process_metadata.py` for the columns we actually keep).
    - Writing the reduced tables into new files.
-   
+
+   Additionally, we have downloaded the photo-z pdfs, which are not directly in the HSC database. The data was downloaded with photoz_binning/get_pdfs.sh.
+
    All this is done with the script `process_metadata.py`. Run `python process_metadata.py -h` to see all available command-line options. The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/HSC_*_frames_proc.fits`.
 3. Reduce the catalog data. This implies:
    - Removing all the unnecessary clutter from the raw files
@@ -21,6 +23,7 @@ We have processed the HSC data for clustering analyses following a number of ste
    
    All this is done with the script `process.py`. Run `python process.py -h` to see all available command-line options.
    The reduced files are stored (and available) at `/global/cscratch1/sd/damonge/HSC/HSC_processed/` in per-field sub-directories.
+   We match the photo-z pdf data to the clean catalogs to produce reduced pdf files. These are currently stored at in the same directories described above (with hopefully self-explanatory file names). The pdf data is stored as a FITS file containig three data tables. The first table contains the object IDs in one column and the pdf array for each object in the second column. The second table contains a single array with the redshift binning of the pdfs (the same for all pdfs).
 4. Use the metadata to generate maps of the per-frame systematics (i.e. observing conditions) in each field. This implies:
    - Selecting the frames that fall within the field region.
    - Computing the map pixels each frame intersects and their corresponding areas (this is the most time-consuming part).
