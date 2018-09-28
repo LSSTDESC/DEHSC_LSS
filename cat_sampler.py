@@ -102,14 +102,14 @@ for zi,zf in zip(zi_arr,zf_arr) :
   zmcs=subcat[column_pdfs]
   if o.usepdf:
     binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
-    bz = np.linspace(0.08,4,5)
+    bz = np.linspace(0.08,4,50)
     hz = []
     for x in xrange(len(bz) - 1):
       # interpolate at the edges of the bins and then integrate
       redshift_subset = [bz[x]] + list(bins[(bins > bz[x]) & (bins < bz[x+1])]) + [bz[x+1]] # The interpolation x-axis
       interp_pdfs = interp1d(bins, pdfs)(redshift_subset) # Get the PDF values at the interpolation points
       pdf_area = np.trapz(interp_pdfs, x = redshift_subset, axis = 1)
-      hz.append(sum(pdf_area))
+      hz.append(np.nansum(pdf_area))
     hz = np.array(hz)
   else:
     hz,bz=np.histogram(zmcs,bins=50,range=[0.,4.])
