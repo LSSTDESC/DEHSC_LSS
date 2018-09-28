@@ -27,7 +27,7 @@ parser.add_option('--pz-type',dest='pz_type',default='nnpz',type=str,
                   help='Photo-z to use')
 parser.add_option('--pz-mark',dest='pz_mark',default='best',type=str,
                   help='Photo-z summary statistic to use when binning objects')
-parser.add_option('--use-pdf',dest='usepdf',default=False,type=bool,
+parser.add_option('--use-pdf',dest='usepdf',default=False,
                   help='Whether to stack photo-z pdfs to generate N(z)')
 parser.add_option('--pz-bins',dest='fname_bins',default=None,type=str,
                   help='File containing the redshift bins (format: 1 row per bin, 2 columns: z_ini z_end)')
@@ -52,7 +52,7 @@ if not os.path.isfile(o.map_sample) :
   raise KeyError("File "+o.map_sample+" doesn't exist")
 
 if (o.fname_bins is None) or (not os.path.isfile(o.fname_bins)) :
-  raise KeyError("Can't fine bins file")
+  raise KeyError("Can't find bins file")
 
 if o.fname_out is None :
   o.fname_out=o.prefix_in+'_bins_'+o.fname_bins+'.fits'
