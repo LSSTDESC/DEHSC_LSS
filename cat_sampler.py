@@ -88,7 +88,7 @@ nbins=len(zi_arr)
 
 if o.usepdf:
   # Read in pdfs and bins
-  pdf_file = sorted(prefix_pdf + 'matched_pdfs_ids_bins_deep_' + o.prefix_in.split('/')[-1].lower() + '.fits')
+  pdf_file = prefix_pdf + 'matched_pdfs_ids_bins_' + o.prefix_in.split('/')[-1].lower() + '_' + o.pz_type'.fits'
   pdfs = fits.open(pdf_file)[1].data['pdf']
   bins = fits.open(pdf_file)[2].data['bins']
 
