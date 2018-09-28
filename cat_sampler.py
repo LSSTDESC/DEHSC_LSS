@@ -86,7 +86,7 @@ fsk,mpdum=fm.read_flat_map(o.map_sample,0)
 zi_arr,zf_arr=np.loadtxt(o.fname_bins,unpack=True,ndmin=2)
 nbins=len(zi_arr)
 
-if usepdf:
+if o.usepdf:
   # Read in pdfs and bins
   pdf_files = sorted(glob(prefix_pdf + '*' + pz_code + '*'))
   pdfs = np.vstack([fits.open(thisfile)[1].data['pdf'] for thisfile in pdf_files])
@@ -99,7 +99,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
   msk=(cat[column_mark]<=zf) & (cat[column_mark]>zi)
   subcat=cat[msk]
   zmcs=subcat[column_pdfs]
-  if usepdf:
+  if o.usepdf:
     binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
     bz = np.linspace(0,4,51)
     hz = []
