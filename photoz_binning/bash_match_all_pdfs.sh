@@ -16,10 +16,10 @@ do
 #SBATCH --qos=regular
 #SBATCH -t 00:30:00             # Set 30 min limit
 #SBATCH --constraint=haswell    # Use Haswell nodes
-#SBATCH --output=/global/cscratch1/sd/awan/hsc_matched_pdfs/sbatch_output/%j_match_pdfs_${i}_${j}.out
+#SBATCH --output=/global/cscratch1/sd/damonge/HSC/%j_match_pdfs_${i}_${j}.out
 #SBATCH --job-name=match_pdfs
 
-srun python /global/homes/a/awan/LSST/lsstRepos/HyperSupremeStructure-HSC-LSS/photoz_binning/match_pdfs.py \
+srun python /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/photoz_binning/match_pdfs.py \
                     --data_main_path='/global/cscratch1/sd/damonge/HSC/HSC_processed' \
                     --pdfs_main_path='/global/cscratch1/sd/awan/hsc_pdfs/' \
                     --outDir='/global/cscratch1/sd/damonge/HSC/HSC_processed/${i^^}' \
