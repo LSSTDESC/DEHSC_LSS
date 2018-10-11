@@ -5,13 +5,13 @@ predir_out=/global/cscratch1/sd/damonge/HSC
 do_cleanup=false
 do_process=false
 do_sysmap=false
-do_cat_sample=true
-do_power_spectra=false
+do_cat_sample=false
+do_power_spectra=true
 
-recompute_mcm=true
-covar_option=NONE
-pz_bins_file=4bins_hsc #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
-ell_bins_file=hsc #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
+recompute_mcm=false
+covar_option=data
+pz_bins_file=1bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
+ell_bins_file=400 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
 nz_method=pdfstack
 
@@ -69,8 +69,8 @@ do
 	if [ "$recompute_mcm" = true ]; then	
 	    rm -f ${fname_mcm} ${fname_cov_mcm}
 	fi
-	python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --covariance-option ${covar_option} --covariance-theory-prediction cl_th_${nbins}pzbins.txt --covariance-coupling-file ${fname_cov_mcm}
-	python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_nocont.sacc --input-prefix ${dirname}/${field}                       --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --covariance-theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm}
+	python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --cont-deproj-bias-option ${covar_option}
+	python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont.sacc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm}
     fi
 done
 
