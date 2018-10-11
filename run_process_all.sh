@@ -5,15 +5,15 @@ predir_out=/global/cscratch1/sd/damonge/HSC
 do_cleanup=false
 do_process=false
 do_sysmap=false
-do_cat_sample=false
-do_power_spectra=true
+do_cat_sample=true
+do_power_spectra=false
 
 recompute_mcm=true
 covar_option=NONE
 pz_bins_file=4bins_hsc #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
-ell_bins_file=400 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
+ell_bins_file=hsc #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
-nz_method=zmc
+nz_method=pdfstack
 
 #First clean up the metadata
 for table in WIDE DEEP UDEEP
@@ -23,24 +23,13 @@ do
     fi
 done
 
-#Now clean up the WIDE fields
-for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
+#Now clean up the WIDE and DEEP fields
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS
 do
     dirname=${predir_out}/HSC_processed/${field}
     mkdir -p ${dirname}
     if [ "$do_process" = true ]; then
-	#python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5
-	python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5 --flat-project CAR
-    fi
-done
-
-#Same for deep fields.
-for field in DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS
-do
-    dirname=${predir_out}/HSC_processed/${field}
-    mkdir -p ${dirname}
-    if [ "$do_process" = true ]; then
-	#python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5
+	echo $field
 	python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5 --flat-project CAR
     fi
 done

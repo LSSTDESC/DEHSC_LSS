@@ -132,9 +132,17 @@ systdesc['dust']=np.array(dustdesc)
 # 2- Nstar
 #    This needs to be done for stars passing the same cuts as the sample (except for the s/g separator)
 sel_maglim=np.ones(len(cat),dtype=bool); sel_maglim[cat['%scmodel_mag'%o.band]-cat['a_%s'%o.band]>o.depth_cut]=0
+sel_fluxcut_i=np.ones(len(cat),dtype=bool); sel_fluxcut_i[cat['icmodel_flux']<10*cat['icmodel_flux_err']]=0
+sel_fluxcut_g=np.ones(len(cat),dtype=int); sel_fluxcut_i[cat['gcmodel_flux']<5*cat['gcmodel_flux_err']]=0
+sel_fluxcut_r=np.ones(len(cat),dtype=int); sel_fluxcut_i[cat['rcmodel_flux']<5*cat['rcmodel_flux_err']]=0
+sel_fluxcut_z=np.ones(len(cat),dtype=int); sel_fluxcut_i[cat['zcmodel_flux']<5*cat['zcmodel_flux_err']]=0
+sel_fluxcut_y=np.ones(len(cat),dtype=int); sel_fluxcut_i[cat['ycmodel_flux']<5*cat['ycmodel_flux_err']]=0
+sel_fluxcut_grzy=(sel_fluxcut_g+sel_fluxcut_r+sel_fluxcut_z+sel_fluxcut_y>=2)
+sel_fluxcut=sel_fluxcut_i*sel_fluxcut_grzy
 sel_stars=np.ones(len(cat),dtype=bool);  sel_stars[cat['iclassification_extendedness']>0.99]=0
 sel_gals =np.ones(len(cat),dtype=bool);  sel_gals[cat['iclassification_extendedness']<0.99]=0
-mstar=createCountsMap(cat['ra'][sel_maglim*sel_stars],cat['dec'][sel_maglim*sel_stars],fsk)+0.
+mstar=createCountsMap(cat['ra'][sel_maglim*sel_stars*sel_fluxcut],
+                      cat['dec'][sel_maglim*sel_stars*sel_fluxcut],fsk)+0.
 if o.gen_plot :
   fsk.view_map(mstar,posColorbar=True,title='N_star',xlabel='ra',ylabel='dec',
                fnameOut=o.out_prefix+'_nstar_'+o.band+'%.2lf.png'%(o.depth_cut))
@@ -224,9 +232,10 @@ if o.sv_mask :
 ####
 # Implement final cuts
 # - Mag. limit
+# - S/N cut
 # - Star-galaxy separator
-print("Will lose %d objects to depth and stars"%(np.sum(~(sel_maglim*sel_gals))))
-cat.remove_rows(~(sel_maglim*sel_gals))
+print("Will lose %d objects to depth, S/N and stars"%(np.sum(~(sel_maglim*sel_gals*sel_fluxcut))))
+cat.remove_rows(~(sel_maglim*sel_gals*sel_fluxcut))
 
 ####
 # Write final catalog
