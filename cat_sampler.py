@@ -104,7 +104,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
   zmcs=subcat[column_pdfs]
   if o.usepdf:
     binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
-    bz = np.linspace(0,nz_bin_max,nz_bin_num+1)
+    bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
     hz = []
     for x in xrange(len(bz) - 1):
       # interpolate at the edges of the bins and then integrate
@@ -114,7 +114,7 @@ for zi,zf in zip(zi_arr,zf_arr) :
       hz.append(np.nansum(pdf_area))
     hz = np.array(hz)
   else:
-    hz,bz=np.histogram(zmcs,bins=nz_bin_num,range=[0.,nz_bin_max])
+    hz,bz=np.histogram(zmcs,bins=o.nz_bin_num,range=[0.,o.nz_bin_max])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
   nzs.append([bz[:-1],bz[1:],hz+0.])
   maps.append(nmap)

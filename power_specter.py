@@ -174,7 +174,7 @@ class Tracer(object) :
     #Reshape contaminants
     conts=None
     if contaminants is not None :
-      conts=[[c.reshape([self.fsk.ny,self.fsk.nx]) for c in contaminants]]
+      conts=[[c.reshape([self.fsk.ny,self.fsk.nx])] for c in contaminants]
 
     #Form NaMaster field
     self.field=nmt.NmtFieldFlat(np.radians(self.fsk.lx),np.radians(self.fsk.ly),
