@@ -96,7 +96,7 @@ if o.use_cosmos:
   weights = fits.open(weights_file)[1].data['weights']
   cosmosz= fits.open(weights_file)[1].data['cosmos_photoz']
   weights_tot= np.sum(weights)
-  N_photo_tot= len(weights_file)
+  N_photo_tot= 527452
   #weights = weights[msk]
 
 
@@ -132,9 +132,10 @@ for zi,zf in zip(zi_arr,zf_arr) :
     bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
     hz = []
     for x in xrange(len(bz) - 1):
+      sum_weights=0
       zmsk= (bincosmosz<=bz[x+1]) & (bincosmosz>bz[x]) #Mask based on cosmos photoz bins
-      sum_weights= np.sum(binweights[zmsk])
-      hz.append((sum_weights/weights_tot)*N_photo_tot)
+      sum_weights= np.sum(binweights[zmsk]) #Sum the weights in this redhift bin
+      hz.append((sum_weights/weights_tot)*N_photo_tot) #Make N(z) values
     hz = np.array(hz)       
   else:
     hz,bz=np.histogram(zmcs,bins=o.nz_bin_num,range=[0.,o.nz_bin_max])
