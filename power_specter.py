@@ -10,6 +10,7 @@ import sacc
 import sys
 import time
 import os
+from scipy.interpolate import interp1d
 
 prefix_data='/global/cscratch1/sd/damonge/HSC/'
 def opt_callback(option, opt, value, parser):
@@ -54,12 +55,18 @@ parser.add_option('--cont-oc',dest='cont_oc',type='string',
                   'list here all observing conditions you want to include')
 parser.add_option('--cont-oc-bands',dest='cont_oc_bands',default=False,action='store_true',
                   help='Marginalize over observing contition templates in all bands.')
+parser.add_option('--cont-deproj-bias',dest='cont_deproj_bias',default=False,action='store_true',
+                  help='Remove deprojection bias.')
+parser.add_option('--cont-deproj-bias-option',dest='cont_deproj_bias_opt',default='NONE',type=str,
+                  help='Option to compute the deprojection bias. Options are \'NONE\''+
+                  '(no debias),  \'theory\' (Analytical with input theory Cls),'+
+                  '\'data\' (Analytical with Cls from data) or \'gaus_sim\' (mean from Gaussian simulations)')
 parser.add_option('--covariance-option',dest='covar_opt',default='NONE',type=str,
                   help='Option to compute the covariance matrix. Options are \'NONE\''+
-                  '(no covariance),  \'theory\' (theoretical Gaussian covariance) or'+
-                  '\'gaus_sim\' (MC over Gaussian simulations)')
-parser.add_option('--covariance-theory-prediction',dest='covar_theory',default='NONE',type=str,
-                  help='If computing the covariance, you must supply a file with a'+
+                  '(no covariance),  \'theory\' (Gaussian covariance with input theory Cls),'+
+                  '\'data\' (Gaussian covariance with Cls from data) or \'gaus_sim\' (MC over Gaussian simulations)')
+parser.add_option('--theory-prediction',dest='cl_theory',default='NONE',type=str,
+                  help='If computing the covariance or deprojection bias from theory, you must supply a file with a'+
                   'theory prediction for the power spectra. First column should be a'+
                   'list of ell values, subsequent columns should contain all unique cross '+
                   'correlations (11,12,...,1N,22,23,...,NN)')
@@ -174,7 +181,7 @@ class Tracer(object) :
     #Reshape contaminants
     conts=None
     if contaminants is not None :
-      conts=[[c.reshape([self.fsk.ny,self.fsk.nx]) for c in contaminants]]
+      conts=[[c.reshape([self.fsk.ny,self.fsk.nx])] for c in contaminants]
 
     #Form NaMaster field
     self.field=nmt.NmtFieldFlat(np.radians(self.fsk.lx),np.radians(self.fsk.ly),
@@ -214,6 +221,40 @@ for i in range(nbins) :
     if j!=i :
       ordering[j,i]=i_x
     i_x+=1
+
+#Set up deprojection bias proposal power spectrum
+if o.cont_deproj_bias :
+  cls_all=np.array(cls_all)
+  n_cross=len(cls_all)
+  print("Computing deprojection bias")
+  if o.cont_deproj_bias_opt=='data' :
+    lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
+    #Interpolate measured power spectra
+    lth=np.arange(2,lmax+1)+0.
+    clth=np.zeros([n_cross,len(lth)])
+    for i in range(n_cross) :
+      clf=interp1d(ell_eff,cls_all[i],bounds_error=False,fill_value=0,kind='linear')
+      clth[i,:]=clf(lth)
+      clth[i,lth<=ell_eff[0]]=cls_all[i,0]
+      clth[i,lth>=ell_eff[-1]]=cls_all[i,-1]
+  elif o.covar_opt=='theory' :
+    #Read theory power spectra
+    data=np.loadtxt(o.cl_theory,unpack=True)
+    lth=data[0]
+    clth=data[1:]
+  else :
+    raise ValueError("Must provide a valid method to compute the deprojection bias\n")
+
+  cls_all=[]
+  i_x=0
+  for i in range(nbins) :
+    for j in range(i,nbins) :
+      cl_coupled=nmt.compute_coupled_cell_flat(tracers[i].field,tracers[j].field,bpws)
+      if o.cont_deproj_bias :
+        cl_deproj_bias=nmt.deprojection_bias_flat(tracers[i].field,tracers[j].field,bpws,lth,[clth[i_x]])
+      else :
+        cl_deproj_bias=None
+      cls_all.append(wsp.decouple_cell(cl_coupled,cl_bias=cl_deproj_bias)[0])
 cls_all=np.array(cls_all)
 n_cross=len(cls_all)
 n_ell=len(ell_eff)
@@ -221,12 +262,24 @@ n_ell=len(ell_eff)
 #Compute covariance matrix
 if o.covar_opt=='NONE' :
   covar=None
-elif o.covar_opt=='theory' :
-  print("Computing theory covariance")
-  #Read theory power spectra
-  data=np.loadtxt(o.covar_theory,unpack=True)
-  lth=data[0]
-  clth=data[1:]
+elif ((o.covar_opt=='data') or (o.covar_opt=='theory')) :
+  print("Computing Gaussian covariance")
+  if o.covar_opt=='data' :
+    lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
+    #Interpolate measured power spectra
+    lth=np.arange(2,lmax+1)+0.
+    clth=np.zeros([n_cross,len(lth)])
+    for i in range(n_cross) :
+      clf=interp1d(ell_eff,cls_all[i],bounds_error=False,fill_value=0,kind='linear')
+      clth[i,:]=clf(lth)
+      clth[i,lth<=ell_eff[0]]=cls_all[i,0]
+      clth[i,lth>=ell_eff[-1]]=cls_all[i,-1]
+  elif o.covar_opt=='theory' :
+    #Read theory power spectra
+    data=np.loadtxt(o.cl_theory,unpack=True)
+    lth=data[0]
+    clth=data[1:]
+
   if len(clth)!=n_cross :
     raise ValueError("Theory power spectra have a wrong shape")
 
@@ -262,7 +315,7 @@ elif o.covar_opt=='gaus_sim' :
   raise ValueError("Gaussian simulations not implemented yet")
   '''
   covar=Non
-  data=np.loadtxt(o.covar_theory,unpack=True)
+  data=np.loadtxt(o.cl_theory,unpack=True)
   lth=data[0]
   clth=data[1:]
   if len(clth)!=n_cross :
