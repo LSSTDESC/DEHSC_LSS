@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
-import healpy as hp
+#import healpy as hp
 from scipy.stats import binned_statistic
 import flatmaps as fm
 import os
@@ -125,7 +125,7 @@ cont_maps = ['oc_airmass','oc_ccdtemp','oc_ellipt','oc_exptime','oc_nvisit', \
     'oc_seeing', 'oc_sigma_sky', 'oc_skylevel','syst_dust','syst_nstar_i24.50']
 xlabels= ['Airmass', r'CCD Temperature [$^{\circ}$C]', 'PSF Ellipticity', \
     'Exposure Time [s]', 'Number of visits', 'Seeing [pixels]', 'Sky noise [ADU]', \
-    'Sky level [ADU]', 'E(B-V)', 'Stars per pixel'] 
+    'Sky level [ADU]', 'Extinction', 'Stars per pixel'] 
 data_hdus = fits.open(o.fname_maps)
 if len(data_hdus)%2!=0:
     raise ValueError("Input file should have two HDUs per map")
