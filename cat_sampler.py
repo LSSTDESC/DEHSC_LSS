@@ -94,7 +94,9 @@ if o.use_cosmos:
   # Read in weights and bins
   weights_file = o.prefix_in+'cosmos_hsc_weights.fits'
   weights = fits.open(weights_file)[1].data['weights']
+  cosmosz= fits.open(weights_file)[1].data['cosmos_photoz']
   weights_tot= np.sum(weights)
+  N_photo_tot= len(weights_file)
   #weights = weights[msk]
 
 
@@ -126,10 +128,14 @@ for zi,zf in zip(zi_arr,zf_arr) :
   elif o.use_cosmos:
     msk_cosmos=(weights_file[column_mark]<=zf) & (weights_file[column_mark]>zi)
     binweights= weights[msk_cosmos]
-    
-    
-        
-    
+    bincosmosz=cosmosz[msk_cosmos]
+    bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
+    hz = []
+    for x in xrange(len(bz) - 1):
+      zmsk= (bincosmosz<=bz[x+1]) & (bincosmosz>bz[x]) #Mask based on cosmos photoz bins
+      sum_weights= np.sum(binweights[zmsk])
+      hz.append((sum_weights/weights_tot)*N_photo_tot)
+    hz = np.array(hz)       
   else:
     hz,bz=np.histogram(zmcs,bins=o.nz_bin_num,range=[0.,o.nz_bin_max])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
