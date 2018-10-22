@@ -107,9 +107,7 @@ def check_sys(data_hdu, path_sys, mask, nbins, **kwargs):
     """
 
     fmi, s_map = fm.read_flat_map(path_sys, i_map=-1)
-    fmd, data_map = fm.read_flat_map(None, hdu=data_hdu)
-    #fmd.view_map(data_map)
-    #plt.show()
+    fmd, data_map = fm.read_flat_map(None, hdu=data_hdu) 
     mean = []
     err = []
     bin_centers = []
