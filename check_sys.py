@@ -108,6 +108,8 @@ def check_sys(data_hdu, path_sys, mask, nbins, **kwargs):
 
     fmi, s_map = fm.read_flat_map(path_sys, i_map=-1)
     fmd, data_map = fm.read_flat_map(None, hdu=data_hdu)
+    #fmd.view_map(data_map)
+    #plt.show()
     mean = []
     err = []
     bin_centers = []
@@ -148,20 +150,24 @@ for ibin in range(nbins):
     data_hdu = data_hdus[2*ibin]
     for j, cm in enumerate(cont_maps):
         path_sys = o.prefix_in+'_%s.fits' %(cm)
-        xsys, mean_sys, std_sys = check_sys(data_hdu, path_sys, msk_t, o.nbins_sys)
+        xsys, mean_sys, std_sys = check_sys(data_hdu, path_sys, msk_t, o.nbins_sys) 
         plt.figure()
         if len(xsys)>1:
             for i in range(len(xsys)):
-                plt.errorbar(xsys[i],mean_sys[i],std_sys[i],fmt='o',label='%s-band' %band[i],fillstyle='none')
+                plt.errorbar(xsys[i], mean_sys[i], std_sys[i], fmt='o', label='%s-band' %band[i], fillstyle='none')
         else:
-           plt.errorbar(xsys[0],mean_sys[0],std_sys[0],fmt='o',label=xlabels[j],fillstyle='none')
-        plt.ylabel(r'$\bar{n}$ [galaxies/pixel]',fontsize=16)
-        plt.xlabel(xlabels[j],fontsize=16)
+           plt.errorbar(xsys[0], mean_sys[0], std_sys[0], fmt='o', label=xlabels[j], fillstyle='none')
+        plt.ylabel(r'$\bar{n}$ [galaxies/pixel]', fontsize=16)
+        plt.xlabel(xlabels[j], fontsize=16)
         plt.grid()
         plt.legend(loc='best')
-        plt.ylim(5,20)
+        mean_sys_all = np.concatenate(mean_sys).ravel()
+        ymin = 0.9*np.percentile(mean_sys_all[~np.isnan(mean_sys_all)], 5)
+        ymax = 1.1*np.percentile(mean_sys_all[~np.isnan(mean_sys_all)], 95)
+        plt.ylim(ymin, ymax)
         if len(xsys)>1:
             sname = cm.split('_')[-1]+'_bin_%d.pdf' % ibin
         else:
             sname = 'nstars_bin_%d.pdf' % ibin
-        plt.savefig(os.path.join(o.prefix_out, sname)) 
+        plt.savefig(os.path.join(o.prefix_out, sname))
+        plt.close() 
