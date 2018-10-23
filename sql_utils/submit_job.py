@@ -157,21 +157,22 @@ def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_fiel
         sthere=""
         for fi in filters :
             if behind :
-                sthere+="       ,"+name+fi+"\n"
+                sthere+="       ,forced."+name+fi+"\n"
             else :
-                sthere+="       ,"+fi+name+"\n"
+                sthere+="       ,forced."+fi+name+"\n"
         return sthere
 
     stout+="SELECT object_id\n"
-    stout+="       ,ra\n"
-    stout+="       ,dec\n"
-    stout+="       ,tract\n"
-    stout+="       ,patch\n"
+    stout+="       ,forced.ra as ra\n"
+    stout+="       ,forced.dec as dec\n"
+    stout+="       ,forced.tract as tract\n"
+    stout+="       ,forced.patch as patch\n"
     stout+=add_filters("merge_peak_")
     stout+=add_filters("countinputs",behind=False)
-    stout+="       ,iflags_pixel_bright_object_center\n"
-    stout+="       ,iflags_pixel_bright_object_any\n" 
-    stout+="       ,iclassification_extendedness\n"
+    stout+="       ,forced.iflags_pixel_bright_object_center\n"
+    stout+="       ,forced.iflags_pixel_bright_object_any\n" 
+    stout+="       ,forced.iclassification_extendedness\n"
+    stout+="       ,meas.iblendedness_abs_flux as iblendedness_abs_flux\n"
     #Dust extinction
     stout+=add_filters("a_")
     #Psf fluxes and magnitudes
@@ -197,22 +198,24 @@ def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_fiel
         stout+=add_photoz("frz")
         stout+=add_photoz("nnz")
     stout+="FROM\n"
-    stout+="       "+tablename+".forced\n"
+    stout+="       "+tablename+".forced as forced\n"
     if do_photoz :
+        stout+="       LEFT JOIN "+tablename+".meas meas USING (object_id)\n"
         stout+="       LEFT JOIN "+tablename+".photoz_ephor_ab peab USING (object_id)\n"
         stout+="       LEFT JOIN "+tablename+".photoz_frankenz pfrz USING (object_id)\n"
         stout+="       LEFT JOIN "+tablename+".photoz_nnpz pnnz USING (object_id)\n"
     stout+="WHERE\n"
-    stout+="       detect_is_primary=True and\n"
-    stout+="       icmodel_flags_badcentroid=False and\n"
-    stout+="       icentroid_sdss_flags=False and\n"
-    stout+="       iflags_pixel_edge=False and\n"
-    stout+="       iflags_pixel_interpolated_center=False and\n"
-    stout+="       iflags_pixel_saturated_center=False and\n"
-    stout+="       iflags_pixel_cr_center=False and\n"
-    stout+="       iflags_pixel_bad=False and\n"
-    stout+="       iflags_pixel_suspect_center=False and\n"
-    stout+="       iflags_pixel_clipped_any=False"
+    stout+="       forced.detect_is_primary=True and\n"
+    stout+="       forced.icmodel_flags_badcentroid=False and\n"
+    stout+="       forced.icentroid_sdss_flags=False and\n"
+    stout+="       forced.iflags_pixel_edge=False and\n"
+    stout+="       forced.iflags_pixel_interpolated_center=False and\n"
+    stout+="       forced.iflags_pixel_saturated_center=False and\n"
+    stout+="       forced.iflags_pixel_cr_center=False and\n"
+    stout+="       forced.iflags_pixel_bad=False and\n"
+    stout+="       forced.iflags_pixel_suspect_center=False and\n"
+    stout+="       forced.iflags_pixel_clipped_any=False and\n"
+    stout+="       meas.ideblend_skipped=False"
 # and\n"
 #    stout+="       iclassification_extendedness!=0"
     if do_field :
@@ -220,8 +223,8 @@ def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_fiel
         stout+="       "+tablename+".search_"+fieldname+"(object_id)"
     if ra_range is not None :
         stout+=" and\n"
-        stout+="       ra>=%.3lf and\n"%(ra_range[0])
-        stout+="       ra<%.3lf"%(ra_range[1])
+        stout+="       forced.ra>=%.3lf and\n"%(ra_range[0])
+        stout+="       forced.ra<%.3lf"%(ra_range[1])
     stout+="\n;\n"
 
     f=open(fname_out,"w")
@@ -283,7 +286,7 @@ write_frames("pdr1_deep","frames_deep.sql",submit=True)
 write_frames("pdr1_udeep","frames_udeep.sql",submit=True)
 
 #WIDE fields
-for fld in ['gama09h','gama15h','hectomap','wide12h','xmm_lss','aegis'] :
+for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss','aegis'] :
     write_fieldsearch("pdr1_wide",fld,"field_wide_"+fld+"_pz.sql",do_field=True,submit=True,do_photoz=True)
 write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h1.sql",do_field=True,submit=True,ra_range=[330.,336.],do_photoz=True)
 write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h2.sql",do_field=True,submit=True,ra_range=[336.,342.],do_photoz=True)
@@ -295,7 +298,7 @@ for fld in ['cosmos','deep2_3','elais_n1','xmm_lss'] :
 #UDEEP fields
 for fld in ['cosmos','sxds'] :
     write_fieldsearch("pdr1_udeep",fld,"field_udeep_"+fld+".sql",do_field=True,submit=True,do_photoz=True)
-
+exit(1)
 #WIDE-depth COSMOS
 for see in ['best','median','worst'] :
     write_fieldsearch("pdr1_cosmos_widedepth_"+see,"none","field_cosmo_wide_"+see+".sql",do_field=False,submit=True,do_photoz=False)

@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import astropy.io.fits as fits
 from createMaps import createCountsMap
@@ -9,7 +10,6 @@ import sys
 import time
 import os
 
-prefix_data='/global/cscratch1/sd/damonge/HSC/'
 def opt_callback(option, opt, value, parser):
   setattr(parser.values, option.dest, value.split(','))
 
@@ -25,8 +25,16 @@ parser.add_option('--pz-type',dest='pz_type',default='nnpz',type=str,
                   help='Photo-z to use')
 parser.add_option('--pz-mark',dest='pz_mark',default='best',type=str,
                   help='Photo-z summary statistic to use when binning objects')
+parser.add_option('--use-pdf',dest='usepdf',default=False,
+                  help='Whether to stack photo-z pdfs to generate N(z)')
+parser.add_option('--use-cosmos',dest='use_cosmos',default=False,
+                  help='Whether to use the COSMOS reweighting to generate N(z)')
 parser.add_option('--pz-bins',dest='fname_bins',default=None,type=str,
                   help='File containing the redshift bins (format: 1 row per bin, 2 columns: z_ini z_end)')
+parser.add_option('--nz-bins',dest='nz_bin_num',default=200,type=int,
+                  help='Number of bins to use in the output N(z)\'s')
+parser.add_option('--nz-max',dest='nz_bin_max',default=4.0,type=float,
+                  help='Maximum redshift to use for output N(z)\'s')
 parser.add_option('--map-sample',dest='map_sample',default=None,type=str,
                   help='Sample map used to determine the pixelization that will be used. If None I\'ll try to find the masked fraction map')
 parser.add_option('--analysis-band', dest='band', default='i', type=str,
@@ -48,7 +56,7 @@ if not os.path.isfile(o.map_sample) :
   raise KeyError("File "+o.map_sample+" doesn't exist")
 
 if (o.fname_bins is None) or (not os.path.isfile(o.fname_bins)) :
-  raise KeyError("Can't fine bins file")
+  raise KeyError("Can't find bins file")
 
 if o.fname_out is None :
   o.fname_out=o.prefix_in+'_bins_'+o.fname_bins+'.fits'
@@ -75,6 +83,23 @@ if not o.no_bo_cut :
   msk*=np.logical_not(cat['iflags_pixel_bright_object_any'])
   cat=cat[msk]
 
+if o.usepdf:
+  # Read in pdfs and bins
+  pdf_file = o.prefix_in+'_pdfs_'+o.pz_type+'.fits'
+  pdfs = fits.open(pdf_file)[1].data['pdf']
+  bins = fits.open(pdf_file)[2].data['bins']
+  pdfs = pdfs[msk]
+
+if o.use_cosmos:
+  # Read in weights and bins
+  weights_file = o.prefix_in+'cosmos_hsc_weights.fits'
+  weights = fits.open(weights_file)[1].data['weights']
+  cosmosz= fits.open(weights_file)[1].data['cosmos_photoz']
+  weights_tot= np.sum(weights)
+  N_photo_tot= 527452
+  #weights = weights[msk]
+
+
 #Read map information
 fsk,mpdum=fm.read_flat_map(o.map_sample,0)
 
@@ -89,7 +114,31 @@ for zi,zf in zip(zi_arr,zf_arr) :
   msk=(cat[column_mark]<=zf) & (cat[column_mark]>zi)
   subcat=cat[msk]
   zmcs=subcat[column_pdfs]
-  hz,bz=np.histogram(zmcs,bins=50,range=[0.,4.])
+  if o.usepdf:
+    binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
+    bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
+    hz = []
+    for x in xrange(len(bz) - 1):
+      # interpolate at the edges of the bins and then integrate
+      redshift_subset = [max(bz[x], bins[0])] + list(bins[(bins > bz[x]) & (bins < bz[x+1])]) + [bz[x+1]] # The interpolation x-axis
+      interp_pdfs = interp1d(bins, binpdfs)(redshift_subset) # Get the PDF values at the interpolation points
+      pdf_area = np.trapz(interp_pdfs, x = redshift_subset, axis = 1)
+      hz.append(np.nansum(pdf_area))
+    hz = np.array(hz)
+  elif o.use_cosmos:
+    msk_cosmos=(weights_file[column_mark]<=zf) & (weights_file[column_mark]>zi)
+    binweights= weights[msk_cosmos]
+    bincosmosz=cosmosz[msk_cosmos]
+    bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
+    hz = []
+    for x in xrange(len(bz) - 1):
+      sum_weights=0
+      zmsk= (bincosmosz<=bz[x+1]) & (bincosmosz>bz[x]) #Mask based on cosmos photoz bins
+      sum_weights= np.sum(binweights[zmsk]) #Sum the weights in this redhift bin
+      hz.append((sum_weights/weights_tot)*N_photo_tot) #Make N(z) values
+    hz = np.array(hz)       
+  else:
+    hz,bz=np.histogram(zmcs,bins=o.nz_bin_num,range=[0.,o.nz_bin_max])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
   nzs.append([bz[:-1],bz[1:],hz+0.])
   maps.append(nmap)
