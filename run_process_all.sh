@@ -5,13 +5,13 @@ predir_out=/global/cscratch1/sd/damonge/HSC
 do_cleanup=false
 do_process=false
 do_sysmap=false
-do_cat_sample=false
+do_cat_sample=true
 do_power_spectra=true
 
 recompute_mcm=false
 covar_option=data
 pz_bins_file=1bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
-ell_bins_file=400 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
+ell_bins_file=200 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
 nz_method=pdfstack
 
@@ -24,7 +24,7 @@ do
 done
 
 #Now clean up the WIDE and DEEP fields
-for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS
 do
     dirname=${predir_out}/HSC_processed/${field}
     mkdir -p ${dirname}

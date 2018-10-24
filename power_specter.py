@@ -209,7 +209,6 @@ else :
 
 #Compute all cross-correlations
 print("Computing all cross-power specra")
-print("Warning : deprojection bias still missing")
 cls_all=[]
 ordering=np.zeros([nbins,nbins],dtype=int)
 i_x=0
