@@ -41,6 +41,8 @@ parser.add_option('--analysis-band', dest='band', default='i', type=str,
                   help='Band considered for your analysis (g,r,i,z,y)')
 parser.add_option('--depth-cut', dest='depth_cut', default=24.5, type=float,
                   help='Minimum depth to consider in your footprint')
+parser.add_option('--cosmos-weights-file',dest='cosmos_weights_file',default='/global/cscratch1/sd/damonge/HSC/HSC_processed/COSMOS_HSC_WEIGHTS.fits',type=str,
+                  help='Photo-z summary statistic to use when binning objects')
 
 ####
 # Read options
@@ -74,7 +76,7 @@ if o.pz_mark  not in ['best','mean','mode','mc'] :
   raise KeyError("Photo-z mark "+o.pz_mark+" unavailable. Choose between best, mean, mode and mc")
 
 column_mark='pz_'+o.pz_mark+'_'+pz_code
-column_pdfs='pz_mc_'+pz_code
+column_zmc='pz_mc_'+pz_code
 
 #Read catalog
 cat=fits.open(fname_cat)[1].data
@@ -92,13 +94,12 @@ if o.usepdf:
 
 if o.use_cosmos:
   # Read in weights and bins
-  weights_file = o.prefix_in+'cosmos_hsc_weights.fits'
-  weights = fits.open(weights_file)[1].data['weights']
-  cosmosz= fits.open(weights_file)[1].data['cosmos_photoz']
-  weights_tot= np.sum(weights)
-  N_photo_tot= 527452
-  #weights = weights[msk]
-
+  weights_file = fits.open(o.cosmos_weights_file)[1].data
+  #print(np.amax(weights_file['icmodel_mag']),np.amin(weights_file['gcmodel_mag']))
+  #print(np.amax(cat['icmodel_mag']),np.amin(cat['gcmodel_mag']))
+  #plt.hist(weights_file['icmodel_mag'],range=[17.,25.],bins=50,normed=True)
+  #plt.hist(cat['icmodel_mag'],range=[17.,25.],bins=50,normed=True)
+  #plt.show()
 
 #Read map information
 fsk,mpdum=fm.read_flat_map(o.map_sample,0)
@@ -113,7 +114,6 @@ nzs=[]
 for zi,zf in zip(zi_arr,zf_arr) :
   msk=(cat[column_mark]<=zf) & (cat[column_mark]>zi)
   subcat=cat[msk]
-  zmcs=subcat[column_pdfs]
   if o.usepdf:
     binpdfs = pdfs[msk] # The pdfs which have a redshift in the correct bin
     bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
@@ -126,18 +126,12 @@ for zi,zf in zip(zi_arr,zf_arr) :
       hz.append(np.nansum(pdf_area))
     hz = np.array(hz)
   elif o.use_cosmos:
-    msk_cosmos=(weights_file[column_mark]<=zf) & (weights_file[column_mark]>zi)
-    binweights= weights[msk_cosmos]
-    bincosmosz=cosmosz[msk_cosmos]
-    bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
-    hz = []
-    for x in xrange(len(bz) - 1):
-      sum_weights=0
-      zmsk= (bincosmosz<=bz[x+1]) & (bincosmosz>bz[x]) #Mask based on cosmos photoz bins
-      sum_weights= np.sum(binweights[zmsk]) #Sum the weights in this redhift bin
-      hz.append((sum_weights/weights_tot)*N_photo_tot) #Make N(z) values
-    hz = np.array(hz)       
+    msk_cosmos=(weights_file['hsc_'+column_mark]<=zf) & (weights_file['hsc_'+column_mark]>zi)
+    binweights=weights_file[msk_cosmos]['weight']
+    bincosmosz=weights_file[msk_cosmos]['cosmos_photoz']
+    hz,bz=np.histogram(bincosmosz,bins=o.nz_bin_num,range=[0.,o.nz_bin_max],weight=binweights)
   else:
+    zmcs=subcat[column_zmc]
     hz,bz=np.histogram(zmcs,bins=o.nz_bin_num,range=[0.,o.nz_bin_max])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
   nzs.append([bz[:-1],bz[1:],hz+0.])

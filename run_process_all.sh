@@ -6,7 +6,7 @@ do_cleanup=false
 do_process=false
 do_sysmap=false
 do_cat_sample=true
-do_power_spectra=true
+do_power_spectra=false
 
 recompute_mcm=false
 covar_option=data
