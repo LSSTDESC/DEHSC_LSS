@@ -27,6 +27,8 @@ parser.add_option('--pz-mark',dest='pz_mark',default='best',type=str,
                   help='Photo-z summary statistic to use when binning objects')
 parser.add_option('--use-pdf',dest='usepdf',default=False,
                   help='Whether to stack photo-z pdfs to generate N(z)')
+parser.add_option('--use-cosmos',dest='use_cosmos',default=False,
+                  help='Whether to use the COSMOS reweighting to generate N(z)')
 parser.add_option('--pz-bins',dest='fname_bins',default=None,type=str,
                   help='File containing the redshift bins (format: 1 row per bin, 2 columns: z_ini z_end)')
 parser.add_option('--nz-bins',dest='nz_bin_num',default=200,type=int,
@@ -88,6 +90,16 @@ if o.usepdf:
   bins = fits.open(pdf_file)[2].data['bins']
   pdfs = pdfs[msk]
 
+if o.use_cosmos:
+  # Read in weights and bins
+  weights_file = o.prefix_in+'cosmos_hsc_weights.fits'
+  weights = fits.open(weights_file)[1].data['weights']
+  cosmosz= fits.open(weights_file)[1].data['cosmos_photoz']
+  weights_tot= np.sum(weights)
+  N_photo_tot= 527452
+  #weights = weights[msk]
+
+
 #Read map information
 fsk,mpdum=fm.read_flat_map(o.map_sample,0)
 
@@ -113,6 +125,18 @@ for zi,zf in zip(zi_arr,zf_arr) :
       pdf_area = np.trapz(interp_pdfs, x = redshift_subset, axis = 1)
       hz.append(np.nansum(pdf_area))
     hz = np.array(hz)
+  elif o.use_cosmos:
+    msk_cosmos=(weights_file[column_mark]<=zf) & (weights_file[column_mark]>zi)
+    binweights= weights[msk_cosmos]
+    bincosmosz=cosmosz[msk_cosmos]
+    bz = np.linspace(0,o.nz_bin_max,o.nz_bin_num+1)
+    hz = []
+    for x in xrange(len(bz) - 1):
+      sum_weights=0
+      zmsk= (bincosmosz<=bz[x+1]) & (bincosmosz>bz[x]) #Mask based on cosmos photoz bins
+      sum_weights= np.sum(binweights[zmsk]) #Sum the weights in this redhift bin
+      hz.append((sum_weights/weights_tot)*N_photo_tot) #Make N(z) values
+    hz = np.array(hz)       
   else:
     hz,bz=np.histogram(zmcs,bins=o.nz_bin_num,range=[0.,o.nz_bin_max])
   nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
