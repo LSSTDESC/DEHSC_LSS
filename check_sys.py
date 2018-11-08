@@ -149,23 +149,34 @@ for ibin in range(nbins):
     for j, cm in enumerate(cont_maps):
         path_sys = o.prefix_in+'_%s.fits' %(cm)
         xsys, mean_sys, std_sys = check_sys(data_hdu, path_sys, msk_t, o.nbins_sys) 
-        plt.figure()
+        f, ax = plt.subplots(1,2,figsize=(10,4))
         if len(xsys)>1:
             for i in range(len(xsys)):
-                plt.errorbar(xsys[i], mean_sys[i], std_sys[i], fmt='o', label='%s-band' %band[i], fillstyle='none')
+                err_mean = std_sys[i]/np.mean(mean_sys[i])+ \
+                           np.std(std_sys[i])/np.sqrt(len(std_sys[i]))*mean_sys[i]/np.mean(mean_sys[i])**2
+                ax[0].errorbar(xsys[i], mean_sys[i], std_sys[i], fmt='o', label='%s-band' %band[i], fillstyle='none')
+                ax[1].errorbar(xsys[i], mean_sys[i]/np.mean(mean_sys[i])-1, err_mean, label='%s-band' %band[i], fillstyle='none')
         else:
-           plt.errorbar(xsys[0], mean_sys[0], std_sys[0], fmt='o', label=xlabels[j], fillstyle='none')
-        plt.ylabel(r'$\bar{n}$ [galaxies/pixel]', fontsize=16)
-        plt.xlabel(xlabels[j], fontsize=16)
-        plt.grid()
+           err_mean = std_sys[0]/np.mean(mean_sys[0])+ \
+                           np.std(std_sys[0])/np.sqrt(len(std_sys[0]))*mean_sys[0]/np.mean(mean_sys[0])**2
+           ax[0].errorbar(xsys[0], mean_sys[0], std_sys[0], fmt='o', label=xlabels[j], fillstyle='none')
+           ax[1].errorbar(xsys[0], mean_sys[0]/np.mean(mean_sys[0])-1, err_mean, label='%s-band' %band[i], fillstyle='none') 
+
+        ax[0].set_ylabel(r'$\bar{n}$ [galaxies/pixel]', fontsize=16)
+        ax[0].set_xlabel(xlabels[j], fontsize=16)
+        ax[0].grid()
+        ax[1].grid()
         plt.legend(loc='best')
         mean_sys_all = np.concatenate(mean_sys).ravel()
         ymin = 0.9*np.percentile(mean_sys_all[~np.isnan(mean_sys_all)], 5)
         ymax = 1.1*np.percentile(mean_sys_all[~np.isnan(mean_sys_all)], 95)
-        plt.ylim(ymin, ymax)
+        ax[0].set_ylim(ymin, ymax)
+        ax[1].set_ylabel(r'$\bar{n}/\langle \bar{n} \rangle -1$', fontsize=16)
+        ax[1].set_xlabel(xlabels[j], fontsize=16)
         if len(xsys)>1:
             sname = cm.split('_')[-1]+'_bin_%d.pdf' % ibin
         else:
             sname = 'nstars_bin_%d.pdf' % ibin
-        plt.savefig(os.path.join(o.prefix_out, sname))
-        plt.close() 
+        f.tight_layout()
+        f.savefig(os.path.join(o.prefix_out, sname))
+        plt.close(f) 
