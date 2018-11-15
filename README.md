@@ -64,7 +64,7 @@ The scripts described above make use of some dependencies and python modules wri
 - `estDepth.py`: contains routines to create depth maps using 3 different methods. All routines are wrapped into a single one called `get_depth`.
 - `flatMask.py`: describes the method used to generate the bright-object mask from the catalog data.
 - `obscond.py`: defines an "ObservingCondition" class to handle the generation of observing condition maps from the metadata. Used by `map_obscond.py`.
-- `NaMaster` (https://github.com/damonge/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies. The current state of the pipeline requires the use of the `validation` branch instead of `master`.
+- `NaMaster` (https://github.com/LSSTDESC/NaMaster): a python module to compute arbitrary-spin power spectra of masked fields both in flat and curved skies. The current state of the pipeline requires the use of the `validation` branch instead of `master`.
 - `SACC` (https://github.com/LSSTDESC/sacc): a file format to store generic two-point functions.
 
 The repo currently also hosts a number of ipython notebooks that were used to carry out the first analyses on the data. These also illustrate the use that has been made of the database information.
