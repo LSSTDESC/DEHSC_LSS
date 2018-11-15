@@ -41,7 +41,10 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Save all maps and redshift distributions to file. These are currently collected into a single FITS file that alternates image HDUs (containing the maps) and table HDUs (containing the binned N(z)).
    
    All this is done with the script `cat_sampler.py`. Run `python cat_sampler.py -h` to see all possible command-line options. 
-6. Compute tomographic cross-power spectrum and covariance matrix. This implies, for each field:
+6. Generate diagonstic plots and data for the impact of different systematics. For each field we basically estimate the average galaxy density in bins of the local value of a given systematic. All this is done with the script `check_sys.py`. Run `python check_sys.py -h` to see all possible command-line options. 
+
+   The diagnostic plots and data can be found in e.g. `/global/cscratch1/sd/damonge/HSC/HSC_processed/WIDE_GAMA09H/WIDE_GAMA09H_eab_best_pzb4bins_systematics/` (for the GAMA09H field).
+7. Compute tomographic cross-power spectrum and covariance matrix. This implies, for each field:
    - Reading in the maps generated in the previous stage.
    - Reading in masks and systematics maps.
    - Computing all possible power spectra, including systematics deprojection, using NaMaster
@@ -49,10 +52,10 @@ We have processed the HSC data for clustering analyses following a number of ste
    - Saving all power spectra into a SACC file
    
    All this is done with the script `power_specter.py`. Run `python power_specter.py -h` to see all possible command-line options.
-7. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
-8. The bash script `run_process_all.sh` runs 2, 3, 4 and 5 above for all the WIDE fields.
-9. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
-10. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
+8. It's worth noting that we currently use WCS to create flat-sky maps of different quantities (depth, mask, dust etc) when processing each field. The maps are generated using gnomonic projection, with the median coordinates of all sources in each field as the tangent point.
+9. The bash script `run_process_all.sh` runs 2, 3, 4 and 5 above for all the WIDE fields.
+10. Once all fields have been processed, we compute maps of the galaxy distribution and their corresponding power spectra for each field. The script `study_power_spectra.py` does this for all the WIDE fields. The power spectra are contaminant-deprojected for all contaminants studied in the previous step. We expect to extend this study to a larger list of systematics.
+11. Our studies currently use a magnitude limit i<24.5. This is based on a study of the 10-sigma depth maps on all the different fields, and corresponds to a conservative estimate of the magnitude limit of the sample. Note that the quality of the photo-zs degrades significantly for fainter sources (according to the HSC papers).
 
 The scripts described above make use of some dependencies and python modules written explicitly for this work. The most relevant ones are:
 - `check_sys.py` and `twoPtCorr.py` are currently orphan files used in the development of the real-space pipeline.
