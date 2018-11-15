@@ -286,7 +286,7 @@ write_frames("pdr1_deep","frames_deep.sql",submit=True)
 write_frames("pdr1_udeep","frames_udeep.sql",submit=True)
 
 #WIDE fields
-for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss','aegis'] :
+for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss'] :
     write_fieldsearch("pdr1_wide",fld,"field_wide_"+fld+"_pz.sql",do_field=True,submit=True,do_photoz=True)
 write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h1.sql",do_field=True,submit=True,ra_range=[330.,336.],do_photoz=True)
 write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h2.sql",do_field=True,submit=True,ra_range=[336.,342.],do_photoz=True)

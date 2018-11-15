@@ -14,7 +14,7 @@ covar_option=data
 pz_bins_file=4bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
 ell_bins_file=400 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
-nz_method=pdfstack
+nz_method=pdfstack #Currently available: zmc, pdfstack, cosmos30
 
 #First clean up the metadata
 for table in WIDE DEEP UDEEP
@@ -25,7 +25,7 @@ do
 done
 
 #Now clean up the WIDE and DEEP fields
-for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS
 do
     dirname=${predir_out}/HSC_processed/${field}
     mkdir -p ${dirname}
@@ -51,9 +51,11 @@ do
     if [ "$do_cat_sample" = true ]; then
 	echo $field
 	dirname=${predir_out}/HSC_processed/${field}
-	exc="python cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --pz-type ephor_ab --pz-mark best --pz-bins photoz_binning/photoz_bin_edges_${pz_bins_file}.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5 --nz-max 4. --nz-bins 200"
+	exc="python cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --pz-type ephor_ab --pz-mark best --pz-bins photoz_binning/photoz_bin_edges_${pz_bins_file}.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5 --nz-max 4. --nz-bins 100"
 	if [ "$nz_method" = pdfstack ]; then
 	    exc+=" --use-pdf=True"
+	elif [ "$nz_method" = cosmos30 ]; then
+	    exc+=" --use-cosmos=True"
 	fi
 	${exc}
     fi
