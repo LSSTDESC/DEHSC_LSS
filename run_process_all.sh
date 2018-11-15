@@ -6,11 +6,12 @@ do_cleanup=false
 do_process=false
 do_sysmap=false
 do_cat_sample=false
-do_power_spectra=true
+do_syst_check=true
+do_power_spectra=false
 
 recompute_mcm=false
 covar_option=data
-pz_bins_file=1bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
+pz_bins_file=4bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
 ell_bins_file=400 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
 nz_method=pdfstack
@@ -54,6 +55,16 @@ do
 	if [ "$nz_method" = pdfstack ]; then
 	    exc+=" --use-pdf=True"
 	fi
+	${exc}
+    fi
+done
+
+#Run diagnostics 
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS
+do
+    if [ "$do_syst_check" = true ]; then
+	dirname=${predir_out}/HSC_processed/${field}
+	exc="python check_sys.py --input-prefix ${dirname}/${field} --output-prefix ${dirname}/${field}_eab_best_pzb${pz_bins_file}_systematics --nsys-bins 10 --map-path ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --depth-cut 24.5 --mask-threshold 0.5"
 	${exc}
     fi
 done

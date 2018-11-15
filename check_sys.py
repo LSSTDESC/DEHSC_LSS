@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 #import healpy as hp
@@ -26,7 +27,7 @@ parser.add_option('--mask-threshold', dest='mask_thr', default=0.5, type=float,
                  help='Minimum area fraction of a given pixel to be considered in the analysis')
 o, args = parser.parse_args()
 
-def stats_on_sysmap(sys_map, mask, data_map, nbins, bintype='percentiles', perc0=30, reweight=True):
+def stats_on_sysmap(sys_map, mask, data_map, nbins, bintype='equal', perc0=0,njk=50) :
     """ Auxiliary routine that reads a galaxy density map and an observing condition
     density map and computes mean and standard deviation of the galaxy overdensity map
     as a function of the observing condition overdensity map 
@@ -39,47 +40,51 @@ def stats_on_sysmap(sys_map, mask, data_map, nbins, bintype='percentiles', perc0
     data_map: (flatmap) Galaxy density map.
     nbins: (int) Number of bins in which to analyze sys_map
     bintype: (str) Binning type: `percentiles` uses the percentiles of sys_map, `equal` makes equal spaced
-    bins in sys_map and `log` makes logarithmic spaced bins (default `percentiles`).
-    perc0: (float) In case of using the percentiles as binning scheme, starting percentile value (default=30).
-    reweight: (bool) If True, reweights the galaxy density map by the mask value (default=True).
+    bins in sys_map (default `equal`).
+    perc0: (float) In case of using the percentiles as binning scheme, starting percentile value (default=0).
+    njk: (int) Number of jackknife samples to use to compute errors.
 
     Returns:
     --------
    
-    bin_centers: (float) Centers of the bins where we analyze sys_map.
+    bin_centers_r: (float) Centers of the bins where we analyze sys_map rescaled by the mean
+    bin_centers: (float) Centers of the bins where we analyze sys_map in the original units
     mean: (float) Mean value of data_map at bin_centers.
     err: (float) Uncertainty on the mean value of data_map at bin_centers.
     """
     if bintype not in ['percentiles', 'equal', 'log']:
         raise ValueError('Only `percentiles`, `equal` or `log` bintypes allowed.')
     mean = np.zeros(nbins)
-    err = np.zeros(nbins)
+    means=np.zeros([njk,nbins])
     bin_centers = np.zeros(nbins)
     binary_mask = mask > 0
-    if reweight: 
-        data_map[binary_mask] = data_map[binary_mask]/mask[binary_mask]
+
+    #Divide by mean
+    data_use=data_map[binary_mask]*np.sum(mask[binary_mask])/(mask[binary_mask]*np.sum(data_map[binary_mask]))
+    sys_mean=np.mean(sys_map[binary_mask])
+    sys_use=sys_map[binary_mask]/sys_mean
     if bintype=='percentiles':
+        percentile_edges=np.percentile(sys_use,perc0+(100.-perc0)*(np.arange(nbins+1)+0.)/nbins)
         for i in range(nbins):
-            bin_centers[i] = np.percentile(sys_map[binary_mask], perc0+(100.-perc0)/nbins*i)
-            sys_mask = sys_map[binary_mask] < bin_centers[i]
-            mean[i] = np.mean(data_map[binary_mask][sys_mask])
-            err[i] = np.std(data_map[binary_mask][sys_mask])/np.sqrt(np.count_nonzero(sys_mask))
-    if bintype in ['equal','log']:
-        if bintype=='equal':
-            nbins=nbins
-        else:
-            min_sys = np.nanmin(sys_map[binary_mask])
-            max_sys = np.nanmax(sys_map[binary_mask])
-            if min_sys < 0:
-                nbins = np.logspace(np.log10(min_sys-min_sys), np.log10(max_sys-min_sys), nbins+1)
-            else:
-                nbins = np.logspace(np.log10(min_sys), np.log10(max_sys), nbins+1)
-        mean, bin_edges, _  = binned_statistic(sys_map[mask], data_map[binary_mask], statistic='mean', bins=nbins)
-        std, bin_edges, _  = binned_statistic(sys_map[mask], data_map[binary_mask], statistic='std', bins=nbins)
-        counts, bin_edges, _  = binned_statistic(sys_map[mask], data_map[binary_mask], statistic='count', bins=nbins)
+            sys_mask = (sys_use < percentile_edges[i+1]) & (sys_use >= percentile_edges[i])
+            bin_centers[i] = np.mean(sys_use[sys_mask])
+            mean[i] = np.mean(data_use[sys_mask])
+            for j in range(njk) :
+                djk=len(sys_use)//njk
+                jk_mask=np.ones(len(sys_use),dtype=bool); jk_mask[j*djk:(j+1)*djk]=False
+                means[j,i] = np.mean(data_use[sys_mask*jk_mask])
+                
+    else :
+        nbins=nbins
+        mean, bin_edges, _  = binned_statistic(sys_use, data_use, statistic='mean', bins=nbins)
         bin_centers = 0.5*bin_edges[1:]+0.5*bin_edges[:-1]
-        err = std/np.sqrt(counts)
-    return bin_centers, mean, err
+        for j in range(njk) :
+            djk=len(sys_use)//njk
+            jk_mask=np.ones(len(sys_use),dtype=bool); jk_mask[j*djk:(j+1)*djk]=False
+            means[j,:],_,_=binned_statistic(sys_use[jk_mask],data_use[jk_mask],statistic='mean',bins=bin_edges)
+    err = np.std(means,axis=0)*np.sqrt(njk-1.)
+
+    return bin_centers, bin_centers*sys_mean, mean, err
      
 def check_sys(data_hdu, path_sys, mask, nbins, **kwargs):
     """ Routine to check the evolution of the mean
@@ -101,7 +106,8 @@ def check_sys(data_hdu, path_sys, mask, nbins, **kwargs):
     Outputs:
     --------
 
-    xsys: Values of the potential source of systematics in each bin
+    xsys_r: Values of the potential source of systematics in each bin rescaled by its mean
+    xsys: Values of the potential source of systematics in each bin in the original units
     mean: Mean galaxy density in each bin
     err: Error on the mean density in each bin
     """
@@ -111,15 +117,16 @@ def check_sys(data_hdu, path_sys, mask, nbins, **kwargs):
     mean = []
     err = []
     bin_centers = []
+    bin_centers_resc = []
     for sys_map in s_map:
-        aux_centers, aux_mean, aux_err = stats_on_sysmap(sys_map, mask, data_map, nbins, **kwargs) 
+        aux_centers, aux_centers_resc, aux_mean, aux_err = stats_on_sysmap(sys_map, mask, data_map, nbins, **kwargs) 
         mean.append(aux_mean)
         bin_centers.append(aux_centers)
+        bin_centers_resc.append(aux_centers_resc)
         err.append(aux_err)
-    return bin_centers, mean, err
+    return np.array(bin_centers), np.array(bin_centers_resc), np.array(mean), np.array(err)
 
 # Set up
-
 band = ['u','g','r','i','z']
 cont_maps = ['oc_airmass','oc_ccdtemp','oc_ellipt','oc_exptime','oc_nvisit', \
     'oc_seeing', 'oc_sigma_sky', 'oc_skylevel','syst_dust','syst_nstar_i24.50']
@@ -130,6 +137,8 @@ data_hdus = fits.open(o.fname_maps)
 if len(data_hdus)%2!=0:
     raise ValueError("Input file should have two HDUs per map")
 nbins = len(data_hdus)//2
+
+os.system('mkdir -p '+o.prefix_out)
 
 print("Reading mask")
 #Create depth-based mask
@@ -144,39 +153,30 @@ fm.compare_infos(fsk,fskb)
 #Create BO-based mask
 msk_bo=np.zeros_like(mskfrac); msk_bo[mskfrac>o.mask_thr]=1
 msk_t=msk_bo*msk_depth*mskfrac
+
 for ibin in range(nbins):
+    print("Bin %d"%ibin)
     data_hdu = data_hdus[2*ibin]
     for j, cm in enumerate(cont_maps):
+        print(" "+cm)
         path_sys = o.prefix_in+'_%s.fits' %(cm)
-        xsys, mean_sys, std_sys = check_sys(data_hdu, path_sys, msk_t, o.nbins_sys) 
-        f, ax = plt.subplots(1,2,figsize=(10,4))
+        xsys, xsys_resc, mean_sys, std_sys = check_sys(data_hdu, path_sys, msk_t, o.nbins_sys) 
         if len(xsys)>1:
+            f,ax=plt.subplots(5,1,figsize=(5,20))
             for i in range(len(xsys)):
-                err_mean = std_sys[i]/np.mean(mean_sys[i])+ \
-                           np.std(std_sys[i])/np.sqrt(len(std_sys[i]))*mean_sys[i]/np.mean(mean_sys[i])**2
-                ax[0].errorbar(xsys[i], mean_sys[i], std_sys[i], fmt='o', label='%s-band' %band[i], fillstyle='none')
-                ax[1].errorbar(xsys[i], mean_sys[i]/np.mean(mean_sys[i])-1, err_mean, label='%s-band' %band[i], fillstyle='none')
+                ax[i].errorbar(xsys[i], mean_sys[i], std_sys[i], fmt='o', label='%s-band' %band[i], fillstyle='none')
+                ax[i].set_ylabel(r'$n/\bar{n}$', fontsize=16)
+                ax[i].text(0.9,0.9,band[i],transform=ax[i].transAxes)
+            ax[-1].set_xlabel(xlabels[j], fontsize=16)
         else:
-           err_mean = std_sys[0]/np.mean(mean_sys[0])+ \
-                           np.std(std_sys[0])/np.sqrt(len(std_sys[0]))*mean_sys[0]/np.mean(mean_sys[0])**2
-           ax[0].errorbar(xsys[0], mean_sys[0], std_sys[0], fmt='o', label=xlabels[j], fillstyle='none')
-           ax[1].errorbar(xsys[0], mean_sys[0]/np.mean(mean_sys[0])-1, err_mean, label='%s-band' %band[i], fillstyle='none') 
-
-        ax[0].set_ylabel(r'$\bar{n}$ [galaxies/pixel]', fontsize=16)
-        ax[0].set_xlabel(xlabels[j], fontsize=16)
-        ax[0].grid()
-        ax[1].grid()
-        plt.legend(loc='best')
-        mean_sys_all = np.concatenate(mean_sys).ravel()
-        ymin = 0.9*np.percentile(mean_sys_all[~np.isnan(mean_sys_all)], 5)
-        ymax = 1.1*np.percentile(mean_sys_all[~np.isnan(mean_sys_all)], 95)
-        ax[0].set_ylim(ymin, ymax)
-        ax[1].set_ylabel(r'$\bar{n}/\langle \bar{n} \rangle -1$', fontsize=16)
-        ax[1].set_xlabel(xlabels[j], fontsize=16)
-        if len(xsys)>1:
-            sname = cm.split('_')[-1]+'_bin_%d.pdf' % ibin
-        else:
-            sname = 'nstars_bin_%d.pdf' % ibin
+            f=plt.figure()
+            plt.errorbar(xsys[0], mean_sys[0], std_sys[0], fmt='o', label=xlabels[j], fillstyle='none')
+            plt.ylabel(r'$n/\bar{n}$', fontsize=16)
+            plt.xlabel(xlabels[j], fontsize=16) 
+            
         f.tight_layout()
-        f.savefig(os.path.join(o.prefix_out, sname))
+        sname = cm+'_bin_%d' % ibin
+        prefix_save=os.path.join(o.prefix_out,sname)
+        f.savefig(prefix_save+".pdf")
         plt.close(f) 
+        np.savez(prefix_save,x=xsys_resc,x_rescaled=xsys,mean=mean_sys,error=std_sys)
