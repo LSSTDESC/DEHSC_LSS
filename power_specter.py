@@ -73,10 +73,26 @@ parser.add_option('--theory-prediction',dest='cl_theory',default='NONE',type=str
 parser.add_option('--covariance-coupling-file',dest='covar_coup',default='NONE',type=str,
                   help='If computing the theory covariance, pass a file name where the '+
                   'coupling coefficients will be stored. If NONE, they won\'t be saved')
+parser.add_option('--syst-masking-file',dest='syst_mask_file',default='NONE',type=str,
+                  help='Path to a file containing a list of systematics that one should mask. The format should be '+
+                  'four columns: 1- systematic name, 2- filter (u,g,r,i,z), 3- > or <, 4- Threshold value')
 
 ####
 # Read options
 (o, args) = parser.parse_args()
+
+def read_map_bands(fname,read_bands,bandname) :
+  if read_bands :
+    i_map=-1
+  else :
+    i_map=['g','r','i','z','y'].index(bandname)
+  fskb,temp=fm.read_flat_map(fname,i_map=i_map)
+  fm.compare_infos(fsk,fskb)
+  if i_map!=-1 :
+    temp=[temp]
+    
+  return temp
+
 
 print("Reading mask")
 #Create depth-based mask
@@ -92,29 +108,52 @@ fm.compare_infos(fsk,fskb)
 msk_bo=np.zeros_like(mskfrac); msk_bo[mskfrac>o.mask_thr]=1
 msk_t=msk_bo*msk_depth
 
+#Mask systematics
+do_mask_syst=not (o.syst_mask_file=='NONE')
+msk_syst=msk_t.copy()
+if do_mask_syst :
+  #Read systematics cut data
+  data_syst=np.genfromtxt(o.syst_mask_file,dtype=[('name','|U32'),('band','|U4'),('gl','|U4'),('thr','<f8')])
+  for d in data_syst :
+    #Read systematic
+    if d['name'].startswith('oc_') :
+      sysmap=read_map_bands(o.prefix_in+'_'+d['name']+'.fits',False,d['band'])[0]
+    elif d['name']=='dust' :
+      sysmap=read_map_bands(o.prefix_in+'_syst_dust.fits',False,d['band'])[0]
+    else :
+      raise KeyError("Unknown systematic name "+d['name'])
+    
+    #Divide by mean
+    sysmean=np.sum(msk_t*mskfrac*sysmap)/np.sum(msk_t*mskfrac)
+    sysmap/=sysmean
+
+    #Apply threshold
+    msk_sys_this=msk_t.copy(); fsky_pre=np.sum(msk_syst)
+    if d['gl']=='<' :
+      msk_sys_this[sysmap<d['thr']]=0
+    else :
+      msk_sys_this[sysmap>d['thr']]=0
+    msk_syst*=msk_sys_this
+    fsky_post=np.sum(msk_syst)
+    print(' '+d['name']+d['gl']+'%.3lf'%(d['thr'])+
+          ' removes ~%.2lf per-cent of the available sky'%((1-fsky_post/fsky_pre)*100))
+  print(' All systematics remove %.2lf per-cent of the sky'%((1-np.sum(msk_syst)/np.sum(msk_t))*100))
+#  fsk.view_map(msk_syst+msk_t); plt.show()
+msk_t*=msk_syst
+
+
 #Area
 area_patch=np.sum(msk_t*mskfrac)*np.radians(fsk.dx)*np.radians(fsk.dy)
 
 #Read contaminants
 print("Reading contaminant templates")
 temps=[]
-def read_map_bands(fname,read_bands) :
-  if read_bands :
-    i_map=-1
-  else :
-    i_map=['g','r','i','z','y'].index(o.band)
-  fskb,temp=fm.read_flat_map(fname,i_map=i_map)
-  fm.compare_infos(fsk,fskb)
-  if i_map!=-1 :
-    temp=[temp]
-    
-  return temp
 # 1- Depth
 if o.cont_depth :
   temps.append(mp_depth)
 # 2- Dust
 if o.cont_dust :
-  temp=read_map_bands(o.prefix_in+'_syst_dust.fits',o.cont_dust_bands)
+  temp=read_map_bands(o.prefix_in+'_syst_dust.fits',o.cont_dust_bands,o.band)
   for t in temp :
     temps.append(t)
 # 3- Stars
@@ -132,7 +171,7 @@ if o.cont_oc is not None :
       if c in oc_all :
         oc_list.append(c)
   for c in oc_list :
-    temp=read_map_bands(o.prefix_in+'_oc_'+c+'.fits',o.cont_oc_bands)
+    temp=read_map_bands(o.prefix_in+'_oc_'+c+'.fits',o.cont_oc_bands,o.band)
     for t in temp :
       temps.append(t)
 if temps==[] :

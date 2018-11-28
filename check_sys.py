@@ -127,7 +127,7 @@ def check_sys(data_hdu, path_sys, mask, nbins, **kwargs):
     return np.array(bin_centers), np.array(bin_centers_resc), np.array(mean), np.array(err)
 
 # Set up
-band = ['u','g','r','i','z']
+band = ['g','r','i','z','y']
 cont_maps = ['oc_airmass','oc_ccdtemp','oc_ellipt','oc_exptime','oc_nvisit', \
     'oc_seeing', 'oc_sigma_sky', 'oc_skylevel','syst_dust','syst_nstar_i24.50']
 xlabels= ['Airmass', r'CCD Temperature [$^{\circ}$C]', 'PSF Ellipticity', \
