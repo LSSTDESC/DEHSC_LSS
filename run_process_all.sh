@@ -1,6 +1,9 @@
 #!/bin/bash
 
 predir_out=/global/cscratch1/sd/damonge/HSC
+python_exec=python
+#predir_out=../data
+#python_exec=python3
 
 do_cleanup=false
 do_process=false
@@ -12,7 +15,7 @@ do_power_spectra=true
 recompute_mcm=true
 covar_option=data
 pz_bins_file=4bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
-ell_bins_file=400 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
+ell_bins_file=200 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
 nz_method=pdfstack #Currently available: zmc, pdfstack, cosmos30
 
@@ -20,7 +23,7 @@ nz_method=pdfstack #Currently available: zmc, pdfstack, cosmos30
 for table in WIDE DEEP UDEEP
 do
     if [ "$do_cleanup" = true ]; then
-	python process_metadata.py --input-file ${predir_out}/HSC_${table}_frames.fits --output-file ${predir_out}/HSC_processed/HSC_${table}_frames_proc.fits
+	${python_exec} process_metadata.py --input-file ${predir_out}/HSC_${table}_frames.fits --output-file ${predir_out}/HSC_processed/HSC_${table}_frames_proc.fits
     fi
 done
 
@@ -31,7 +34,7 @@ do
     mkdir -p ${dirname}
     if [ "$do_process" = true ]; then
 	echo $field
-	python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5 --flat-project CAR
+	${python_exec} process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5 --flat-project CAR
     fi
 done
 
@@ -41,7 +44,7 @@ do
     if [ "$do_sysmap" = true ]; then
 	echo $field
 	dirname=${predir_out}/HSC_processed/${field}
-	python map_obscond.py --input-frames ${predir_out}/HSC_processed/HSC_WIDE_frames_proc.fits --map-sample ${dirname}/${field}_MaskedFraction.fits --output-prefix ${dirname}/${field}
+	${python_exec} map_obscond.py --input-frames ${predir_out}/HSC_processed/HSC_WIDE_frames_proc.fits --map-sample ${dirname}/${field}_MaskedFraction.fits --output-prefix ${dirname}/${field}
     fi
 done
 
@@ -51,7 +54,7 @@ do
     if [ "$do_cat_sample" = true ]; then
 	echo $field
 	dirname=${predir_out}/HSC_processed/${field}
-	exc="python cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --pz-type ephor_ab --pz-mark best --pz-bins photoz_binning/photoz_bin_edges_${pz_bins_file}.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5 --nz-max 4. --nz-bins 100"
+	exc="${python_exec} cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --pz-type ephor_ab --pz-mark best --pz-bins photoz_binning/photoz_bin_edges_${pz_bins_file}.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5 --nz-max 4. --nz-bins 100"
 	if [ "$nz_method" = pdfstack ]; then
 	    exc+=" --use-pdf=True"
 	elif [ "$nz_method" = cosmos30 ]; then
@@ -66,7 +69,7 @@ for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_W
 do
     if [ "$do_syst_check" = true ]; then
 	dirname=${predir_out}/HSC_processed/${field}
-	exc="python check_sys.py --input-prefix ${dirname}/${field} --output-prefix ${dirname}/${field}_eab_best_pzb${pz_bins_file}_systematics --nsys-bins 10 --map-path ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --depth-cut 24.5 --mask-threshold 0.5"
+	exc="${python_exec} check_sys.py --input-prefix ${dirname}/${field} --output-prefix ${dirname}/${field}_eab_best_pzb${pz_bins_file}_systematics --nsys-bins 10 --map-path ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --depth-cut 24.5 --mask-threshold 0.5"
 	${exc}
     fi
 done
@@ -86,13 +89,17 @@ do
 	    rm -f ${fname_mcm} ${fname_cov_mcm} ${fname_mcm_sysmask} ${fname_cov_mcm_sysmask}
 	fi
 	#Deprojected, not syst-masked
-	python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --cont-deproj-bias-option ${covar_option}
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --cont-deproj-bias-option ${covar_option}
+	#Deprojected, not syst-masked, with SSC
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_ssc.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --cont-deproj-bias-option ${covar_option} --covariance-ssc
 	#No deprojection, not syst-masked
-	#python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont.sacc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm}
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont.sacc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --covariance-ssc
+	#No deprojection, not syst-masked, with SSC
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_ssc.sacc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --covariance-ssc
 	#Deprojected, syst-masked
-	#python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_sysmasked.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --cont-deproj-bias-option ${covar_option} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_sysmasked.sacc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --cont-deproj-bias-option ${covar_option} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt
 	#No deprojection, syst-masked
-	#python power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_sysmasked.sacc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_sysmasked.sacc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt
     fi
 done
 
@@ -103,19 +110,19 @@ for field in COSMOS_WIDE_BEST COSMOS_WIDE_MEDIAN COSMOS_WIDE_WORST
 do
     dirname=${predir_out}/HSC_processed/${field}
     mkdir -p ${dirname}
-    python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --gen-plots --min-snr 10.0 --depth-cut 24.5
+    ${python_exec} process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --gen-plots --min-snr 10.0 --depth-cut 24.5
 done
 
 for field in DEEP_COSMOS DEEP_DEEP32 DEEP_ELAISN1 DEEP_XMMLSS
 do
     dirname=${predir_out}/HSC_processed/${field}
     mkdir -p ${dirname}
-    python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --gen-plots --min-snr 10.0 --depth-cut 24.5
+    ${python_exec} process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --gen-plots --min-snr 10.0 --depth-cut 24.5
 done
 
 for field in UDEEP_COSMOS UDEEP_SXDS
 do
     dirname=${predir_out}/HSC_processed/${field}
     mkdir -p ${dirname}
-    python process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --gen-plots --min-snr 10.0 --depth-cut 24.5
+    ${python_exec} process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --gen-plots --min-snr 10.0 --depth-cut 24.5
 done

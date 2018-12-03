@@ -12,7 +12,6 @@ import time
 import os
 from scipy.interpolate import interp1d
 
-prefix_data='/global/cscratch1/sd/damonge/HSC/'
 def opt_callback(option, opt, value, parser):
   setattr(parser.values, option.dest, value.split(','))
 
@@ -65,6 +64,8 @@ parser.add_option('--covariance-option',dest='covar_opt',default='NONE',type=str
                   help='Option to compute the covariance matrix. Options are \'NONE\''+
                   '(no covariance),  \'theory\' (Gaussian covariance with input theory Cls),'+
                   '\'data\' (Gaussian covariance with Cls from data) or \'gaus_sim\' (MC over Gaussian simulations)')
+parser.add_option('--covariance-ssc',dest='compute_ssc',default=False,action='store_true',
+                  help='Compute super-sample covariance part.')
 parser.add_option('--theory-prediction',dest='cl_theory',default='NONE',type=str,
                   help='If computing the covariance or deprojection bias from theory, you must supply a file with a'+
                   'theory prediction for the power spectra. First column should be a'+
@@ -370,6 +371,7 @@ else :
   covar=None
 
 if (covar is not None) and o.compute_ssc :
+  import pyccl as ccl
   #Cosmology
   cosmo=ccl.Cosmology(Omega_c=0.27,Omega_b=0.049,h=0.67,sigma8=0.83,w0=-1.,wa=0.,n_s=0.96)
 
@@ -382,7 +384,7 @@ if (covar is not None) and o.compute_ssc :
   b_b=np.array([0.81877956,1.09962214,1.44457603,1.65513987,2.61238931])
   b_bf=interp1d(z_b,b_b)
   for i_t,t in enumerate(tracers) :
-    zarr=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5,
+    zarr=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5
     narr=t.nz_data['n_z']
     barr=b_bf(zarr)
     cclt.append(ccl.NumberCountsTracer(cosmo,has_rsd=False,dndz=(zarr,narr),
@@ -394,7 +396,6 @@ if (covar is not None) and o.compute_ssc :
     resp2d=[]
     for iz,z in enumerate(zarr) :
       kresph,_,_,_,resp1d=np.loadtxt("ssc_responses/Response_z%d.txt"%(int(z)),unpack=True)
-      #kresph,resp1d=np.loadtxt("data/Response_z0b.txt",unpack=True)
       resp2d.append(resp1d)
     kresp=kresph*0.67
     aresp=1./(1.+zarr)
@@ -417,6 +418,7 @@ if (covar is not None) and o.compute_ssc :
           covar_ssc[iv*n_ell:(iv+1)*n_ell,jv*n_ell:(jv+1)*n_ell]=mat
           jv+=1
       iv+=1
+
   covar+=covar_ssc
 
 #Save to SACC format
