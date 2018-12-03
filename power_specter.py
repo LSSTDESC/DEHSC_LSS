@@ -141,7 +141,6 @@ if do_mask_syst :
 #  fsk.view_map(msk_syst+msk_t); plt.show()
 msk_t*=msk_syst
 
-
 #Area
 area_patch=np.sum(msk_t*mskfrac)*np.radians(fsk.dx)*np.radians(fsk.dy)
 
@@ -369,6 +368,56 @@ elif o.covar_opt=='gaus_sim' :
 else :
   print("Unknown covariance option "+o.covar_opt+" no covariance computed")
   covar=None
+
+if (covar is not None) and o.compute_ssc :
+  #Cosmology
+  cosmo=ccl.Cosmology(Omega_c=0.27,Omega_b=0.049,h=0.67,sigma8=0.83,w0=-1.,wa=0.,n_s=0.96)
+
+  #Sky fraction
+  f_sky=np.sum(msk_t*mskfrac)*fsk.dx*fsk.dy/(4*np.pi*(180./np.pi)**2)
+
+  #Tracers
+  cclt=[]
+  z_b=np.array([0.0,0.5,1.0,2.0,4.0]);
+  b_b=np.array([0.81877956,1.09962214,1.44457603,1.65513987,2.61238931])
+  b_bf=interp1d(z_b,b_b)
+  for i_t,t in enumerate(tracers) :
+    zarr=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5,
+    narr=t.nz_data['n_z']
+    barr=b_bf(zarr)
+    cclt.append(ccl.NumberCountsTracer(cosmo,has_rsd=False,dndz=(zarr,narr),
+                                       bias=(zarr,barr)))
+
+  #SSC init
+  def get_response_func() :
+    zarr=np.array([4,3,2,1,0])
+    resp2d=[]
+    for iz,z in enumerate(zarr) :
+      kresph,_,_,_,resp1d=np.loadtxt("ssc_responses/Response_z%d.txt"%(int(z)),unpack=True)
+      #kresph,resp1d=np.loadtxt("data/Response_z0b.txt",unpack=True)
+      resp2d.append(resp1d)
+    kresp=kresph*0.67
+    aresp=1./(1.+zarr)
+    resp2d=np.array(resp2d)
+    return ccl.Pk2D(a_arr=aresp,lk_arr=np.log(kresp),pk_arr=resp2d,is_logp=False)
+  respf=get_response_func()
+  ssc_wsp=ccl.SSCWorkspace(cosmo,f_sky,ell_eff,respf)
+
+  #SSC compute
+  covar_ssc=np.zeros([n_cross*n_ell,n_cross*n_ell])
+  iv=0
+  for i1 in range(nbins) :
+    for i2  in range(i1,nbins) :
+      jv=0
+      for j1 in range(nbins) :
+        for j2  in range(j1,nbins) :
+          mat=ccl.angular_cl_ssc_from_workspace(ssc_wsp,cosmo,
+                                                cclt[i1],cclt[i2],
+                                                cclt[j1],cclt[j2])
+          covar_ssc[iv*n_ell:(iv+1)*n_ell,jv*n_ell:(jv+1)*n_ell]=mat
+          jv+=1
+      iv+=1
+  covar+=covar_ssc
 
 #Save to SACC format
 print("Saving to SACC")
