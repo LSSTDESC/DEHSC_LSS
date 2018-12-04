@@ -402,7 +402,7 @@ if (covar is not None) and o.compute_ssc :
     resp2d=np.array(resp2d)
     return ccl.Pk2D(a_arr=aresp,lk_arr=np.log(kresp),pk_arr=resp2d,is_logp=False)
   respf=get_response_func()
-  ssc_wsp=ccl.SSCWorkspace(cosmo,f_sky,ell_eff,respf)
+  ssc_wsp=ccl.SSCWorkspace(cosmo,f_sky,cclt[0],cclt[0],cclt[0],cclt[0],ell_eff,respf)
 
   #SSC compute
   covar_ssc=np.zeros([n_cross*n_ell,n_cross*n_ell])
