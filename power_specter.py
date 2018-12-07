@@ -490,6 +490,6 @@ s.printInfo()
 s.saveToHDF(o.prefix_out+'.sacc')
 #Save noise
 sacc_mean_noise=sacc.MeanVec(nls_all.flatten())
-s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,precision=None,meta=sacc_meta)
+s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean_noise,precision=None,meta=sacc_meta)
 s.printInfo()
 s.saveToHDF(o.prefix_out+'_noise.sacc')
