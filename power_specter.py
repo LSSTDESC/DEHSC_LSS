@@ -26,7 +26,7 @@ parser.add_option('--input-maps', dest='fname_maps', default='NONE', type=str,
 parser.add_option('--ell-bins', dest='fname_ellbins', default='NONE', type=str,
                   help='Path to ell-binning file. '+
                   'Format should be: double column (l_min,l_max). One row per bandpower.')
-parser.add_option('--output-file', dest='fname_out',default=None,type=str,
+parser.add_option('--output-file', dest='prefix_out',default=None,type=str,
                   help='Output file name. Output will be in SACC format.')
 parser.add_option('--analysis-band', dest='band', default='i', type=str,
                   help='Band considered for your analysis (g,r,i,z,y)')
@@ -56,14 +56,14 @@ parser.add_option('--cont-oc-bands',dest='cont_oc_bands',default=False,action='s
                   help='Marginalize over observing contition templates in all bands.')
 parser.add_option('--cont-deproj-bias',dest='cont_deproj_bias',default=False,action='store_true',
                   help='Remove deprojection bias.')
-parser.add_option('--cont-deproj-bias-option',dest='cont_deproj_bias_opt',default='NONE',type=str,
-                  help='Option to compute the deprojection bias. Options are \'NONE\''+
-                  '(no debias),  \'theory\' (Analytical with input theory Cls),'+
-                  '\'data\' (Analytical with Cls from data) or \'gaus_sim\' (mean from Gaussian simulations)')
 parser.add_option('--covariance-option',dest='covar_opt',default='NONE',type=str,
                   help='Option to compute the covariance matrix. Options are \'NONE\''+
-                  '(no covariance),  \'theory\' (Gaussian covariance with input theory Cls),'+
-                  '\'data\' (Gaussian covariance with Cls from data) or \'gaus_sim\' (MC over Gaussian simulations)')
+                  '(no covariance),  \'analytic\' (Gaussian covariance),'+
+                  ' or \'gaus_sim\' (MC over Gaussian simulations)')
+parser.add_option('--guess-cell',dest='guess_cell',default='NONE',type=str,
+                  help='Choice of best-guess power spectra to use. Options are: \'theory\''+
+                  '(input theoretical power spectra, given by --theory-prediction, '+
+                  'or \'data\' (Cls from data)')
 parser.add_option('--covariance-ssc',dest='compute_ssc',default=False,action='store_true',
                   help='Compute super-sample covariance part.')
 parser.add_option('--theory-prediction',dest='cl_theory',default='NONE',type=str,
@@ -259,68 +259,55 @@ for i in range(nbins) :
     if j!=i :
       ordering[j,i]=i_x
     i_x+=1
-
-#Set up deprojection bias proposal power spectrum
-if o.cont_deproj_bias :
-  cls_all=np.array(cls_all)
-  n_cross=len(cls_all)
-  print("Computing deprojection bias")
-  if o.cont_deproj_bias_opt=='data' :
-    lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
-    #Interpolate measured power spectra
-    lth=np.arange(2,lmax+1)+0.
-    clth=np.zeros([n_cross,len(lth)])
-    for i in range(n_cross) :
-      clf=interp1d(ell_eff,cls_all[i],bounds_error=False,fill_value=0,kind='linear')
-      clth[i,:]=clf(lth)
-      clth[i,lth<=ell_eff[0]]=cls_all[i,0]
-      clth[i,lth>=ell_eff[-1]]=cls_all[i,-1]
-  elif o.covar_opt=='theory' :
-    #Read theory power spectra
-    data=np.loadtxt(o.cl_theory,unpack=True)
-    lth=data[0]
-    clth=data[1:]
-  else :
-    raise ValueError("Must provide a valid method to compute the deprojection bias\n")
-
-  cls_all=[]
-  i_x=0
-  for i in range(nbins) :
-    for j in range(i,nbins) :
-      cl_coupled=nmt.compute_coupled_cell_flat(tracers[i].field,tracers[j].field,bpws)
-      if o.cont_deproj_bias :
-        cl_deproj_bias=nmt.deprojection_bias_flat(tracers[i].field,tracers[j].field,bpws,lth,[clth[i_x]])
-      else :
-        cl_deproj_bias=None
-      cls_all.append(wsp.decouple_cell(cl_coupled,cl_bias=cl_deproj_bias)[0])
 cls_all=np.array(cls_all)
 n_cross=len(cls_all)
 n_ell=len(ell_eff)
 
+#Get guess power spectra
+if o.guess_cell=='data' :
+  lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
+  #Interpolate measured power spectra
+  lth=np.arange(2,lmax+1)+0.
+  clth=np.zeros([n_cross,len(lth)])
+  for i in range(n_cross) :
+    clf=interp1d(ell_eff,cls_all[i],bounds_error=False,fill_value=0,kind='linear')
+    clth[i,:]=clf(lth)
+    clth[i,lth<=ell_eff[0]]=cls_all[i,0]
+    clth[i,lth>=ell_eff[-1]]=cls_all[i,-1]
+elif o.guess_cell=='theory' :
+  #Read theory power spectra
+  data=np.loadtxt(o.cl_theory,unpack=True)
+  lth=data[0]
+  clth=data[1:]
+else :
+  raise ValueError("Must provide a valid guess C_ell\n")
+if len(clth)!=n_cross :
+  raise ValueError("Theory power spectra have a wrong shape")
+    
+#Compute deprojection bias
+cl_deproj_all=[]
+if o.cont_deproj_bias :
+  print("Computing deprojection bias")
+  cls_all=[]
+i_x=0
+for i in range(nbins) :
+  for j in range(i,nbins) :
+    if o.cont_deproj_bias :
+      cl_coupled=nmt.compute_coupled_cell_flat(tracers[i].field,tracers[j].field,bpws)
+      cl_deproj_bias=nmt.deprojection_bias_flat(tracers[i].field,tracers[j].field,bpws,lth,[clth[i_x]])
+      cls_all.append(wsp.decouple_cell(cl_coupled,cl_bias=cl_deproj_bias)[0])
+    else :
+      cl_deproj_bias=None
+    cl_deproj_all.append(cl_deproj_bias)
+    i_x+=1
+if o.cont_deproj_bias :
+  cls_all=np.array(cls_all)
+
 #Compute covariance matrix
 if o.covar_opt=='NONE' :
   covar=None
-elif ((o.covar_opt=='data') or (o.covar_opt=='theory')) :
-  print("Computing Gaussian covariance")
-  if o.covar_opt=='data' :
-    lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
-    #Interpolate measured power spectra
-    lth=np.arange(2,lmax+1)+0.
-    clth=np.zeros([n_cross,len(lth)])
-    for i in range(n_cross) :
-      clf=interp1d(ell_eff,cls_all[i],bounds_error=False,fill_value=0,kind='linear')
-      clth[i,:]=clf(lth)
-      clth[i,lth<=ell_eff[0]]=cls_all[i,0]
-      clth[i,lth>=ell_eff[-1]]=cls_all[i,-1]
-  elif o.covar_opt=='theory' :
-    #Read theory power spectra
-    data=np.loadtxt(o.cl_theory,unpack=True)
-    lth=data[0]
-    clth=data[1:]
-
-  if len(clth)!=n_cross :
-    raise ValueError("Theory power spectra have a wrong shape")
-
+elif o.covar_opt=='analytic' :
+  print("Computing analytic Gaussian covariance")
   #Initialize covariance
   covar=np.zeros([n_cross*n_ell,n_cross*n_ell])
 
@@ -350,28 +337,46 @@ elif ((o.covar_opt=='data') or (o.covar_opt=='theory')) :
 
 elif o.covar_opt=='gaus_sim' :
   #Read theory power spectra
-  raise ValueError("Gaussian simulations not implemented yet")
-  '''
-  covar=Non
-  data=np.loadtxt(o.cl_theory,unpack=True)
-  lth=data[0]
-  clth=data[1:]
-  if len(clth)!=n_cross :
-    raise ValueError("Theory power spectra have a wrong shape")
-  clmat=np.zeros([len(lth),nbins,nbins])
-  for i in range(nbins) :
-    for j in range(nbins) :
-      clmat[:,i,j]=clth[ordering[i,j]]
+  nsims=10*n_cross*n_ell #Use 10 times as many simulations as there are data points
+  print("Computing covariance from %d Gaussian simulations"%nsims)
+  msk_binary=msk_t.reshape([fsk.ny,fsk.nx])
+  weights=(msk_t*mskfrac).reshape([fsk.ny,fsk.nx])
+  if temps is not None :
+    conts=[[t.reshape([fsk.ny,fsk.nx])] for t in temps]
+  else :
+    conts=None
+  
+  cells_sims=[]
+  for isim in range(nsims) :
+    if isim%100==0 :
+      print(" %d-th isim"%isim)
+    #Generate random maps
+    mps=nmt.synfast_flat(fsk.nx,fsk.ny,np.radians(fsk.lx),np.radians(fsk.ly),clth,np.zeros(nbins),seed=1000+isim)
+    #Nmt fields
+    flds=[nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly),weights,[m],templates=conts) for m in mps]
+    #Compute power spectra (possibly with deprojection)
+    i_x=0
+    cells_this=[]
+    for i in range(nbins) :
+      for j in range(i,nbins) :
+        cells_this.append(wsp.decouple_cell(nmt.compute_coupled_cell_flat(flds[i],flds[j],bpws),
+                                            cl_bias=cl_deproj_all[i_x])[0])
+        i_x+=1
+    cells_sims.append(np.array(cells_this).flatten())
+  cells_sims=np.array(cells_sims)
+  #Save simulations for further analysis
+  np.savez(o.prefix_out+".cls",cl_sims=cells_sims)
 
-  #Initialize covariance
-  covar=np.zeros([n_cross*n_ell,n_cross*n_ell])
-  '''
+  #Compute covariance
+  covar=np.cov(cells_sims.T)
 else :
   print("Unknown covariance option "+o.covar_opt+" no covariance computed")
   covar=None
 
 if (covar is not None) and o.compute_ssc :
+  #Compute number density and uncertainty on it from cosmic variance
   import pyccl as ccl
+  from scipy.special import jv
   #Cosmology
   cosmo=ccl.Cosmology(Omega_c=0.27,Omega_b=0.049,h=0.67,sigma8=0.83,w0=-1.,wa=0.,n_s=0.96)
 
@@ -383,12 +388,30 @@ if (covar is not None) and o.compute_ssc :
   z_b=np.array([0.0,0.5,1.0,2.0,4.0]);
   b_b=np.array([0.81877956,1.09962214,1.44457603,1.65513987,2.61238931])
   b_bf=interp1d(z_b,b_b)
+  ng_data=np.zeros([len(tracers),4]);
   for i_t,t in enumerate(tracers) :
     zarr=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5
     narr=t.nz_data['n_z']
     barr=b_bf(zarr)
     cclt.append(ccl.NumberCountsTracer(cosmo,has_rsd=False,dndz=(zarr,narr),
                                        bias=(zarr,barr)))
+
+    lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
+    lmax=3000
+    larr=np.arange(lmax+1)
+    cell=ccl.angular_cl(cosmo,cclt[i_t],cclt[i_t],larr) # A = pi*th^2
+    theta_s=np.sqrt(area_patch/np.pi)
+    well=np.ones(len(larr)); well[1:]=2*jv(1,larr[1:]*theta_s)/(larr[1:]*theta_s); well=well**2
+    ngals=t.ndens_perad*(np.radians(t.fsk.dx)*np.radians(t.fsk.dy))*np.sum(t.weight)
+    sigma_c=ngals*np.sqrt(np.sum(larr*cell*well/(2*np.pi)))
+    sigma_p=np.sqrt(ngals)
+    ng_data[i_t,0]=ngals/area_patch
+    ng_data[i_t,1]=sigma_p/area_patch
+    ng_data[i_t,2]=sigma_c/area_patch
+    ng_data[i_t,3]=np.sqrt(sigma_p**2+sigma_c**2)/area_patch
+
+  print(ng_data)
+  np.savetxt(o.prefix_out+".ngals",ng_data,header='[1]-Ngals [2]-Sigma_poisson [3]-Sigma_CV [4]-Sigma_T')
 
   #SSC init
   def get_response_func() :
@@ -421,6 +444,18 @@ if (covar is not None) and o.compute_ssc :
 
   covar+=covar_ssc
 
+#Compute noise bias
+nls_all=np.zeros_like(cls_all)
+i_x=0
+for i in range(nbins) :
+  for j in range(i,nbins) :
+    if i==j : #Add shot noise in auto-correlation
+      t=tracers[i]
+      corrfac=np.sum(t.weight**2)/(t.fsk.nx*t.fsk.ny)
+      nl=np.ones_like(ell_eff)*corrfac/t.ndens_perad
+      nls_all[i_x]=wsp.decouple_cell([nl])[0]
+    i_x+=1
+
 #Save to SACC format
 print("Saving to SACC")
 #Tracers
@@ -452,4 +487,9 @@ else :
 sacc_meta={'Field':o.hsc_field,'Area_rad':area_patch}
 s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,precision=sacc_precision,meta=sacc_meta)
 s.printInfo()
-s.saveToHDF(o.fname_out)
+s.saveToHDF(o.prefix_out+'.sacc')
+#Save noise
+sacc_mean_noise=sacc.MeanVec(nls_all.flatten())
+s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,precision=None,meta=sacc_meta)
+s.printInfo()
+s.saveToHDF(o.prefix_out+'_noise.sacc')
