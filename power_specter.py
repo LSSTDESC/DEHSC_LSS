@@ -246,15 +246,32 @@ else :
   print("Reading mode-coupling matrix from file")
   wsp.read_from(o.fname_mcm)
 
+#Compute window functions
+print("Computing window functions")
+lmax=int(180.*np.sqrt(1./fsk.dx**2+1./fsk.dy**2))
+nbands=wsp.wsp.bin.n_bands
+windows=np.zeros([nbands,lmax+1])
+l_arr=np.arange(lmax+1)
+t_hat=np.zeros(lmax+1);
+for il,l in enumerate(l_arr) :
+    if il%100==0 :
+        print(il)
+    t_hat[il]=1.;
+    windows[:,il]=wsp.decouple_cell(wsp.couple_cell(l_arr,[t_hat]))
+    t_hat[il]=0.;
+
 #Compute all cross-correlations
 print("Computing all cross-power specra")
 cls_all=[]
+windows_sacc=[]
 ordering=np.zeros([nbins,nbins],dtype=int)
 i_x=0
 for i in range(nbins) :
   for j in range(i,nbins) :
     cl_coupled=nmt.compute_coupled_cell_flat(tracers[i].field,tracers[j].field,bpws)
     cls_all.append(wsp.decouple_cell(cl_coupled)[0])
+    for b in range(nbands) :
+      windows_sacc.append(sacc.Window(l_arr,windows[b]))
     ordering[i,j]=i_x
     if j!=i :
       ordering[j,i]=i_x
@@ -265,7 +282,6 @@ n_ell=len(ell_eff)
 
 #Get guess power spectra
 if o.guess_cell=='data' :
-  lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
   #Interpolate measured power spectra
   lth=np.arange(2,lmax+1)+0.
   clth=np.zeros([n_cross,len(lth)])
@@ -396,9 +412,8 @@ if (covar is not None) and o.compute_ssc :
     cclt.append(ccl.NumberCountsTracer(cosmo,has_rsd=False,dndz=(zarr,narr),
                                        bias=(zarr,barr)))
 
-    lmax=int(np.sqrt((fsk.nx*np.pi/np.radians(fsk.lx))**2+(fsk.ny*np.pi/np.radians(fsk.ly))**2))+1
-    lmax=3000
-    larr=np.arange(lmax+1)
+    lmax_ng=3000
+    larr=np.arange(lmax_ng+1)
     cell=ccl.angular_cl(cosmo,cclt[i_t],cclt[i_t],larr) # A = pi*th^2
     theta_s=np.sqrt(area_patch/np.pi)
     well=np.ones(len(larr)); well[1:]=2*jv(1,larr[1:]*theta_s)/(larr[1:]*theta_s); well=well**2
@@ -478,7 +493,7 @@ for t1i in range(nbins) :
       q1.append('P')
       t2.append(t2i)
       q2.append('P')
-sacc_binning=sacc.Binning(type,ell,t1,q1,t2,q2,deltaLS=dell)
+sacc_binning=sacc.Binning(type,ell,t1,q1,t2,q2,deltaLS=dell,windows=windows_sacc)
 sacc_mean=sacc.MeanVec(cls_all.flatten())
 if covar is None :
   sacc_precision=None
@@ -489,7 +504,8 @@ s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean,precision=sacc_precision,meta=sa
 s.printInfo()
 s.saveToHDF(o.prefix_out+'.sacc')
 #Save noise
+sacc_binning_noise=sacc.Binning(type,ell,t1,q1,t2,q2,deltaLS=dell)
 sacc_mean_noise=sacc.MeanVec(nls_all.flatten())
-s=sacc.SACC(sacc_tracers,sacc_binning,sacc_mean_noise,precision=None,meta=sacc_meta)
+s=sacc.SACC(sacc_tracers,sacc_binning_noise,sacc_mean_noise,precision=None,meta=sacc_meta)
 s.printInfo()
 s.saveToHDF(o.prefix_out+'_noise.sacc')
