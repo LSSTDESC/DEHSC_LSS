@@ -254,8 +254,6 @@ windows=np.zeros([nbands,lmax+1])
 l_arr=np.arange(lmax+1)
 t_hat=np.zeros(lmax+1);
 for il,l in enumerate(l_arr) :
-    if il%100==0 :
-        print(il)
     t_hat[il]=1.;
     windows[:,il]=wsp.decouple_cell(wsp.couple_cell(l_arr,[t_hat]))
     t_hat[il]=0.;
