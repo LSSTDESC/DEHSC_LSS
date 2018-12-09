@@ -77,6 +77,12 @@ parser.add_option('--covariance-coupling-file',dest='covar_coup',default='NONE',
 parser.add_option('--syst-masking-file',dest='syst_mask_file',default='NONE',type=str,
                   help='Path to a file containing a list of systematics that one should mask. The format should be '+
                   'four columns: 1- systematic name, 2- filter (u,g,r,i,z), 3- > or <, 4- Threshold value')
+parser.add_option('--noise-bias',dest='noise_bias',default='analytic',type=str,
+                  help='Option to compute the noise bias. Options are: \'analytic\''+
+                  'or \'simulated\'.')
+parser.add_option('--nrealiz',dest='nrealiz',type=int,required=False,
+                  help='If the noise bias is computed using simulations, this parameters determines the number of'+
+                  'simulations to use.')
 
 ####
 # Read options
@@ -212,6 +218,7 @@ class Tracer(object) :
     #Translate into delta map
     self.weight=masked_fraction*mask_binary
     goodpix=np.where(mask_binary>0.1)[0]
+    self.Ngal = np.sum(nmap*mask_binary)
     ndens=np.sum(nmap*mask_binary)/np.sum(self.weight)
     self.ndens_perad=ndens/(np.radians(self.fsk.dx)*np.radians(self.fsk.dy))
     self.delta=np.zeros_like(self.weight)
@@ -445,16 +452,86 @@ if (covar is not None) and o.compute_ssc :
   covar+=covar_ssc
 
 #Compute noise bias
-nls_all=np.zeros_like(cls_all)
-i_x=0
-for i in range(nbins) :
-  for j in range(i,nbins) :
-    if i==j : #Add shot noise in auto-correlation
-      t=tracers[i]
-      corrfac=np.sum(t.weight**2)/(t.fsk.nx*t.fsk.ny)
-      nl=np.ones_like(ell_eff)*corrfac/t.ndens_perad
-      nls_all[i_x]=wsp.decouple_cell([nl])[0]
-    i_x+=1
+if o.noise_bias == 'analytic':
+    nls_all=np.zeros_like(cls_all)
+    i_x=0
+    for i in range(nbins) :
+      for j in range(i,nbins) :
+        if i==j : #Add shot noise in auto-correlation
+          t=tracers[i]
+          corrfac=np.sum(t.weight**2)/(t.fsk.nx*t.fsk.ny)
+          nl=np.ones_like(ell_eff)*corrfac/t.ndens_perad
+          nls_all[i_x]=wsp.decouple_cell([nl])[0]
+        i_x+=1
+
+elif o.noise_bias == 'simulated':
+
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    def randomize_deltag_map(tracer):
+        """
+        Creates a randomised version of the input map map by assigning the
+        galaxies in the surevy to random pixels in the map. Basically it rotates each
+        galaxy by a random angle but not rotating it out of the survey footprint.
+        :param map: masked galaxy overdensity map which needs to randomised
+        :param Ngal: number of galaxies used to create the map
+        :return randomised_map: a randomised version of the masked input map
+        """
+
+        logger.info('Randomizing galaxy map.')
+
+        mask = tracer.weight
+        Ngal = tracer.Ngal
+
+        np.random.seed(seed=None)
+        maskpixy, maskpixx = np.where(mask != 0.)
+
+        galpix_mask = np.random.choice(np.arange(maskpixx.shape[0]), size=Ngal, \
+                                       p=mask[mask != 0.]/np.sum(mask[mask != 0.]))
+
+        galpixx = maskpixx[galpix_mask]
+        galpixy = maskpixy[galpix_mask]
+
+        maskshape = mask.shape
+        ny, nx = maskshape
+        ipix = galpixx + nx*galpixy
+
+        randomized_map = np.bincount(ipix, minlength=nx*ny).reshape(maskshape)
+
+        mean = np.average(randomized_map[mask != 0.], weights=mask[mask != 0])
+        randomized_map = (randomized_map-mean)/mean
+
+        return randomized_map
+
+    nls_all = np.zeros_like(cls_all)
+    wsps = [[0 for i in range(nbins)] for ii in range(nbins)]
+    i_x = 0
+    for i in range(nbins) :
+      for j in range(i,nbins) :
+        if i == j: #Add shot noise in auto-correlation
+            tracer = tracers[i]
+            ncl_uncoupled = np.zeros((o.nrealiz, ell_eff.shape[0]))
+            for ii in range(o.nrealiz):
+                randomized_map = randomize_deltag_map(tracer)
+                f0 = nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly), tracer.weight, randomized_map, purify_b=False)
+                if wsps[i][j] == None:
+                    logger.info('Workspace element for i, j = {}, {} not set.'.format(i, j))
+                    logger.info('Computing workspace element.')
+                    wsp = nmt.NmtWorkspaceFlat()
+                    wsp.compute_coupling_matrix(f0, f0, bpws)
+                    wsps[i][j] = wsp
+                else:
+                    logger.info('Workspace element already set for i, j = {}, {}.'.format(i, j))
+
+                # Compute pseudo-Cls
+                ncl_coupled = nmt.compute_coupled_cell_flat(f0, f0, bpws)
+                # Uncoupling pseudo-Cls
+                ncl_uncoupled[ii, :] = wsps[i][j].decouple_cell(ncl_coupled)
+            ncl_uncoupled_mean = np.mean(ncl_uncoupled, axis=0)
+            nls_all[i_x] = ncl_uncoupled_mean
+        i_x+=1
 
 #Save to SACC format
 print("Saving to SACC")
