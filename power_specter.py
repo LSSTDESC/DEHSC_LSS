@@ -80,7 +80,7 @@ parser.add_option('--syst-masking-file',dest='syst_mask_file',default='NONE',typ
 parser.add_option('--noise-bias',dest='noise_bias',default='analytic',type=str,
                   help='Option to compute the noise bias. Options are: \'analytic\''+
                   'or \'simulated\'.')
-parser.add_option('--nrealiz',dest='nrealiz',type=int,required=False,
+parser.add_option('--nrealiz',dest='nrealiz',type=int,default=1000,
                   help='If the noise bias is computed using simulations, this parameters determines the number of'+
                   'simulations to use.')
 
