@@ -483,7 +483,7 @@ elif o.noise_bias == 'simulated':
         logger.info('Randomizing galaxy map.')
 
         mask = tracer.weight.reshape([tracer.fsk.ny, tracer.fsk.nx])
-        Ngal = tracer.Ngal
+        Ngal = int(tracer.Ngal)
 
         np.random.seed(seed=None)
         maskpixy, maskpixx = np.where(mask != 0.)
