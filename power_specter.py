@@ -464,11 +464,14 @@ if o.noise_bias == 'analytic':
           nls_all[i_x]=wsp.decouple_cell([nl])[0]
         i_x+=1
 
-elif o.noise_bias == 'simulated':
+elif o.noise_bias == 'simulations':
 
     import logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
+
+    logger.info('Computing shape noise power spectrum from Poisson simulations.')
+    logger.info('Running nrealiz = {}.'.format(o.nrealiz))
 
     def randomize_deltag_map(tracer):
         """
