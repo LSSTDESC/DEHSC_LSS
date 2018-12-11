@@ -464,7 +464,7 @@ if o.noise_bias == 'analytic':
           nls_all[i_x]=wsp.decouple_cell([nl])[0]
         i_x+=1
 
-elif o.noise_bias == 'simulations':
+elif o.noise_bias == 'simulated':
 
     import logging
     logging.basicConfig(level=logging.INFO)
