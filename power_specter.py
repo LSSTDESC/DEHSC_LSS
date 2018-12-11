@@ -506,7 +506,7 @@ elif o.noise_bias == 'simulated':
         return randomized_map
 
     nls_all = np.zeros_like(cls_all)
-    wsps = [[0 for i in range(nbins)] for ii in range(nbins)]
+    wsps = [[None for i in range(nbins)] for ii in range(nbins)]
     i_x = 0
     for i in range(nbins) :
       for j in range(i,nbins) :
