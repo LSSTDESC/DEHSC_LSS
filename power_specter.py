@@ -516,7 +516,7 @@ elif o.noise_bias == 'simulated':
             ncl_uncoupled = np.zeros((o.nrealiz, ell_eff.shape[0]))
             for ii in range(o.nrealiz):
                 randomized_map = randomize_deltag_map(tracer)
-                f0 = nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly), mask, randomized_map, purify_b=False)
+                f0 = nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly), mask, [randomized_map], purify_b=False)
                 if wsps[i][j] == None:
                     logger.info('Workspace element for i, j = {}, {} not set.'.format(i, j))
                     logger.info('Computing workspace element.')
