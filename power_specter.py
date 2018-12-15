@@ -218,6 +218,8 @@ class Tracer(object) :
     #Translate into delta map
     self.weight=masked_fraction*mask_binary
     goodpix=np.where(mask_binary>0.1)[0]
+    self.goodpix=goodpix
+    self.mask_binary=mask_binary
     self.Ngal = np.sum(nmap*mask_binary)
     ndens=np.sum(nmap*mask_binary)/np.sum(self.weight)
     self.ndens_perad=ndens/(np.radians(self.fsk.dx)*np.radians(self.fsk.dy))
@@ -501,12 +503,14 @@ elif o.noise_bias == 'simulated':
         ny, nx = maskshape
         ipix = galpixx + nx*galpixy
 
-        randomized_map = np.bincount(ipix, minlength=nx*ny).reshape(maskshape)
+        randomized_nmap = np.bincount(ipix, minlength=nx*ny)
 
-        mean = np.average(randomized_map[mask != 0.], weights=mask[mask != 0])
-        randomized_map = (randomized_map-mean)/mean
+        randomized_deltamap = np.zeros_like(randomized_nmap)
+        ndens = np.sum(randomized_nmap*tracer.mask_binary)/np.sum(tracer.weight)
+        randomized_deltamap[tracer.goodpix] = randomized_nmap[tracer.goodpix]/(ndens*tracer.masked_fraction[tracer.goodpix])-1
+        randomized_deltamap = randomized_deltamap.reshape(maskshape)
 
-        return randomized_map
+        return randomized_deltamap
 
     nls_all = np.zeros_like(cls_all)
     wsps = [[None for i in range(nbins)] for ii in range(nbins)]
