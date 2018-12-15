@@ -216,6 +216,7 @@ class Tracer(object) :
           raise ValueError("%d-th contaminant template is incompatible"%ic)
           
     #Translate into delta map
+    self.masked_fraction=masked_fraction
     self.weight=masked_fraction*mask_binary
     goodpix=np.where(mask_binary>0.1)[0]
     self.goodpix=goodpix
