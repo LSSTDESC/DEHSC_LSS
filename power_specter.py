@@ -506,7 +506,7 @@ elif o.noise_bias == 'simulated':
 
         randomized_nmap = np.bincount(ipix, minlength=nx*ny)
 
-        randomized_deltamap = np.zeros_like(randomized_nmap)
+        randomized_deltamap = np.zeros_like(randomized_nmap, dtype='float')
         ndens = np.sum(randomized_nmap*tracer.mask_binary)/np.sum(tracer.weight)
         randomized_deltamap[tracer.goodpix] = randomized_nmap[tracer.goodpix]/(ndens*tracer.masked_fraction[tracer.goodpix])-1
         randomized_deltamap = randomized_deltamap.reshape(maskshape)
@@ -525,19 +525,19 @@ elif o.noise_bias == 'simulated':
             for ii in range(o.nrealiz):
                 randomized_map = randomize_deltag_map(tracer)
                 f0 = nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly), mask, [randomized_map], purify_b=False)
-                if wsps[i][j] == None:
-                    logger.info('Workspace element for i, j = {}, {} not set.'.format(i, j))
-                    logger.info('Computing workspace element.')
-                    wsp = nmt.NmtWorkspaceFlat()
-                    wsp.compute_coupling_matrix(f0, f0, bpws)
-                    wsps[i][j] = wsp
-                else:
-                    logger.info('Workspace element already set for i, j = {}, {}.'.format(i, j))
+                # if wsps[i][j] == None:
+                #     logger.info('Workspace element for i, j = {}, {} not set.'.format(i, j))
+                #     logger.info('Computing workspace element.')
+                #     wsp = nmt.NmtWorkspaceFlat()
+                #     wsp.compute_coupling_matrix(f0, f0, bpws)
+                #     wsps[i][j] = wsp
+                # else:
+                #     logger.info('Workspace element already set for i, j = {}, {}.'.format(i, j))
 
                 # Compute pseudo-Cls
                 ncl_coupled = nmt.compute_coupled_cell_flat(f0, f0, bpws)
                 # Uncoupling pseudo-Cls
-                ncl_uncoupled[ii, :] = wsps[i][j].decouple_cell(ncl_coupled)
+                ncl_uncoupled[ii, :] = wsp.decouple_cell(ncl_coupled)
             ncl_uncoupled_mean = np.mean(ncl_uncoupled, axis=0)
             nls_all[i_x] = ncl_uncoupled_mean
         i_x+=1
