@@ -247,16 +247,23 @@ else :
   wsp.read_from(o.fname_mcm)
 
 #Compute window functions
-print("Computing window functions")
 lmax=int(180.*np.sqrt(1./fsk.dx**2+1./fsk.dy**2))
 nbands=wsp.wsp.bin.n_bands
-windows=np.zeros([nbands,lmax+1])
-l_arr=np.arange(lmax+1)
-t_hat=np.zeros(lmax+1);
-for il,l in enumerate(l_arr) :
+if (o.fname_mcm=='NONE') or (not os.path.isfile(o.fname_mcm+".windows.npz")) :
+  print("Computing window functions")
+  windows=np.zeros([nbands,lmax+1])
+  l_arr=np.arange(lmax+1)
+  t_hat=np.zeros(lmax+1);
+  for il,l in enumerate(l_arr) :
     t_hat[il]=1.;
     windows[:,il]=wsp.decouple_cell(wsp.couple_cell(l_arr,[t_hat]))
     t_hat[il]=0.;
+  if o.fname_mcm!='NONE' :
+    np.savez(o.fname_mcm+".windows",windows=windows)
+else :
+  print("Reading window functions")
+  windows=np.load(o.fname_mcm+".windows.npz")['windows']
+    
 
 #Compute all cross-correlations
 print("Computing all cross-power specra")
