@@ -482,7 +482,7 @@ if o.noise_bias == 'analytic':
       for j in range(i,nbins) :
         if i==j : #Add shot noise in auto-correlation
           t=tracers[i]
-          corrfac=np.sum(t.weight**2)/(t.fsk.nx*t.fsk.ny)
+          corrfac=np.sum(t.weight)/(t.fsk.nx*t.fsk.ny)
           nl=np.ones_like(ell_eff)*corrfac/t.ndens_perad
           nls_all[i_x]=wsp.decouple_cell([nl])[0]
         i_x+=1
