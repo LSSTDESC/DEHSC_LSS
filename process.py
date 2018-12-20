@@ -51,6 +51,8 @@ parser.add_option('--depth-method', dest='depth_method', default='0', type=int,
                   help='Method to construct depth maps: 0-> DR1-like, 1-DESC, 2-Flux-error')
 parser.add_option('--flat-project',dest='flat_project',default='TAN',type=str,
                   help='Flat-sky projection: use TAN or CAR')
+parser.add_option('--strict-cuts',dest='strict_cuts',default=False,action='store_true',
+                  help='Whether to use the strict-cuts catalogs')
 
 ####
 # Read options
@@ -58,11 +60,14 @@ parser.add_option('--flat-project',dest='flat_project',default='TAN',type=str,
 # Read catalog (with fitsio or astropy)
 print("Reading")
 nparts=0
-while os.path.isfile(prefix_data+'HSC_'+o.field_in+'_part%d_forced.fits'%(nparts+1)) :
+suffix_in="_forced.fits"
+if o.strict_cuts :
+  suffix_in="_forced_strict.fits"
+while os.path.isfile(prefix_data+'HSC_'+o.field_in+'_part%d'%(nparts+1)+suffix_in) :
   nparts+=1
 if nparts==0 :
   #Single-part file
-  fname_in=prefix_data+'HSC_'+o.field_in+'_forced.fits'
+  fname_in=prefix_data+'HSC_'+o.field_in+suffix_in
   try:
     cat = Table.read(fname_in)
   except:
@@ -72,7 +77,7 @@ else :
   #Parted file
   for ipart in np.arange(nparts)+1 :
     print(" Reading part %d"%ipart)
-    fname_in=prefix_data+'HSC_'+o.field_in+'_part%d_forced.fits'%ipart
+    fname_in=prefix_data+'HSC_'+o.field_in+'_part%d'%ipart+suffix_in
     try:
       c=Table.read(fname_in)
     except:

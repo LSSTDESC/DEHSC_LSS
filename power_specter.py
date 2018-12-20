@@ -265,6 +265,8 @@ if (o.fname_mcm=='NONE') or (not os.path.isfile(o.fname_mcm+".windows.npz")) :
   l_arr=np.arange(lmax+1)
   t_hat=np.zeros(lmax+1);
   for il,l in enumerate(l_arr) :
+    if l%100==0 : 
+      print(l)
     t_hat[il]=1.;
     windows[:,il]=wsp.decouple_cell(wsp.couple_cell(l_arr,[t_hat]))
     t_hat[il]=0.;
