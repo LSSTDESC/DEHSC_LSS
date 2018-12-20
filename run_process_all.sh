@@ -6,11 +6,12 @@ python_exec=python
 #python_exec=python3
 
 do_cleanup=false
+do_arcturus=true
 do_process=false
 do_sysmap=false
 do_cat_sample=false
 do_syst_check=false
-do_power_spectra=true
+do_power_spectra=false
 
 recompute_mcm=false
 covar_option=analytic #Currently available: analytic or gaus_sim
@@ -27,6 +28,18 @@ do
     fi
 done
 
+#Add Arcturus mask flags for all fields
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS
+do
+    if [ "$do_arcturus" = true ]; then
+	echo ${field}
+	arcturus_predir=/global/cscratch1/sd/damonge/HSC/HSC-SSP_brightStarMask_Arcturus
+	venice_exec=${arcturus_predir}/venice-4.0.3/bin/venice
+	${venice_exec} -m ${arcturus_predir}/reg/masks_all.reg -cat ${predir_out}/HSC_${field}_forced.fits -xcol ra -ycol dec -o testcat.fits -f all -flagName mask_Arcturus
+	mv testcat.fits ${predir_out}/HSC_${field}_forced.fits
+    fi
+done
+exit
 #Now clean up the WIDE and DEEP fields
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS
 do
