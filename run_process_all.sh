@@ -6,19 +6,20 @@ python_exec=python
 #python_exec=python3
 
 do_cleanup=false
-do_arcturus=true
+do_arcturus=false
 do_process=false
 do_sysmap=false
-do_cat_sample=false
+do_cat_sample=true
 do_syst_check=false
 do_power_spectra=false
 
 recompute_mcm=false
+mask_option=arcturus #Currently available: arcturus or sirius
 covar_option=analytic #Currently available: analytic or gaus_sim
 pz_bins_file=4bins #Currently available: nbins (with n=1,2,3,4,5,6) and 4bins_hsc (HSC shear binning)
 ell_bins_file=200 #Currently available: 400 (constant bandpowers with width 400) and hsc (HSC ell binning)
 theory_prediction_file=NONE
-nz_method=pdfstack #Currently available: zmc, pdfstack, cosmos30
+nz_method=zmc #pdfstack #Currently available: zmc, pdfstack, cosmos30
 
 #First clean up the metadata
 for table in WIDE DEEP UDEEP
@@ -29,7 +30,7 @@ do
 done
 
 #Add Arcturus mask flags for all fields
-for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS
+for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS_part1 WIDE_VVDS_part2 WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS UDEEP_COSMOS UDEEP_SXDS
 do
     if [ "$do_arcturus" = true ]; then
 	echo ${field}
@@ -39,7 +40,7 @@ do
 	mv testcat.fits ${predir_out}/HSC_${field}_forced.fits
     fi
 done
-exit
+
 #Now clean up the WIDE and DEEP fields
 for field in WIDE_AEGIS WIDE_GAMA09H WIDE_GAMA15H WIDE_HECTOMAP WIDE_VVDS WIDE_WIDE12H WIDE_XMMLSS DEEP_COSMOS DEEP_DEEP23 DEEP_ELAISN1 DEEP_XMMLSS UDEEP_COSMOS UDEEP_SXDS
 do
@@ -47,7 +48,7 @@ do
     mkdir -p ${dirname}
     if [ "$do_process" = true ]; then
 	echo $field
-	${python_exec} process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5 --flat-project CAR
+	${python_exec} process.py --input-field ${field} --resolution 0.01 --field-padding 0.1 --output-prefix ${dirname}/${field} --save-systematics --save-masks --save-depth-maps --min-snr 10.0 --depth-cut 24.5 --flat-project CAR --bo-mask-type ${mask_option}
     fi
 done
 
@@ -67,7 +68,7 @@ do
     if [ "$do_cat_sample" = true ]; then
 	echo $field
 	dirname=${predir_out}/HSC_processed/${field}
-	exc="${python_exec} cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --pz-type ephor_ab --pz-mark best --pz-bins photoz_binning/photoz_bin_edges_${pz_bins_file}.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5 --nz-max 4. --nz-bins 100"
+	exc="${python_exec} cat_sampler.py --input-prefix ${dirname}/${field} --output-file ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --pz-type ephor_ab --pz-mark best --pz-bins photoz_binning/photoz_bin_edges_${pz_bins_file}.txt --map-sample ${dirname}/${field}_MaskedFraction.fits --analysis-band i --depth-cut 24.5 --nz-max 4. --nz-bins 100 --bo-mask-type ${mask_option}"
 	if [ "$nz_method" = pdfstack ]; then
 	    exc+=" --use-pdf=True"
 	elif [ "$nz_method" = cosmos30 ]; then

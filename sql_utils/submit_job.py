@@ -8,7 +8,7 @@ def submit_job(fname_sql,output_format,do_preview=False) :
         command+=" -p"
     command+=" -f "+output_format
     command+=" "+fname_sql
-    print command
+    print(command)
     os.system(command)
 
 def write_boxsearch(tablename,dec_range,ra_range,fname_out,output_format="fits",do_box=True,submit=False,strict_cuts=False) :
