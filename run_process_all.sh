@@ -9,9 +9,9 @@ do_cleanup=false
 do_arcturus=false
 do_process=false
 do_sysmap=false
-do_cat_sample=true
+do_cat_sample=false
 do_syst_check=false
-do_power_spectra=false
+do_power_spectra=true
 
 recompute_mcm=false
 mask_option=arcturus #Currently available: arcturus or sirius
@@ -95,25 +95,25 @@ do
     if [ "$do_power_spectra" = true ]; then
 	echo $field
 	dirname=${predir_out}/HSC_processed/${field}
-	fname_mcm=${dirname}/${field}_bpw${ell_bins_file}_mcm.dat
-	fname_mcm_sysmask=${dirname}/${field}_bpw${ell_bins_file}_sysmask_mcm.dat
-	fname_cov_mcm=${dirname}/${field}_bpw${ell_bins_file}_cov_mcm.dat
-	fname_cov_mcm_sysmask=${dirname}/${field}_bpw${ell_bins_file}_cov_sysmask_mcm.dat
+	fname_mcm=${dirname}/${field}_bpw${ell_bins_file}_mcm_mask${mask_option}.dat
+	fname_mcm_sysmask=${dirname}/${field}_bpw${ell_bins_file}_sysmask_mcm_mask${mask_option}.dat
+	fname_cov_mcm=${dirname}/${field}_bpw${ell_bins_file}_cov_mcm_mask${mask_option}.dat
+	fname_cov_mcm_sysmask=${dirname}/${field}_bpw${ell_bins_file}_cov_sysmask_mcm_mask${mask_option}.dat
 	if [ "$recompute_mcm" = true ]; then	
 	    rm -f ${fname_mcm} ${fname_cov_mcm} ${fname_mcm_sysmask} ${fname_cov_mcm_sysmask}
 	fi
 	#Deprojected, not syst-masked
-	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_mask${mask_option} --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --bo-mask-type ${mask_option}
 	#Deprojected, not syst-masked, with SSC
-	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_ssc --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --covariance-ssc
+	#${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_ssc_mask${mask_option} --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias --covariance-ssc --bo-mask-type ${mask_option}
 	#No deprojection, not syst-masked
-	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm}
+	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_mask${mask_option}                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --bo-mask-type ${mask_option}
 	#No deprojection, not syst-masked, with SSC
-	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_ssc                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --covariance-ssc
+	#${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_ssc_mask${mask_option}                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm} --covariance-ssc --bo-mask-type ${mask_option}
 	#Deprojected, syst-masked
-	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_sysmasked --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias ${covar_option} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt
+	#${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_cont_dpt_dst_str_ams_fwh_ssk_sysmasked_mask${mask_option} --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --cont-depth --cont-dust --cont-stars --cont-oc airmass,seeing,sigma_sky --cont-deproj-bias ${covar_option} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt --bo-mask-type ${mask_option}
 	#No deprojection, syst-masked
-	${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_sysmasked                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt
+	#${python_exec} power_specter.py --output-file ${dirname}/${field}_spectra_eab_best_pzb${pz_bins_file}_bpw${ell_bins_file}_cov${covar_option}_nocont_sysmasked_mask${mask_option}                       --input-prefix ${dirname}/${field} --input-maps ${dirname}/${field}_Ngal_bins_eab_best_pzb${pz_bins_file}_${nz_method}_mask${mask_option}.fits --ell-bins ell_binning/ell_bins_${ell_bins_file}.txt --mcm-output ${fname_mcm_sysmask} --hsc-field HSC_${field} --covariance-option ${covar_option} --guess-cell data --theory-prediction ${theory_prediction_file} --covariance-coupling-file ${fname_cov_mcm_sysmask} --syst-masking-file systematic_cuts/${field}_syst_cuts.txt --bo-mask-type ${mask_option}
     fi
 done
 

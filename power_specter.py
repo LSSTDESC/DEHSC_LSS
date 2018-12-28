@@ -83,10 +83,16 @@ parser.add_option('--noise-bias',dest='noise_bias',default='analytic',type=str,
 parser.add_option('--nrealiz',dest='nrealiz',type=int,default=1000,
                   help='If the noise bias is computed using simulations, this parameters determines the number of'+
                   'simulations to use.')
+parser.add_option('--bo-mask-type', dest='mask_type', default='sirius', type=str,
+                  help='Bright object mask (arcturus or sirius)')
 
 ####
 # Read options
 (o, args) = parser.parse_args()
+
+prefix_in_use=o.prefix_in
+if o.mask_type=='arcturus' :
+  prefix_in_use+='_marct'
 
 def read_map_bands(fname,read_bands,bandname) :
   if read_bands :
@@ -103,12 +109,12 @@ def read_map_bands(fname,read_bands,bandname) :
 
 print("Reading mask")
 #Create depth-based mask
-fsk,mp_depth=fm.read_flat_map(o.prefix_in+"_10s_depth_mean_fluxerr.fits",2)
+fsk,mp_depth=fm.read_flat_map(prefix_in_use+"_10s_depth_mean_fluxerr.fits",2)
 mp_depth[np.isnan(mp_depth)]=0; mp_depth[mp_depth>40]=0
 msk_depth=np.zeros_like(mp_depth); msk_depth[mp_depth>=o.depth_cut]=1
 
 #Read masked fraction
-fskb,mskfrac=fm.read_flat_map(o.prefix_in+'_MaskedFraction.fits',i_map=0)
+fskb,mskfrac=fm.read_flat_map(prefix_in_use+'_MaskedFraction.fits',i_map=0)
 fm.compare_infos(fsk,fskb)
 
 #Create BO-based mask
@@ -145,7 +151,6 @@ if do_mask_syst :
     print(' '+d['name']+d['gl']+'%.3lf'%(d['thr'])+
           ' removes ~%.2lf per-cent of the available sky'%((1-fsky_post/fsky_pre)*100))
   print(' All systematics remove %.2lf per-cent of the sky'%((1-np.sum(msk_syst)/np.sum(msk_t))*100))
-#  fsk.view_map(msk_syst+msk_t); plt.show()
 msk_t*=msk_syst
 
 #Area
