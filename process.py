@@ -51,6 +51,10 @@ parser.add_option('--depth-method', dest='depth_method', default='0', type=int,
                   help='Method to construct depth maps: 0-> DR1-like, 1-DESC, 2-Flux-error')
 parser.add_option('--flat-project',dest='flat_project',default='TAN',type=str,
                   help='Flat-sky projection: use TAN or CAR')
+parser.add_option('--strict-cuts',dest='strict_cuts',default=False,action='store_true',
+                  help='Whether to use the strict-cuts catalogs')
+parser.add_option('--bo-mask-type', dest='mask_type', default='sirius', type=str,
+                  help='Bright object mask (arcturus or sirius)')
 
 ####
 # Read options
@@ -58,11 +62,14 @@ parser.add_option('--flat-project',dest='flat_project',default='TAN',type=str,
 # Read catalog (with fitsio or astropy)
 print("Reading")
 nparts=0
-while os.path.isfile(prefix_data+'HSC_'+o.field_in+'_part%d_forced.fits'%(nparts+1)) :
+suffix_in="_forced.fits"
+if o.strict_cuts :
+  suffix_in="_forced_strict.fits"
+while os.path.isfile(prefix_data+'HSC_'+o.field_in+'_part%d'%(nparts+1)+suffix_in) :
   nparts+=1
 if nparts==0 :
   #Single-part file
-  fname_in=prefix_data+'HSC_'+o.field_in+'_forced.fits'
+  fname_in=prefix_data+'HSC_'+o.field_in+suffix_in
   try:
     cat = Table.read(fname_in)
   except:
@@ -72,7 +79,7 @@ else :
   #Parted file
   for ipart in np.arange(nparts)+1 :
     print(" Reading part %d"%ipart)
-    fname_in=prefix_data+'HSC_'+o.field_in+'_part%d_forced.fits'%ipart
+    fname_in=prefix_data+'HSC_'+o.field_in+'_part%d'%ipart+suffix_in
     try:
       c=Table.read(fname_in)
     except:
@@ -110,6 +117,9 @@ cat.remove_rows(~sel) #np.where(~sel)[0])#[sel]
 ####
 # Generate flat-sky information object
 fsk=fm.FlatMapInfo.from_coords(cat['ra'],cat['dec'],o.res,pad=o.pad/o.res,projection=o.flat_project)
+
+if o.mask_type=='arcturus' :
+  o.out_prefix+='_marct'
 
 ####
 # Generate systematics maps
@@ -156,10 +166,16 @@ if o.sv_syst :
 ####
 # Generate bright-object mask
 #Binary BO mask
-mask_bo,fsg=createMask(cat['ra'],cat['dec'],
-                       [cat['iflags_pixel_bright_object_center'],
-                        cat['iflags_pixel_bright_object_any']],
-                       fsk,o.res_bo)
+if o.mask_type=='arcturus' :
+  mask_bo,fsg=createMask(cat['ra'],cat['dec'],
+                         [~cat['mask_Arcturus'].astype(bool)],
+                         fsk,o.res_bo)
+else :
+  mask_bo,fsg=createMask(cat['ra'],cat['dec'],
+                         [cat['iflags_pixel_bright_object_center'],
+                          cat['iflags_pixel_bright_object_any']],
+                         fsk,o.res_bo)
+
 if o.gen_plot :
   fsg.view_map(mask_bo,posColorbar= True,title= 'Bright-object mask',
                xlabel='ra', ylabel='dec',colorMin=0,colorMax=1,
@@ -169,10 +185,14 @@ if o.sv_mask :
 
 #Masked fraction
 masked=np.ones(len(cat))
-masked*=np.logical_not(cat['iflags_pixel_bright_object_center'])
-masked*=np.logical_not(cat['iflags_pixel_bright_object_any'])
+if o.mask_type=='arcturus' :
+  masked*=cat['mask_Arcturus']
+else :
+  masked*=np.logical_not(cat['iflags_pixel_bright_object_center'])
+  masked*=np.logical_not(cat['iflags_pixel_bright_object_any'])
 masked_fraction,s=createMeanStdMaps(cat['ra'],cat['dec'],masked,fsk)
 masked_fraction_cont=removeDisconnected(masked_fraction,fsk)
+
 if o.gen_plot :
   fsk.view_map(masked_fraction_cont,posColorbar=True,title='Masked fraction',
                xlabel='ra',ylabel='dec',colorMin=0,colorMax=1,

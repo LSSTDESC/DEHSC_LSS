@@ -43,21 +43,27 @@ parser.add_option('--depth-cut', dest='depth_cut', default=24.5, type=float,
                   help='Minimum depth to consider in your footprint')
 parser.add_option('--cosmos-weights-file',dest='cosmos_weights_file',default='/global/cscratch1/sd/damonge/HSC/HSC_processed/COSMOS_HSC_WEIGHTS.fits',type=str,
                   help='Photo-z summary statistic to use when binning objects')
+parser.add_option('--bo-mask-type', dest='mask_type', default='sirius', type=str,
+                  help='Bright object mask (arcturus or sirius)')
 
 ####
 # Read options
 (o, args) = parser.parse_args()
 
+prefix_in_use=o.prefix_in
+if o.mask_type=='arcturus' :
+  prefix_in_use+='_marct'
+
 if o.use_cosmos and o.use_pdf :
   raise KeyError("Can't do both pdf stacking and COSMOS 30-band")
   exit(1)
 
-fname_cat=o.prefix_in+'_Catalog_'+o.band+'%.2lf.fits'%o.depth_cut
+fname_cat=prefix_in_use+'_Catalog_'+o.band+'%.2lf.fits'%o.depth_cut
 if not os.path.isfile(fname_cat) :
   raise KeyError("File "+fname_cat+" doesn't exist")
 
 if o.map_sample is None :
-  o.map_sample=o.prefix_in+'_MaskedFraction.fits'
+  o.map_sample=prefix_in_use+'_MaskedFraction.fits'
 if not os.path.isfile(o.map_sample) :
   raise KeyError("File "+o.map_sample+" doesn't exist")
 
@@ -65,7 +71,7 @@ if (o.fname_bins is None) or (not os.path.isfile(o.fname_bins)) :
   raise KeyError("Can't find bins file")
 
 if o.fname_out is None :
-  o.fname_out=o.prefix_in+'_bins_'+o.fname_bins+'.fits'
+  o.fname_out=prefix_in_use+'_bins_'+o.fname_bins+'.fits'
 
 if o.pz_type=='ephor_ab' :
   pz_code='eab'
@@ -85,8 +91,11 @@ column_zmc='pz_mc_'+pz_code
 #Read catalog
 cat=fits.open(fname_cat)[1].data
 if not o.no_bo_cut :
-  msk=np.logical_not(cat['iflags_pixel_bright_object_center'])
-  msk*=np.logical_not(cat['iflags_pixel_bright_object_any'])
+  if o.mask_type=='arcturus' :
+    msk=cat['mask_Arcturus'].astype(bool)
+  else :
+    msk=np.logical_not(cat['iflags_pixel_bright_object_center'])
+    msk*=np.logical_not(cat['iflags_pixel_bright_object_any'])
   cat=cat[msk]
 
 if o.use_pdf:
