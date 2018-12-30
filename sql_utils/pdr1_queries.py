@@ -52,7 +52,7 @@ def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_fiel
 
     fname_job=None
     if do_download :
-        fname_job=prd.predir_saving+tablename.upper()+"_"+fieldname.upper()
+        fname_job=prd.predir_saving+tablename.upper()+"_"+fieldname.replace('_','').upper()
         if part is not None :
             fname_job+="_part%d"%part
         if not strict_cuts :

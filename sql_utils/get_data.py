@@ -63,7 +63,6 @@ def add_Arcturus_flag(fname_in) :
         return
     else :
         print("NOO "+fname_in)
-        return
     
     cmd=prd.venice_exec
     cmd+=" -m "+prd.arcturus_predir+"/reg/masks_all.reg"
@@ -76,9 +75,9 @@ def add_Arcturus_flag(fname_in) :
     os.system(cmd2)
 
 for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss'] :
-    fname=prd.predir_saving+'PDR1_WIDE_'+fld.upper()+'_shearcat_forced.fits'
+    fname=prd.predir_saving+'PDR1_WIDE_'+fld.replace('_','').upper()+'_shearcat_forced.fits'
     add_Arcturus_flag(fname)
-    fname=prd.predir_saving+'PDR1_WIDE_'+fld.upper()+'_forced.fits'
+    fname=prd.predir_saving+'PDR1_WIDE_'+fld.replace('_','').upper()+'_forced.fits'
     add_Arcturus_flag(fname)
 for p in [1,2] :
     fname=prd.predir_saving+'PDR1_WIDE_VVDS_part%d_shearcat_forced.fits'%p
@@ -86,10 +85,10 @@ for p in [1,2] :
     fname=prd.predir_saving+'PDR1_WIDE_VVDS_part%d_forced.fits'%p
     add_Arcturus_flag(fname)
 for fld in ['cosmos','deep2_3','elais_n1','xmm_lss'] :
-    fname=prd.predir_saving+'PDR1_DEEP_'+fld.upper()+'_forced.fits'
+    fname=prd.predir_saving+'PDR1_DEEP_'+fld.replace('_','').upper()+'_forced.fits'
     add_Arcturus_flag(fname)
 for fld in ['cosmos','sxds'] :
-    fname=prd.predir_saving+'PDR1_UDEEP_'+fld.upper()+'_forced.fits'
+    fname=prd.predir_saving+'PDR1_UDEEP_'+fld.replace('_','').upper()+'_forced.fits'
     add_Arcturus_flag(fname)
 for see in ['best','median','worst'] :
     fname=prd.predir_saving+'PDR1_COSMOS_WIDEDEPTH_'+see.upper()+'_NONE_shearcat_forced.fits'
@@ -137,11 +136,16 @@ get_cosmos30band()
 
 def get_pdfs(fld,pzcode) :
     predir=prd.predir_saving+fld.upper()+'/'+pzcode+'/'
+    if os.path.isfile(predir+'done') :
+        print("Found pdfs - ("+fld+","+pzcode+")")
+        return
+
     tarfile='pdr1_'+pzcode+'_'+fld+'.tar.xz'
     url='https://hsc-release.mtk.nao.ac.jp/archive/photoz/pdr1/pdf/'+pzcode
     url+='/'+tarfile
     os.system('wget '+url)
     os.system('mkdir -p '+predir)
+    os.system('touch '+predir+'done')
     os.system('tar -C '+predir+' -xf '+tarfile)
     os.system('rm '+tarfile)
 
