@@ -1,0 +1,22 @@
+modules: hsc_lss
+
+launcher: local
+
+stages: 
+    - name: ReduceCat
+      nprocess: 1
+
+inputs:
+    raw_data: /global/cscratch1/sd/damonge/HSC_ceci/PDR1_WIDE_AEGIS_forced.fits
+    pdf_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS
+    cosmos_data: /global/cscratch1/sd/damonge/HSC_ceci/COSMOS2015_Laigle+_v1.1.fits
+
+config: ./hsc_lss_params/config_aegis.yml
+
+resume: False
+
+output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS_out
+
+log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS_out/logs
+
+pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS_out/logs/full_log.txt

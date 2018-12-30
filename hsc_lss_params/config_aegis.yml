@@ -1,0 +1,15 @@
+global:
+    depth_cut: 24.5
+    res: 0.01
+    pad: 0.1
+    res_bo: 0.003
+    flat_project: CAR
+    mask_type: sirius
+    band: i
+
+Reducecat:
+    min_snr: 10.
+    sv_depth: True
+    sv_mask: True
+    sv_syst: True
+    depth_method: 2
