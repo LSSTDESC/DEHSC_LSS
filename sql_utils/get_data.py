@@ -1,4 +1,13 @@
 from pdr1_queries import write_frames, write_fieldsearch
+import predirs as prd
+import os
+
+
+################################
+#                              #
+#  Download catalog-level data #
+#                              #
+################################
 
 #Per-frame metadata
 write_frames("pdr1_wide","frames_wide.sql",submit=True)
@@ -37,3 +46,107 @@ write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h1_pz.sql",do_field=True,s
                   ra_range=[330.,336.],do_photoz=True,part=1)
 write_fieldsearch("pdr1_wide",'vvds',"field_wide_vvds_h2_pz.sql",do_field=True,submit=True,
                   ra_range=[336.,342.],do_photoz=True,part=2)
+
+
+#############################
+#                           #
+#  Add Arcturus mask flags  #
+#                           #
+#############################
+
+def add_Arcturus_flag(fname_in) :
+    from astropy.io import fits
+    
+    names=fits.open(fname_in)[1].data.names
+    if 'mask_Arcturus' in names :
+        print("Found Arcturus flag "+fname_in)
+        return
+    else :
+        print("NOO "+fname_in)
+        return
+    
+    cmd=prd.venice_exec
+    cmd+=" -m "+prd.arcturus_predir+"/reg/masks_all.reg"
+    cmd+=" -cat "+fname_in
+    cmd+=" -xcol ra -ycol dec -o "+fname_in+".tmp.fits"+" -f all -flagName mask_Arcturus"
+    print(cmd)
+    os.system(cmd)
+    cmd2="mv "+fname_in+".tmp.fits "+fname_in
+    print(cmd2)
+    os.system(cmd2)
+
+for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss'] :
+    fname=prd.predir_saving+'PDR1_WIDE_'+fld.upper()+'_shearcat_forced.fits'
+    add_Arcturus_flag(fname)
+    fname=prd.predir_saving+'PDR1_WIDE_'+fld.upper()+'_forced.fits'
+    add_Arcturus_flag(fname)
+for p in [1,2] :
+    fname=prd.predir_saving+'PDR1_WIDE_VVDS_part%d_shearcat_forced.fits'%p
+    add_Arcturus_flag(fname)
+    fname=prd.predir_saving+'PDR1_WIDE_VVDS_part%d_forced.fits'%p
+    add_Arcturus_flag(fname)
+for fld in ['cosmos','deep2_3','elais_n1','xmm_lss'] :
+    fname=prd.predir_saving+'PDR1_DEEP_'+fld.upper()+'_forced.fits'
+    add_Arcturus_flag(fname)
+for fld in ['cosmos','sxds'] :
+    fname=prd.predir_saving+'PDR1_UDEEP_'+fld.upper()+'_forced.fits'
+    add_Arcturus_flag(fname)
+for see in ['best','median','worst'] :
+    fname=prd.predir_saving+'PDR1_COSMOS_WIDEDEPTH_'+see.upper()+'_NONE_shearcat_forced.fits'
+    add_Arcturus_flag(fname)
+
+
+###########################
+#                         #
+#  Get COSMOS-30band data #
+#                         #
+###########################
+
+def get_cosmos30band() :
+    fname_out=prd.predir_saving+'COSMOS2015_Laigle+_v1.1.fits'
+    
+    if os.path.isfile(fname_out) :
+        print("Found COSMOS data")
+        return
+    else :
+        import urllib
+        import gzip
+        
+        url = 'ftp://ftp.iap.fr/pub/from_users/hjmcc/COSMOS2015/'
+        url+= 'COSMOS2015_Laigle+_v1.1.fits.gz'
+        
+        print 'Downloading COSMOS2015_Laigle+_v1.1.fits.gz...'
+        urllib.urlretrieve(url, 'COSMOS2015_Laigle+_v1.1.fits.gz')
+        
+        print 'Decompressing COSMOS2015_Laigle+_v1.1.fits.gz...'
+        with gzip.open('./COSMOS2015_Laigle+_v1.1.fits.gz', 'rb') as readfile:
+            with open('./COSMOS2015_Laigle+_v1.1.fits', 'wb') as writefile:
+                gzdata = readfile.read()
+                writefile.write(gzdata)
+
+        os.remove('./COSMOS2015_Laigle+_v1.1.fits.gz')
+        os.system('mv ./COSMOS2015_Laigle+_v1.1.fits '+fname_out)
+get_cosmos30band()
+
+
+##########################
+#                        #
+#  Download photo-z pdfs #
+#                        #
+##########################
+
+def get_pdfs(fld,pzcode) :
+    predir=prd.predir_saving+fld.upper()+'/'+pzcode+'/'
+    tarfile='pdr1_'+pzcode+'_'+fld+'.tar.xz'
+    url='https://hsc-release.mtk.nao.ac.jp/archive/photoz/pdr1/pdf/'+pzcode
+    url+='/'+tarfile
+    os.system('wget '+url)
+    os.system('mkdir -p '+predir)
+    os.system('tar -C '+predir+' -xf '+tarfile)
+    os.system('rm '+tarfile)
+
+for pc in ['nnpz','ephor','ephor_ab','demp','frankenz'] :
+    for f in ['wide_aegis','wide_gama09h','wide_gama15h','wide_hectomap','wide_vvds',
+              'wide_wide12h','wide_xmmlss',
+              'deep_cosmos','deep_elaisn1','deep_xmmlss','deep_deep23'] :
+        get_pdfs(f,pc)

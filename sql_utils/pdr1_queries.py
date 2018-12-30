@@ -1,10 +1,13 @@
 import numpy as np
 import os
 import sys
-
-predir_saving='/global/cscratch1/sd/damonge/HSC_ceci/'
+import predirs as prd
 
 def submit_job(fname_sql,output_format,do_preview=False,do_download=True,output_file='none') :
+    if os.path.isfile(output_file) :
+        print("Found "+output_file)
+        return
+
     command="python hscReleaseQuery.py --user=damonge@local"
     if do_preview :
         command+=" -p"
@@ -14,10 +17,8 @@ def submit_job(fname_sql,output_format,do_preview=False,do_download=True,output_
     command+=" "+fname_sql
     if do_download :
         command+=" > "+output_file
-    print("echo \""+command+"\"")
-    print(command)
     
-#    os.system(command)
+    os.system(command)
 
 def add_photoz(mt) :
     sto=""
@@ -35,7 +36,7 @@ def write_frames(tablename,fname_out,output_format='fits',submit=False,do_downlo
 
     fname_job=None
     if do_download :
-        fname_job=predir_saving+tablename.upper()+"_frames."+output_format
+        fname_job=prd.predir_saving+tablename.upper()+"_frames."+output_format
 
     f=open(fname_out,"w")
     f.write(stout)
@@ -51,7 +52,7 @@ def write_fieldsearch(tablename,fieldname,fname_out,output_format="fits",do_fiel
 
     fname_job=None
     if do_download :
-        fname_job=predir_saving+tablename.upper()+"_"+fieldname.upper()
+        fname_job=prd.predir_saving+tablename.upper()+"_"+fieldname.upper()
         if part is not None :
             fname_job+="_part%d"%part
         if not strict_cuts :
