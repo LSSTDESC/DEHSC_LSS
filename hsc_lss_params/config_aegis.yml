@@ -7,6 +7,6 @@ global:
     mask_type: sirius
     band: i
 
-Reducecat:
+ReduceCat:
     min_snr: 10.
-    depth_method: 2
+    depth_method: fluxerr

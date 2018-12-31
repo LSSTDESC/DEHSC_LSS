@@ -4,6 +4,8 @@ from astropy.table import Table,vstack
 import numpy as np
 from .flatmaps import FlatMapInfo
 from .map_utils import createCountsMap, createMeanStdMaps, createMask, removeDisconnected
+from .estDepth import get_depth
+from astropy.io import fits
 
 class ReduceCat(PipelineStage) :
     name="ReduceCat"
@@ -11,7 +13,7 @@ class ReduceCat(PipelineStage) :
     outputs=[('clean_catalog',FitsFile),('dust_map',FitsFile),('star_map',FitsFile),
              ('bo_mask',FitsFile),('masked_fraction',FitsFile),('depth_map',FitsFile)]
     config_options={'min_snr':10.,'depth_cut':24.5,'res':0.0285,
-                    'res_bo':0.003,'pad':0.1,'band':'i','depth_method':2,
+                    'res_bo':0.003,'pad':0.1,'band':'i','depth_method':'fluxerr',
                     'flat_project':'CAR','mask_type':'sirius'}
     bands=['g','r','i','z','y']
 
@@ -57,7 +59,24 @@ class ReduceCat(PipelineStage) :
         masked_fraction_cont=removeDisconnected(masked_fraction,fsk)
         return masked_fraction_cont
 
+    def make_depth_map(self,cat,fsk) :
+        print("Creating depth maps")
+        method=self.config['depth_method']
+        band=self.config['band']
+        snrs=cat['%scmodel_flux'%band]/cat['%scmodel_flux_err'%band]
+        if method=='fluxerr' :
+            arr2=None
+        else :
+            arr2=snrs
+        depth,_=get_depth(method,cat['ra'],cat['dec'],band,
+                          arr1=cat['%scmodel_mag'%band],arr2=arr2,
+                          flatSkyGrid=fsk,SNRthreshold=self.config['min_snr'])
+        desc='%d-s depth, '%(self.config['min_snr'])+band+' '+method+' mean'
+        return depth,desc
+
     def run(self) :
+        band=self.config['band']
+
         #Read list of files
         f=open(self.get_input('raw_data'))
         files=[s.strip() for s in f.readlines()]
@@ -70,8 +89,10 @@ class ReduceCat(PipelineStage) :
                 c=Table.read(fname)
                 cat=vstack([cat,c],join_type='exact')
 
-        if self.config['band'] not in self.bands :
-            raise ValueError("Band "+self.config['band']+" not available")
+        if band not in self.bands :
+            raise ValueError("Band "+band+" not available")
+
+        print('Initial catalog size: %d'%(len(cat)))
             
         # Clean nulls and nans
         print("Basic cleanup")
@@ -95,8 +116,8 @@ class ReduceCat(PipelineStage) :
 
         #Collect sample cuts
         sel_maglim=np.ones(len(cat),dtype=bool);
-        sel_maglim[cat['%scmodel_mag'%self.config['band']]-
-                   cat['a_%s'%self.config['band']]>self.config['depth_cut']]=0
+        sel_maglim[cat['%scmodel_mag'%band]-
+                   cat['a_%s'%band]>self.config['depth_cut']]=0
         # Blending
         sel_blended=np.ones(len(cat),dtype=bool);
         sel_blended[cat['iblendedness_abs_flux']>=0.42169650342]=0 #abs_flux<10^-0.375
@@ -150,6 +171,36 @@ class ReduceCat(PipelineStage) :
         fsk.write_flat_map(self.get_output('masked_fraction'),masked_fraction_cont,
                            descript='Masked fraction')
 
+        ####
+        # Compute maps
+        depth,desc=self.make_depth_map(cat,fsk)
+        fsk.write_flat_map(self.get_output('depth_map'),depth,descript=desc)
+
+        ####
+        # Implement final cuts
+        # - Mag. limit
+        # - S/N cut
+        # - Star-galaxy separator
+        # - Blending
+        sel=~(sel_maglim*sel_gals*sel_fluxcut*sel_blended)
+        print("Will lose %d objects to depth, S/N and stars"%(np.sum(sel)))
+        cat.remove_rows(sel)
+
+        ####
+        # Write final catalog
+        # 1- header
+        print("Writing output")
+        hdr=fits.Header()
+        hdr['BAND']=self.config['band']
+        hdr['DEPTH']=self.config['depth_cut']
+        prm_hdu=fits.PrimaryHDU(header=hdr)
+        # 2- Catalog
+        cat_hdu=fits.table_to_hdu(cat)
+        # 3- Actual writing
+        hdul=fits.HDUList([prm_hdu,cat_hdu])
+        hdul.writeto(self.get_output('clean_catalog'),overwrite=True)
+
+        ####
 
 if __name__ == '__main__':
     cls = PipelineStage.main()
