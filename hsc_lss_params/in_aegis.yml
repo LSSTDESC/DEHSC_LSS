@@ -5,9 +5,12 @@ launcher: local
 stages: 
     - name: ReduceCat
       nprocess: 1
+    - name: MapSyst
+      nprocess: 1
 
 inputs:
     raw_data: ./hsc_lss_params/input_list_aegis.txt
+    frames_data: /global/cscratch1/sd/damonge/HSC_ceci/PDR1_WIDE_frames.fits
     pdf_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS
     cosmos_data: /global/cscratch1/sd/damonge/HSC_ceci/COSMOS2015_Laigle+_v1.1.fits
 

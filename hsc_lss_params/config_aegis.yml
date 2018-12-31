@@ -10,3 +10,6 @@ global:
 ReduceCat:
     min_snr: 10.
     depth_method: fluxerr
+
+MapSyst:
+    hist_nbins: 40
