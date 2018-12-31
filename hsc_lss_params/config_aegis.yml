@@ -9,7 +9,4 @@ global:
 
 Reducecat:
     min_snr: 10.
-    sv_depth: True
-    sv_mask: True
-    sv_syst: True
     depth_method: 2

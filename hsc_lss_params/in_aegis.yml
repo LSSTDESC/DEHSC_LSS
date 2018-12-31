@@ -7,7 +7,7 @@ stages:
       nprocess: 1
 
 inputs:
-    raw_data: /global/cscratch1/sd/damonge/HSC_ceci/PDR1_WIDE_AEGIS_forced.fits
+    raw_data: ./hsc_lss_params/input_list_aegis.txt
     pdf_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS
     cosmos_data: /global/cscratch1/sd/damonge/HSC_ceci/COSMOS2015_Laigle+_v1.1.fits
 
