@@ -7,6 +7,8 @@ stages:
       nprocess: 1
     - name: MapSyst
       nprocess: 1
+    - name: PDFMatch
+      nprocess: 1
 
 inputs:
     raw_data: ./hsc_lss_params/input_list_aegis.txt
@@ -16,7 +18,7 @@ inputs:
 
 config: ./hsc_lss_params/config_aegis.yml
 
-resume: False
+resume: True
 
 output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_AEGIS_out
 
