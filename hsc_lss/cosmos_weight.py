@@ -6,12 +6,15 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.io import fits
 import pandas as pd
+from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import KDTree
+import scipy.spatial as spatial
 
 class COSMOSWeight(PipelineStage) :
     name="COSMOSWeight"
     inputs=[('cosmos_data',FitsFile),('cosmos_hsc',FitsFile)]
     outputs=[('cosmos_weights',FitsFile)]
-    config_options={'depth_cut':24.5,'band':'i','mask_type':'sirius'}
+    config_options={'depth_cut':24.5,'band':'i','mask_type':'sirius','n_neighbors':10}
     bands=['g','r','i','z','y']
 
     def run(self) :
@@ -110,12 +113,35 @@ class COSMOSWeight(PipelineStage) :
 
         ####
         # Get color-space weights
-        print("Setting training and photo-z samples")
+        print("Computing color-space weights")
         train_sample=np.transpose(np.array([np.array(cat_matched['%scmodel_mag'%m]) for m in ['g','r','i','z','y']]))
         train_z=np.array(cat_matched['PHOTOZ'])
         photoz_sample=np.transpose(np.array([np.array(cat['%scmodel_mag'%m]) for m in ['g','r','i','z','y']]))
 
-        exit(1)
+        #Find nearest neighbors in color space
+        n_nbrs=NearestNeighbors(n_neighbors=self.config['n_neighbors'],algorithm='kd_tree',
+                                metric='euclidean').fit(train_sample)
+        distances,_=n_nbrs.kneighbors(train_sample)
+        #Get maximum distance
+        distances=np.amax(distances,axis=1)
+        #Find all photo-z objects within this maximum distance for each COSMOS object
+        tree_NN_lookup = spatial.cKDTree(photoz_sample, leafsize=2*self.config['n_neighbors'])
+        num_photoz=np.array([len(tree_NN_lookup.query_ball_point(t,d+1E-6)) 
+                             for t,d in zip(train_sample,distances)])
+        #Weights are ratio of number of photo-z neighbors to COSMOS neighbors
+        #(normalized by the number of photo-z objects)
+        weights = np.true_divide(num_photoz*len(train_sample),self.config['n_neighbors']*len(photoz_sample))
+        weights_tot=np.sum(weights)
+        print(np.sum(weights))
+
+        ####
+        # Write output
+        keys_t1=['ALPHA_J2000','DELTA_J2000','gcmodel_mag','rcmodel_mag','icmodel_mag','zcmodel_mag','ycmodel_mag',
+              'pz_best_eab','pz_best_frz','pz_best_nnz','PHOTOZ']
+        t1=Table.from_pandas(pd.DataFrame(np.transpose([cat_matched[k] for k in keys_t1]),columns=keys_t1))
+        t2=Table.from_pandas(pd.DataFrame(np.transpose(weights), columns= ['weight']))
+        cat_weights=hstack([t1, t2])
+        cat_weights.write(self.get_output('cosmos_weights'))
 
 if __name__ == '__main__':
     cls = PipelineStage.main()

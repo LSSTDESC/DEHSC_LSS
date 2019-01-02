@@ -13,3 +13,6 @@ ReduceCat:
 
 MapSyst:
     hist_nbins: 40
+
+COSMOSWeight:
+    n_neighbors: 20
