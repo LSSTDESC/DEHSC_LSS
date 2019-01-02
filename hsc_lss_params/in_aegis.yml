@@ -5,11 +5,13 @@ launcher: local
 stages: 
     - name: ReduceCat
       nprocess: 1
-    - name: MapSyst
+    - name: SystMapper
       nprocess: 1
     - name: PDFMatch
       nprocess: 1
     - name: COSMOSWeight
+      nprocess: 1
+    - name: CatMapper
       nprocess: 1
 
 

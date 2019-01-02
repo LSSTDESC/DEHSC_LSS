@@ -9,8 +9,8 @@ from astropy.io import fits
 from shapely.geometry.polygon import Polygon
 from shapely.prepared import prep
 
-class MapSyst(PipelineStage) :
-    name="MapSyst"
+class SystMapper(PipelineStage) :
+    name="SystMapper"
     inputs=[('frames_data',FitsFile),('masked_fraction',FitsFile)]
     outputs=[('ccdtemp_maps',FitsFile),('airmass_maps',FitsFile),('exptime_maps',FitsFile),
              ('skylevel_maps',FitsFile),('sigma_sky_maps',FitsFile),('seeing_maps',FitsFile),
