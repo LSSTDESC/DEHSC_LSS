@@ -13,6 +13,8 @@ stages:
       nprocess: 1
     - name: CatMapper
       nprocess: 1
+    - name: PowerSpecter
+      nprocess: 1
 
 
 inputs:

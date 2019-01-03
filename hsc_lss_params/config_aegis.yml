@@ -23,3 +23,14 @@ CatMapper:
     pz_bins: [0.15,0.50,0.75,1.00,1.50]
     nz_bin_num: 100
     nz_bin_max: 4.0
+
+PowerSpecter:
+    ell_bpws: [200.0,600.0,1000.0,1600.0,2200.0,2800.0,3400.0,4200.0,5000.0,6000.0,7000.0,8500.0,10000.0,12000.0,14000.0]
+    mcm_file: NONE
+    mcm_covar_file: NONE
+    gaus_covar_type: analytic
+    noise_bias_type: analytic
+    guess_spectrum: NONE
+    add_ssc: False
+    mask_thr: 0.5
+    mask_systematics: False

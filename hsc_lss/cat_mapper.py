@@ -12,7 +12,7 @@ class CatMapper(PipelineStage) :
     outputs=[('ngal_maps',FitsFile)]
     config_options={'mask_type':'sirius','pz_code':'ephor_ab','pz_mark':'best',
                     'pz_bins':[0.15,0.50,0.75,1.00,1.50],'nz_bin_num':200,
-                    'nz_bin_max':3.0,}
+                    'nz_bin_max':3.0}
     
     def get_nmaps(self,cat) :
         maps=[]

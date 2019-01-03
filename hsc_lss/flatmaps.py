@@ -175,7 +175,7 @@ class FlatMapInfo(object) :
         if title is not None :
             ax.set_title(title,fontsize=15)
         image= ax.imshow(map_in.reshape([self.ny,self.nx]),
-			origin='lower', interpolation='nearest')
+			 origin='lower', interpolation='nearest')
         if addColorbar :
             plt.colorbar(image)
         ax.set_xlabel(xlabel,fontsize=15)
