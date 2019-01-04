@@ -37,3 +37,42 @@ class ASCIIFile(DataFile):
         # Fitsio doesn't have pure 'w' modes, just 'rw'.
         # Maybe we should check if the file already exists here?
         return open(path,mode)
+
+class BinaryFile(DataFile):
+    """
+    A binary data file
+    """
+    suffix = 'dat'
+    
+    @classmethod
+    def open(cls, path, mode, **kwargs):
+        import fitsio
+        # Fitsio doesn't have pure 'w' modes, just 'rw'.
+        # Maybe we should check if the file already exists here?
+        return open(path,mode)
+
+class NpzFile(DataFile):
+    """
+    A binary data file
+    """
+    suffix = 'npz'
+    
+    @classmethod
+    def open(cls, path, mode, **kwargs):
+        import fitsio
+        # Fitsio doesn't have pure 'w' modes, just 'rw'.
+        # Maybe we should check if the file already exists here?
+        return open(path,mode)
+
+class SACCFile(DataFile):
+    """
+    A SACC file
+    """
+    suffix = 'sacc'
+    
+    @classmethod
+    def open(cls, path, mode, **kwargs):
+        import fitsio
+        # Fitsio doesn't have pure 'w' modes, just 'rw'.
+        # Maybe we should check if the file already exists here?
+        return open(path,mode)
