@@ -29,7 +29,7 @@ class PowerSpecter(PipelineStage) :
                     'b_bias_nodes':[0.82,1.10,1.44,1.66,2.61],
                     'depth_cut':24.5,'band':'i','mask_thr':0.5,'guess_spectrum':'NONE',
                     'gaus_covar_type':'analytic','oc_all_bands':True,'add_ssc':False,
-                    'mask_systematics':False,'noise_bias_type':'analytic',
+                    'mask_systematics':False,'syst_masking_file':'none','noise_bias_type':'analytic',
                     'ssc_response_prefix':'none'}
 
     def read_map_bands(self,fname,read_bands,bandname) :
@@ -385,40 +385,37 @@ class PowerSpecter(PipelineStage) :
         msk_bi=msk_bo*msk_depth
 
         if self.config['mask_systematics'] :
-            '''
-#Mask systematics
-do_mask_syst=not (o.syst_mask_file=='NONE')
-msk_syst=msk_t.copy()
-if do_mask_syst :
-  #Read systematics cut data
-  data_syst=np.genfromtxt(o.syst_mask_file,dtype=[('name','|U32'),('band','|U4'),('gl','|U4'),('thr','<f8')])
-  for d in data_syst :
-    #Read systematic
-    if d['name'].startswith('oc_') :
-      sysmap=read_map_bands(o.prefix_in+'_'+d['name']+'.fits',False,d['band'])[0]
-    elif d['name']=='dust' :
-      sysmap=read_map_bands(o.prefix_in+'_syst_dust.fits',False,d['band'])[0]
-    else :
-      raise KeyError("Unknown systematic name "+d['name'])
+            #Mask systematics
+            msk_syst=msk_bi.copy()
+            #Read systematics cut data
+            data_syst=np.genfromtxt(self.config['syst_masking_file'],
+                                    dtype=[('name','|U32'),('band','|U4'),('gl','|U4'),('thr','<f8')])
+            for d in data_syst :
+                #Read systematic
+                if d['name'].startswith('oc_') :
+                    sysmap=self.read_map_bands(self.get_input(d['name'][3:]+'_maps'),False,d['band'])[0]
+                elif d['name']=='dust' :
+                    sysmap=self.read_map_bands(self.get_input('dust_map'),False,d['band'])[0]
+                else :
+                    raise KeyError("Unknown systematic name "+d['name'])
     
-    #Divide by mean
-    sysmean=np.sum(msk_t*mskfrac*sysmap)/np.sum(msk_t*mskfrac)
-    sysmap/=sysmean
+                #Divide by mean
+                sysmean=np.sum(msk_bi*mskfrac*sysmap)/np.sum(msk_bi*mskfrac)
+                sysmap/=sysmean
 
-    #Apply threshold
-    msk_sys_this=msk_t.copy(); fsky_pre=np.sum(msk_syst)
-    if d['gl']=='<' :
-      msk_sys_this[sysmap<d['thr']]=0
-    else :
-      msk_sys_this[sysmap>d['thr']]=0
-    msk_syst*=msk_sys_this
-    fsky_post=np.sum(msk_syst)
-    print(' '+d['name']+d['gl']+'%.3lf'%(d['thr'])+
-          ' removes ~%.2lf per-cent of the available sky'%((1-fsky_post/fsky_pre)*100))
-  print(' All systematics remove %.2lf per-cent of the sky'%((1-np.sum(msk_syst)/np.sum(msk_t))*100))
-msk_t*=msk_syst
-            '''
-            raise NotImplementedError("TODO: implement systematics masking")
+                #Apply threshold
+                msk_sys_this=msk_bi.copy(); fsky_pre=np.sum(msk_syst)
+                if d['gl']=='<' :
+                    msk_sys_this[sysmap<d['thr']]=0
+                else :
+                    msk_sys_this[sysmap>d['thr']]=0
+                msk_syst*=msk_sys_this
+                fsky_post=np.sum(msk_syst)
+                print(' '+d['name']+d['gl']+'%.3lf'%(d['thr'])+
+                      ' removes ~%.2lf per-cent of the available sky'%((1-fsky_post/fsky_pre)*100))
+            print(' All systematics remove %.2lf per-cent of the sky'%((1-np.sum(msk_syst)/np.sum(msk_bi))*100))
+            msk_bi*=msk_syst
+
         return msk_bi,mskfrac,mp_depth
 
     def get_tracers(self,temps) :
@@ -599,8 +596,6 @@ msk_t*=msk_syst
                                   binning_ww,cls_wodpj,covar=cov_wodpj,verbose=False)
         self.write_vector_to_sacc(self.get_output('power_spectra_wdpj'),tracers_sacc,
                                   binning_ww,cls_wdpj,covar=cov_wdpj,verbose=True)
-        
-        exit(1)
 
 if __name__ == '__main__':
     cls = PipelineStage.main()

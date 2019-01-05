@@ -1,0 +1,6 @@
+oc_ellipt    y > 1.6
+oc_ellipt    g > 1.8
+oc_exptime   g < 0.8
+oc_nvisit    y < 0.75
+oc_seeing    z < 0.75
+oc_skylevel  i < 0.9
