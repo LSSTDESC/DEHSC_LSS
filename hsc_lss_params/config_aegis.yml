@@ -33,3 +33,4 @@ PowerSpecter:
     mask_thr: 0.5
     mask_systematics: False
     oc_all_bands: True
+    ssc_response_prefix: hsc_lss_params/Responses/Response

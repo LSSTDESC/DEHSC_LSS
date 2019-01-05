@@ -29,7 +29,8 @@ class PowerSpecter(PipelineStage) :
                     'b_bias_nodes':[0.82,1.10,1.44,1.66,2.61],
                     'depth_cut':24.5,'band':'i','mask_thr':0.5,'guess_spectrum':'NONE',
                     'gaus_covar_type':'analytic','oc_all_bands':True,'add_ssc':False,
-                    'mask_systematics':False,'noise_bias_type':'analytic'}
+                    'mask_systematics':False,'noise_bias_type':'analytic',
+                    'ssc_response_prefix':'none'}
 
     def read_map_bands(self,fname,read_bands,bandname) :
         if read_bands :
@@ -89,7 +90,7 @@ class PowerSpecter(PipelineStage) :
         return nls_all
         
     def get_noise_simulated(self,tracers,wsp,bpws,nsims) :
-        def randomize_delgag_map(tracer,seed) :
+        def randomize_deltag_map(tracer,seed) :
             """
             Creates a randomised version of the input map map by assigning the
             galaxies in the surevy to random pixels in the map. Basically it rotates each
@@ -123,7 +124,6 @@ class PowerSpecter(PipelineStage) :
             return randomized_deltamap
 
         nls_all=np.zeros([self.ncross,self.nell])
-        wsps=[[None for i in range(self.nbins)] for ii in range[nbins]]
         i_x=0
         for i in range(self.nbins) :
             for j in range(i,self.nbins) :
@@ -132,10 +132,10 @@ class PowerSpecter(PipelineStage) :
                     mask=tracer.weight.reshape([tracer.fsk.ny,tracer.fsk.nx])
                     ncl_uncoupled=np.zeros((nsims,self.nell))
                     for ii in range(nsims) :
-                        randomized_map=randomize_deltag_map(tracer)
+                        randomized_map=randomize_deltag_map(tracer,ii+nsims*i)
                         f0=nmt.NmtFieldFlat(np.radians(self.fsk.lx),np.radians(self.fsk.ly),mask,
                                             [randomized_map])
-                        ncl_uncoupled[ii,:]=wsp.decouple_cell(nmt.coupled_cell_flat(f0,f0,bpws))
+                        ncl_uncoupled[ii,:]=wsp.decouple_cell(nmt.compute_coupled_cell_flat(f0,f0,bpws))
                     nls_all[i_x]=np.mean(ncl_uncoupled,axis=0)
                 i_x+=1
 
@@ -312,10 +312,10 @@ class PowerSpecter(PipelineStage) :
         weights=(self.msk_bi*self.mskfrac).reshape([self.fsk.ny,self.fsk.nx])
         if temps is not None :
             conts=[[t.reshape([self.fsk.ny,self.fsk.nx])] for t in temps]
-            cl_dpj=[None for i in range(self.ncross)]
+            cl_dpj=[[c] for c in cl_dpj_all]
         else :
             conts=None
-            cl_dpj=cl_dpj_all
+            cl_dpj=[None for i in range(self.ncross)]
 
         #Iterate
         cells_sims=[]
@@ -334,7 +334,6 @@ class PowerSpecter(PipelineStage) :
             cells_this=[]
             for i in range(self.nbins) :
                 for j in range(i,self.nbins) :
-                    print(cl_dpj)
                     cl=nmt.compute_coupled_cell_flat(flds[i],flds[j],bpws)
                     cells_this.append(wsp.decouple_cell(cl,cl_bias=cl_dpj[i_x])[0])
                     i_x+=1
@@ -461,7 +460,13 @@ msk_t*=msk_syst
         return temps
 
     def parse_input(self) :
-        #TODO: Parse input params
+        if (self.config['noise_bias_type']!='analytic') and (self.config['noise_bias_type']!='pois_sim') :
+            raise ValueError('Noise bias calculation must be either \'analytic\' or \'pois_sim\'')
+        if (self.config['gaus_covar_type']!='analytic') and (self.config['gaus_covar_type']!='gaus_sim') :
+            raise ValueError('Gaussian covariance calculation must be either \'analytic\' or \'pois_sim\'')
+        if self.config['guess_spectrum']!='NONE' :
+            if not os.path.isfile(self.config['guess_spectrum']) :
+                raise ValueError('Guess spectrum must be either \'NONE\' or an existing ASCII file')
 
         return
 
@@ -575,12 +580,10 @@ msk_t*=msk_syst
             cov_wdpj=self.get_covar(lth,clth,bpws,wsp,temps,cls_deproj)
 
         if self.config['add_ssc'] :
-            raise NotImplementedError("SSC not working yet")
             print("Computing SSC")
             ng_data,cov_ssc=self.get_covar_ssc(tracers_nc,ell_eff)
             cov_wodpj+=cov_ssc
             cov_wdpj+=cov_ssc
-            print(ng_data)
             #np.savetxt(o.prefix_out+".ngals",ng_data,
             #           header='[1]-Ngals [2]-Sigma_poisson [3]-Sigma_CV [4]-Sigma_T')
 
