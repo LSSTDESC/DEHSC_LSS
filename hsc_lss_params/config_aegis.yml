@@ -31,7 +31,7 @@ PowerSpecter:
     guess_spectrum: NONE
     add_ssc: True
     mask_thr: 0.5
-    mask_systematics: True
+    mask_systematics: False
     syst_masking_file: hsc_lss_params/systematic_cuts/WIDE_GAMA09H_syst_cuts.txt
     oc_all_bands: True
     ssc_response_prefix: hsc_lss_params/Responses/Response

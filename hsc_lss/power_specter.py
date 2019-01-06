@@ -545,6 +545,7 @@ class PowerSpecter(PipelineStage) :
                 self.ordering[i,j]=ix
                 if j!=i :
                     self.ordering[j,i]=ix
+                ix+=1
 
         print("Getting MCM")
         wsp=self.get_mcm(tracers_nc,bpws)
@@ -572,7 +573,7 @@ class PowerSpecter(PipelineStage) :
         print("Computing covariance")
         cov_wodpj=self.get_covar(lth,clth,bpws,wsp,None,None)
         if self.config['gaus_covar_type']=='analytic' :
-            cov_wdpj=cov_wodpj
+            cov_wdpj=cov_wodpj.copy()
         else :
             cov_wdpj=self.get_covar(lth,clth,bpws,wsp,temps,cls_deproj)
 
