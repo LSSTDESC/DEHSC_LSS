@@ -25,6 +25,10 @@ class PDFMatch(PipelineStage) :
 
         #Read pdfs from frames
         for alg in pz_algs :
+            if os.path.isfile(prefix_out+"_"+alg+".fits") :
+                print(alg+" found")
+                continue
+
             pdfs_path=self.get_input('pdf_dir')+'/'+alg
             patch_files=[f for f in os.listdir(pdfs_path) if f.__contains__('.fits')]
             for i,file in enumerate(patch_files) :

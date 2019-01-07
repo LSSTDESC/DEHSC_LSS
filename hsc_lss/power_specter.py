@@ -15,7 +15,8 @@ class PowerSpecter(PipelineStage) :
             ('dust_map',FitsFile),('star_map',FitsFile),('depth_map',FitsFile),
             ('ccdtemp_maps',FitsFile),('airmass_maps',FitsFile),('exptime_maps',FitsFile),
             ('skylevel_maps',FitsFile),('sigma_sky_maps',FitsFile),('seeing_maps',FitsFile),
-            ('ellipt_maps',FitsFile),('nvisit_maps',FitsFile),('cosmos_weights',FitsFile)]
+            ('ellipt_maps',FitsFile),('nvisit_maps',FitsFile),('cosmos_weights',FitsFile),
+            ('syst_masking_file',ASCIIFile)]
     outputs=[('mcm',BinaryFile),('cov_mcm',BinaryFile),('gaucov_sims',NpzFile),
              ('windows_l',NpzFile),('noi_bias',SACCFile),('dpj_bias',SACCFile),
              ('power_spectra_wdpj',SACCFile),('power_spectra_wodpj',SACCFile)]
@@ -24,12 +25,13 @@ class PowerSpecter(PipelineStage) :
                                 1000.0,1400.0,1800.0,
                                 2200.0,3000.0,3800.0,
                                 4600.0,6200.0,7800.0,
-                                9400.0,12600.0,12600.0,15800.0],
+                                9400.0,12600.0,15800.0],
+                    'oc_dpj_list': ['airmass','seeing','sigma_sky'],
                     'z_bias_nodes':[0.00,0.50,1.00,2.00,4.00],
                     'b_bias_nodes':[0.82,1.10,1.44,1.66,2.61],
                     'depth_cut':24.5,'band':'i','mask_thr':0.5,'guess_spectrum':'NONE',
                     'gaus_covar_type':'analytic','oc_all_bands':True,'add_ssc':False,
-                    'mask_systematics':False,'syst_masking_file':'none','noise_bias_type':'analytic',
+                    'mask_systematics':False,'noise_bias_type':'analytic',
                     'ssc_response_prefix':'none'}
 
     def read_map_bands(self,fname,read_bands,bandname) :
@@ -388,7 +390,7 @@ class PowerSpecter(PipelineStage) :
             #Mask systematics
             msk_syst=msk_bi.copy()
             #Read systematics cut data
-            data_syst=np.genfromtxt(self.config['syst_masking_file'],
+            data_syst=np.genfromtxt(self.get_input('syst_masking_file'),
                                     dtype=[('name','|U32'),('band','|U4'),('gl','|U4'),('thr','<f8')])
             for d in data_syst :
                 #Read systematic
@@ -442,10 +444,7 @@ class PowerSpecter(PipelineStage) :
         compare_infos(self.fsk,fskb)
         temps.append(t)
         #Observing conditions
-        #TODO: we were not marginalizing over all of these
-        #for oc in ['airmass','ccdtemp','ellipt','exptime','nvisit',
-        #           'seeing','sigma_sky','skylevel'] :
-        for oc in ['airmass','seeing','sigma_sky'] :
+        for oc in self.config['oc_dpj_list'] :
             for t in self.read_map_bands(self.get_input(oc+'_maps'),
                                          self.config['oc_all_bands'],self.config['band']) :
                 temps.append(t)
