@@ -24,7 +24,7 @@ The analysis pipeline consists of 6 stages:
 * ReduceCat: takes in the raw catalog data and produces a cleaned version imposing quality cuts, an overall i-magnitude cut and a star-galaxy separation cut. It also produces maps of quantities stored in the forced-photometry catalog: depth, dust absorption in all bands, star density and bright-object mask.
 * SystMapper: takes in the per-frame metadata and produces maps of different observing conditions in a given HSC field. The observing conditions mapped are: CCD temperature, airmass, exposure time, sky level, sky sigma, seeing, ellipticity and # of visits.
 * PDFMatch: associates each object in the reduced catalog produced by ReduceCat with its photo-z pdf for 5 different photo-z codes (demp, ephor, ephor_ab, frankenz and nnpz).
-* COSMOSWeiht: processes the COSMOS-30band data and produces colour-space weights for each of those objects so they can be used to produce predictions for the redshift distributions.
+* COSMOSWeight: processes the COSMOS-30band data and produces colour-space weights for each of those objects so they can be used to produce predictions for the redshift distributions.
 * CatMapper: takes in the clean catalog data and bins it into photo-z bins, producing maps of the galaxy density and the corresponding N(z) for each redshift bin (using both COSMOS-30band and pdf stacks from all photo-z codes).
 * PowerSpecter: takes the number density maps, mask data and systematics maps to produce measurements of the projected galaxy power spectrum and its covariance matrix with and without deprojection over observational systematics.
 
