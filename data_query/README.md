@@ -3,7 +3,7 @@
 The scripts in this directory can be used to download the raw data from the PDR1 database and everything else needed for this pipeline. 
 This is done by running `python get_data.py`. A few points must be borne in mind first:
 1. Edit the paths in `predirs.py` to point to where you want to save the data (`predir_saving`) and where the Arcturus mask (`arcturus_predir`) is stored.
-2. You need to download and install the Arcturus mask and associated code (Coupon et al. 1705.00622). This can be found [here](ftp://obsftp.unige.ch/pub/coupon/brightStarMasks/HSC-SSP/HSC-SSP_brightStarMask_Arcturus.tgz).
+2. You need to download and install the Arcturus mask and associated code ([Coupon et al. 2017](https://arxiv.org/abs/1705.00622)). This can be found [here](ftp://obsftp.unige.ch/pub/coupon/brightStarMasks/HSC-SSP/HSC-SSP_brightStarMask_Arcturus.tgz).
 
 This script does four things:
 1. Download all the catalog-level data from the PDR1 database needed for this pipeline.
