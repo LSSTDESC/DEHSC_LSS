@@ -2,6 +2,15 @@ import numpy as np
 
 class ObsCond(object):
     def __init__(self,name,data,nx,ny,nbins=40,is_log=False,cutoff=-9999.) :
+        """
+        Observing condition object.
+        :param name: name of the OC.
+        :param data: list of OC values
+        :param nx,ny: dimensionality of the output map
+        :param nbins: number of bins of the OC histograms
+        :param is_log: build logarithmic histograms?
+        :param cutoff: remove all data below the cutoff.
+        """
         self.name=name
         self.is_log=is_log
 
@@ -21,6 +30,7 @@ class ObsCond(object):
         self.map=np.zeros([ny*nx,nbins])
 
     def get_bin_number(self,d) :
+        """Get bin number for a given OC value"""
         if self.is_log :
             x=np.log10(d)
         else :
@@ -29,6 +39,7 @@ class ObsCond(object):
         return int(self.idd*(x-self.dmin))
 
     def collapse_map_mean(self) :
+        """Get mean OC value of each pixel"""
         norm=np.sum(self.map,axis=1)
 
         map_out=np.zeros_like(norm)-9999.

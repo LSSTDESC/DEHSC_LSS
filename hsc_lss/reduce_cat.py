@@ -18,6 +18,11 @@ class ReduceCat(PipelineStage) :
     bands=['g','r','i','z','y']
 
     def make_dust_map(self,cat,fsk) :
+        """
+        Produces a dust absorption map for each band.
+        :param cat: input catalog
+        :param fsk: FlatMapInfo object describing the geometry of the output map
+        """
         print("Creating dust map")
         dustmaps=[]
         dustdesc=[]
@@ -28,12 +33,23 @@ class ReduceCat(PipelineStage) :
         return dustmaps,dustdesc
 
     def make_star_map(self,cat,fsk,sel) :
+        """
+        Produces a star density map
+        :param cat: input catalog
+        :param fsk: FlatMapInfo object describing the geometry of the output map
+        :param sel: mask used to select the stars to be used.
+        """
         print("Creating star map")
         mstar=createCountsMap(cat['ra'][sel],cat['dec'][sel],fsk)+0.
         descstar='Stars, '+self.config['band']+'<%.2lf'%(self.config['depth_cut'])
         return mstar,descstar
 
     def make_bo_mask(self,cat,fsk) :
+        """
+        Produces a bright object mask
+        :param cat: input catalog
+        :param fsk: FlatMapInfo object describing the geometry of the output map
+        """
         print("Generating bright-object mask")
         if self.config['mask_type']=='arcturus' :
             flags_mask=[~cat['mask_Arcturus'].astype(bool)]
@@ -46,6 +62,11 @@ class ReduceCat(PipelineStage) :
         return mask_bo,fsg
 
     def make_masked_fraction(self,cat,fsk) :
+        """
+        Produces a masked fraction map
+        :param cat: input catalog
+        :param fsk: FlatMapInfo object describing the geometry of the output map
+        """
         print("Generating masked fraction map")
         masked=np.ones(len(cat))
         if self.config['mask_type']=='arcturus' :
@@ -60,6 +81,11 @@ class ReduceCat(PipelineStage) :
         return masked_fraction_cont
 
     def make_depth_map(self,cat,fsk) :
+        """
+        Produces a depth map
+        :param cat: input catalog
+        :param fsk: FlatMapInfo object describing the geometry of the output map
+        """
         print("Creating depth maps")
         method=self.config['depth_method']
         band=self.config['band']
@@ -77,6 +103,12 @@ class ReduceCat(PipelineStage) :
         return depth,desc
 
     def run(self) :
+        """
+        Main function.
+        This stage:
+        - Reduces the raw catalog by imposing quality cuts, a cut on i-band magnitude and a star-galaxy separation cat.
+        - Produces mask maps, dust maps, depth maps and star density maps.
+        """
         band=self.config['band']
 
         #Read list of files

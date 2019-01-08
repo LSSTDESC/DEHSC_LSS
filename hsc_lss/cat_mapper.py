@@ -15,6 +15,9 @@ class CatMapper(PipelineStage) :
                     'nz_bin_max':3.0}
     
     def get_nmaps(self,cat) :
+        """
+        Get number counts map from catalog
+        """
         maps=[]
 
         for zi,zf in zip(self.zi_arr,self.zf_arr) :
@@ -25,6 +28,9 @@ class CatMapper(PipelineStage) :
         return np.array(maps)
 
     def get_nz_cosmos(self) :
+        """
+        Get N(z) from weighted COSMOS-30band data
+        """
         weights_file=fits.open(self.get_input('cosmos_weights'))[1].data
 
         pzs=[]
@@ -42,6 +48,11 @@ class CatMapper(PipelineStage) :
         return np.array(pzs)
 
     def get_nz_stack(self,cat,codename) :
+        """
+        Get N(z) from pdf stacks.
+        :param cat: object catalog
+        :param codename: photoz code name (demp, ephor, ephor_ab, frankenz or nnpz).
+        """
         from scipy.interpolate import interp1d
 
         f=fits.open(self.pdf_files[codename])
@@ -62,6 +73,9 @@ class CatMapper(PipelineStage) :
         return np.array(pzs)
             
     def parse_input(self) :
+        """
+        Check config parameters for consistency
+        """
         #Parse input params
         if self.config['pz_code']=='ephor_ab' :
             self.pz_code='eab'
@@ -79,6 +93,12 @@ class CatMapper(PipelineStage) :
         self.column_mark='pz_'+self.config['pz_mark']+'_'+self.pz_code
 
     def run(self) :
+        """
+        Main routine. This stage:
+        - Creates number density maps from the reduced catalog for a set of redshift bins.
+        - Calculates the associated N(z)s for each bin using different methods.
+        - Stores the above into a single FITS file
+        """
         self.parse_input()
         
         print("Reading masked fraction")

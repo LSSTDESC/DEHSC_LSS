@@ -1,12 +1,26 @@
 import numpy as np
 
 def createCountsMap(ra, dec, flatSkyGrid):
+    """
+    Creates a map containing the number of objects in each pixel.
+    :param ra: right ascension for each object.
+    :param dec: declination for each object.
+    :param flatSkyGrid: a flatmaps.FlatMapInfo object describing the geometry of the output map.
+    """
     flatmap= flatSkyGrid.pos2pix(ra, dec)
     mp= np.bincount(flatmap, weights= None, minlength= flatSkyGrid.get_size())
     
     return mp
 
 def createMeanStdMaps(ra, dec, quantity, flatSkyGrid) :
+    """
+    Creates maps of the mean and standard deviation of a given quantity measured at the position 
+    of a number of objects.
+    :param ra: right ascension for each object.
+    :param dec: declination for each object.
+    :param quantity: measurements of the quantity to map for each object.
+    :param flatSkyGrid: a flatmaps.FlatMapInfo object describing the geometry of the output map.
+    """
     pix_ids=flatSkyGrid.pos2pix(ra, dec)
     mp= np.bincount(pix_ids, weights= None, minlength= flatSkyGrid.get_size())
     mpWeighted= np.bincount(pix_ids, weights= quantity, minlength= flatSkyGrid.get_size())
@@ -24,14 +38,15 @@ def createMeanStdMaps(ra, dec, quantity, flatSkyGrid) :
 def createMask(ra,dec,flags,flatsky_base,reso_mask) :
     """
     Creates a mask based on the position of random objects and a set of flags.
-    ra,dec : angular coordinates of the random objects
-    flags : list of arrays containing the flags used to mask areas of the sky.
-            pixels containing objects with any flags=True will be masked.
-            Pass [] if you just want to define a mask based on object positions.
-    flatsky_base : FlatMapInfo for the base mask, defined by the presence of not
+    :param ra: right ascension for each object.
+    :param dec: declination for each object.
+    :param flags: list of arrays containing the flags used to mask areas of the sky.
+                  pixels containing objects with any flags=True will be masked.
+                  Pass [] if you just want to define a mask based on object positions.
+    :param flatsky_base: FlatMapInfo for the base mask, defined by the presence of not
                    of object in pixels defined by this FlatMapInfo
-    reso_mask : resolution of the final mask (dx or dy)
-    returns mask and associated FlatMapInfo
+    :param reso_mask: resolution of the final mask (dx or dy)
+    :return: mask and associated FlatMapInfo
     """
     from scipy.ndimage import label
     fsg0=flatsky_base

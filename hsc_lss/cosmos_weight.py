@@ -18,6 +18,12 @@ class COSMOSWeight(PipelineStage) :
     bands=['g','r','i','z','y']
 
     def run(self) :
+        """
+        Main function.
+        This stage matches the COSMOS-30band data with the HSC COSMOS sample cut with the
+        same criteria as our data and produces colour-space weights to match our sample
+        so it can be used to estimate redshift distributions.
+        """
         band=self.config['band']
 
         #Read HSC COSMOS catalog

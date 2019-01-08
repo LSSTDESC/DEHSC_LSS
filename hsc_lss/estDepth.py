@@ -155,6 +155,17 @@ def dr1_method(ra, dec, band, mags, snr, flatSkyGrid, SNRthreshold= 5):
     return depth, depth_std
 
 def get_depth(method,ra,dec,band,arr1,arr2,flatSkyGrid,SNRthreshold=5) :
+    """
+    Creates a depth map based on the positions and fluxes of a set of objects.
+    :param method: method used to compute the depth map. Allowed values: 'dr1', 'desc' and 'fluxerr'.
+    :param ra: right ascension for each object.
+    :param dec: declination for each object.
+    :param band: band for which to compute the depth map.
+    :param arr1: measurement of the flux (if using 'fluxerr') or magnitude (otherwise) for each object.
+    :param arr2: measurement of the S/N for each object (or `None` if using 'fluxerr').
+    :param flatSkyGrid: flatmaps.FlatMapInfo object describing the geometry of the output map.
+    :param SNRthreshold: S/N cut to use.
+    """
     
     SNRthreshold= int(SNRthreshold)
     print('Creating %s-band %ssigma depth maps'%(band, SNRthreshold))

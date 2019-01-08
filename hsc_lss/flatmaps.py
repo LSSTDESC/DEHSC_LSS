@@ -10,9 +10,9 @@ class FlatMapInfo(object) :
     def __init__(self,wcs,nx=None,ny=None,lx=None,ly=None) :
         """
         Creates a flat map
-        wcs : WCS object containing information about reference point and resolution
-        nx,ny : Number of pixels in the x/y axes. If None, dx/dy must be provided
-        lx,ly : Extent of the map in the x/y axes. If None, nx/ny must be provided
+        :param wcs: WCS object containing information about reference point and resolution
+        :param nx,ny: Number of pixels in the x/y axes. If None, dx/dy must be provided
+        :param lx,ly: Extent of the map in the x/y axes. If None, nx/ny must be provided
         """
         self.wcs=wcs.copy()
 
@@ -306,8 +306,8 @@ class FlatMapInfo(object) :
         """
         Up-grades the resolution of a map and returns the associated FlatSkyInfo object.
         mp : input map
-        x_fac : the new map will be sub-divided into x_fac*nx pixels in the x direction
-        y_fac : the new map will be sub-divided into y_fac*ny pixels in the y direction
+        :param x_fac: the new map will be sub-divided into x_fac*nx pixels in the x direction
+        :param y_fac: the new map will be sub-divided into y_fac*ny pixels in the y direction
                 if y_fac=None, then y_fac=x_fac
         """
         if y_fac is None :
@@ -331,8 +331,8 @@ class FlatMapInfo(object) :
         """
         Down-grades the resolution of a map and returns the associated FlatSkyInfo object.
         mp : input map
-        x_fac : the new map will be sub-divided into floor(nx/x_fac) pixels in the x direction
-        y_fac : the new map will be sub-divided into floor(ny/y_fac) pixels in the y direction
+        :param x_fac: the new map will be sub-divided into floor(nx/x_fac) pixels in the x direction
+        :param y_fac: the new map will be sub-divided into floor(ny/y_fac) pixels in the y direction
                 if y_fac=None, then y_fac=x_fac.
         Note that if nx/ny is not a multiple of x_fac/y_fac, the remainder pixels will be lost.
         """
@@ -398,12 +398,11 @@ class FlatMapInfo(object) :
 
         return FlatMapInfo(w,nx=nsidex,ny=nsidey)
 
-####
 def read_flat_map(filename,i_map=0,hdu=None) :
     """
     Reads a flat-sky map and the details of its pixelization scheme.
     The latter are returned as a FlatMapInfo object.
-    i_map : map to read. If -1, all maps will be read.
+    :param i_map: map to read. If -1, all maps will be read.
     """
     if hdu is None :
         hdul=fits.open(filename)
@@ -428,5 +427,6 @@ def read_flat_map(filename,i_map=0,hdu=None) :
     return fmi,maps
 
 def compare_infos(fsk1,fsk2) :
+    """Checks whether two FlatMapInfo objects are compatible"
     if (fsk1.nx!=fsk2.nx) or (fsk1.ny!=fsk2.ny) or (fsk1.lx!=fsk2.lx) or (fsk1.ly!=fsk2.ly) :
         raise ValueError("Map infos are incompatible")

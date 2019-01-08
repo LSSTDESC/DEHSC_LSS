@@ -1,38 +1,66 @@
 global:
+    #Depth cut in band `band`
     depth_cut: 24.5
+    #Map resolution (in degrees)
     res: 0.01
+    #Padding (in degrees) to be left around the edges of all maps
     pad: 0.1
+    #High resolution for the bright-object mask (in degrees)
     res_bo: 0.003
+    #Which flat-sky projection to use
     flat_project: CAR
+    #Which mask to used (allowed "sirius" or "arcturus).
     mask_type: sirius
+    #Analysis band (g, r, i, z or y).
     band: i
 
 ReduceCat:
+    #S/N defining the depth map.
     min_snr: 10.
+    #Method used to compute the depth map.
     depth_method: fluxerr
 
 SystMapper:
+    #Number of histogram bins used when computing the systematics maps
     hist_nbins: 40
 
 COSMOSWeight:
+    #Number of nearest-neighbors to use when computing the
+    #COSMOS-30band color-space weights.
     n_neighbors: 20
 
 CatMapper:
+    #Photo-z code used to define the redshift bins
     pz_code: ephor_ab
+    #Which photo-z quantity to use when defining the redshift bins
     pz_mark: best
+    #Photo-z bin edges.
     pz_bins: [0.15,0.50,0.75,1.00,1.50]
+    #Number of points at which to sample the N(z)
     nz_bin_num: 100
+    #Maximum redshift when estimating the N(z)
     nz_bin_max: 4.0
 
 PowerSpecter:
+    #Multipole bandpower edges
     ell_bpws: [100.0,200.0,300.0,400.0,600.0,800.0,1000.0,1400.0,1800.0,2200.0,3000.0,3800.0,4600.0,6200.0,7800.0,9400.0,12600.0,15800.0]
+    #Method to compute the Gaussian covariance matrix (allowed 'analytic' or 'gaus_sim').
     gaus_covar_type: analytic
+    #Method to compute the noise bias (allowed 'analytic' or 'pois_sim').
     noise_bias_type: analytic
+    #Path to file containing the guess power spectrum.
+    #If NONE, then the measurement will be used as a guess.
     guess_spectrum: NONE
+    #Whether or not to compute the SSC.
     add_ssc: True
+    #Throw away all pixels in which the masked fraction is below this threshold.
     mask_thr: 0.5
+    #Do we want to additionally mask certain regions based on the value
+    #of the systematic templates there?
     mask_systematics: False
-    #oc_dpj_list: [airmass,ccdtemp,ellipt,exptime,nvisit,seeing,sigma_sky,skylevel]
+    #List of observing conditions to deproject
     oc_dpj_list: [airmass,seeing,sigma_sky]
+    #Deproject them in all bands or only in the measurement band?
     oc_all_bands: False
+    #Path to directory containing the power spectrum responses needed to compute the SSC.
     ssc_response_prefix: hsc_lss_params/Responses/Response

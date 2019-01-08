@@ -13,6 +13,12 @@ class PDFMatch(PipelineStage) :
     config_options={}
 
     def run(self) :
+        """
+        Main function.
+        This stage matches each object in the reduced catalog with its photo-z pdf for different
+        photo-z codes. Then stores the matched pdfs with the same ordering as the reduced catalog
+        into a separate FITS file.
+        """
         file_out=self.get_output('pdf_matched')
         prefix_out=file_out[:-4]
         pz_algs=['demp','ephor','ephor_ab','frankenz','nnpz']

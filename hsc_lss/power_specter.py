@@ -35,6 +35,12 @@ class PowerSpecter(PipelineStage) :
                     'ssc_response_prefix':'none'}
 
     def read_map_bands(self,fname,read_bands,bandname) :
+        """
+        Reads maps from file.
+        :param fname: file name
+        :param read_bands: if True, read map in all bands
+        :param bandname: if `read_bands==False`, then read only the map for this band.
+        """
         if read_bands :
             i_map=-1
         else :
@@ -47,6 +53,9 @@ class PowerSpecter(PipelineStage) :
         return temp
 
     def get_sacc_windows(self,wsp) :
+        """
+        Get window functions for each bandpower so they can be stored into the final SACC files.
+        """
         #Compute window functions
         nbands=wsp.wsp.bin.n_bands
         l_arr=np.arange(self.lmax+1)
@@ -73,12 +82,24 @@ class PowerSpecter(PipelineStage) :
         return windows_sacc
 
     def get_noise(self,tracers,wsp,bpws,nsims=1000) :
+        """
+        Get an estimate of the noise bias.
+        :param tracers: list of Tracers.
+        :param wsp: NaMaster workspace.
+        :param bpws: NaMaster bandpowers.
+        :param nsims: number of simulations to use (if using them).
+        """
         if self.config['noise_bias_type']=='analytic' :
             return self.get_noise_analytic(tracers,wsp)
         elif self.config['noise_bias_type']=='pois_sim' :
             return self.get_noise_simulated(tracers,wsp,bpws,nsims)
 
     def get_noise_analytic(self,tracers,wsp) :
+        """
+        Get an analytical estimate of the noise bias.
+        :param tracers: list of Tracers.
+        :param wsp: NaMaster workspace.
+        """
         nls_all=np.zeros([self.ncross,self.nell])
         i_x=0
         for i in range(self.nbins) :
@@ -92,6 +113,13 @@ class PowerSpecter(PipelineStage) :
         return nls_all
         
     def get_noise_simulated(self,tracers,wsp,bpws,nsims) :
+        """
+        Get a simulated estimate of the noise bias.
+        :param tracers: list of Tracers.
+        :param wsp: NaMaster workspace.
+        :param bpws: NaMaster bandpowers.
+        :param nsims: number of simulations to use (if using them).
+        """
         def randomize_deltag_map(tracer,seed) :
             """
             Creates a randomised version of the input map map by assigning the
@@ -144,6 +172,11 @@ class PowerSpecter(PipelineStage) :
         return nls_all
 
     def get_covar_ssc(self,tracers,ell_eff) :
+        """
+        Get an estimate of the super-sample covariance.
+        :param tracers: list of Tracers.
+        :param ell_eff: list of multipoles at which to estimate the SSC.
+        """
         #Compute number density and uncertainty on it from cosmic variance
         import pyccl as ccl
         from scipy.special import jv
@@ -211,6 +244,15 @@ class PowerSpecter(PipelineStage) :
         return ng_data,covar_ssc
 
     def get_dpj_bias(self,trc,lth,clth,cl_coupled,wsp,bpws) :
+        """
+        Estimate the deprojection bias
+        :param trc: list of Tracers.
+        :param lth: list of multipoles.
+        :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
+        :param cl_coupled: mode-coupled measurements of the power spectrum (before subtracting the deprojection bias).
+        :param wsp: NaMaster workspace.
+        :param bpws: NaMaster bandpowers.
+        """
         #Compute deprojection bias
         if os.path.isfile(self.get_output('dpj_bias')) :
             print("Reading deprojection bias")
@@ -240,6 +282,11 @@ class PowerSpecter(PipelineStage) :
         return np.array(cls_all),cls_deproj_all
 
     def get_cl_guess(self,ld,cld) :
+        """
+        Read or compute the guess power spectra.
+        :param ld: list of multipoles at which the data power spectra have been measured.
+        :param cld: list of power spectrum measurements from the data.
+        """
         if self.config['guess_spectrum']=='NONE' :
             print("Interpolating data power spectra")
             lth=np.arange(2,self.lmax+1)
@@ -259,6 +306,12 @@ class PowerSpecter(PipelineStage) :
         return lth,clth
 
     def get_power_spectra(self,trc,wsp,bpws) :
+        """
+        Compute all possible power spectra between pairs of tracers
+        :param trc: list of Tracers.
+        :param wsp: NaMaster workspace.
+        :param bpws: NaMaster bandpowers.
+        """
         cls_all=[]
         cls_coupled=[]
         for i in range(self.nbins) :
@@ -269,6 +322,15 @@ class PowerSpecter(PipelineStage) :
         return np.array(cls_all),np.array(cls_coupled)
 
     def get_covar(self,lth,clth,bpws,wsp,temps,cl_dpj_all) :
+        """
+        Estimate the power spectrum covariance
+        :param lth: list of multipoles.
+        :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
+        :param bpws: NaMaster bandpowers.
+        :param wsp: NaMaster workspace.
+        :param temps: list of contaminatn templates.
+        :params cl_dpj_all: list of deprojection biases for each bin pair combination.
+        """
         if self.config['gaus_covar_type']=='analytic' :
             print("Computing analytical Gaussian covariance")
             cov=self.get_covar_analytic(lth,clth,bpws,wsp)
@@ -279,6 +341,9 @@ class PowerSpecter(PipelineStage) :
         return cov
             
     def get_mcm(self,tracers,bpws) :
+        """
+        Get NmtWorkspaceFlat for our mask
+        """
         wsp=nmt.NmtWorkspaceFlat()
         if not os.path.isfile(self.get_output('mcm')) :
             print("Computing MCM")
@@ -291,6 +356,9 @@ class PowerSpecter(PipelineStage) :
         return wsp
 
     def get_covar_mcm(self,wsp) :
+        """
+        Get NmtCovarianceWorkspaceFlat for our mask
+        """
         cwsp=nmt.NmtCovarianceWorkspaceFlat()
         if not os.path.isfile(self.get_output('cov_mcm')) :
             print("Computing covariance MCM")
@@ -303,6 +371,15 @@ class PowerSpecter(PipelineStage) :
         return cwsp
 
     def get_covar_gaussim(self,lth,clth,bpws,wsp,temps,cl_dpj_all) :
+        """
+        Estimate the power spectrum covariance from Gaussian simulations
+        :param lth: list of multipoles.
+        :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
+        :param bpws: NaMaster bandpowers.
+        :param wsp: NaMaster workspace.
+        :param temps: list of contaminatn templates.
+        :params cl_dpj_all: list of deprojection biases for each bin pair combination.
+        """
         #Create a dummy file for the covariance MCM
         f=open(self.get_output('cov_mcm'),"w")
         f.close()
@@ -349,6 +426,13 @@ class PowerSpecter(PipelineStage) :
         return covar
 
     def get_covar_analytic(self,lth,clth,bpws,wsp) :
+        """
+        Estimate the power spectrum covariance analytically
+        :param lth: list of multipoles.
+        :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
+        :param bpws: NaMaster bandpowers.
+        :param wsp: NaMaster workspace.
+        """
         #Create a dummy file for the covariance MCM
         f=open(self.get_output('gaucov_sims'),"w")
         f.close()
@@ -374,6 +458,9 @@ class PowerSpecter(PipelineStage) :
         return covar
 
     def get_masks(self) :
+        """
+        Read or compute all binary masks and the masked fraction map.
+        """
         #Depth-based mask
         self.fsk,mp_depth=read_flat_map(self.get_input("depth_map"),i_map=0)
         mp_depth[np.isnan(mp_depth)]=0; mp_depth[mp_depth>40]=0
@@ -421,6 +508,10 @@ class PowerSpecter(PipelineStage) :
         return msk_bi,mskfrac,mp_depth
 
     def get_tracers(self,temps) :
+        """
+        Produce a Tracer for each redshift bin. Do so with and without contaminant deprojection.
+        :param temps: list of contaminant tracers
+        """
         hdul=fits.open(self.get_input('ngal_maps'))
         if len(hdul)%2!=0 :
             raise ValueError("Input file should have two HDUs per map")
@@ -433,6 +524,9 @@ class PowerSpecter(PipelineStage) :
         return tracers_nocont,tracers_wcont
 
     def get_contaminants(self) :
+        """
+        Read all contaminant maps.
+        """
         temps=[]
         #Depth
         temps.append(self.mp_depth)
@@ -456,6 +550,9 @@ class PowerSpecter(PipelineStage) :
         return temps
 
     def parse_input(self) :
+        """
+        Check sanity of input parameters.
+        """
         if (self.config['noise_bias_type']!='analytic') and (self.config['noise_bias_type']!='pois_sim') :
             raise ValueError('Noise bias calculation must be either \'analytic\' or \'pois_sim\'')
         if (self.config['gaus_covar_type']!='analytic') and (self.config['gaus_covar_type']!='gaus_sim') :
@@ -467,6 +564,9 @@ class PowerSpecter(PipelineStage) :
         return
 
     def get_sacc_tracers(self,tracers) :
+        """
+        Generate a list of SACC tracers from the input Tracers.
+        """
         sacc_tracers=[]
         for i_t,t in enumerate(tracers) :
             z=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5
@@ -479,6 +579,15 @@ class PowerSpecter(PipelineStage) :
         return sacc_tracers
 
     def write_vector_to_sacc(self,fname_out,sacc_t,sacc_b,cls,covar=None,verbose=False) :
+        """
+        Write a vector of power spectrum measurements into a SACC file.
+        :param fname_out: path to output file
+        :param sacc_t: list of SACC tracers
+        :param sacc_b: SACC Binning object.
+        :param cls: list of power spectrum measurements.
+        :param covar: covariance matrix:
+        :param verbose: do you want to print out information about the SACC file?
+        """
         sacc_mean=sacc.MeanVec(cls.flatten())
         if covar is None :
             sacc_precision=None
@@ -492,6 +601,12 @@ class PowerSpecter(PipelineStage) :
         s.saveToHDF(fname_out)
 
     def get_sacc_binning(self,ell_eff,lini,lend,windows=None) :
+        """
+        Generate a SACC binning object.
+        :param ell_eff: list of effective multipoles.
+        :param lini,lend: bandpower edges.
+        :param windows: optional list of bandpower window functions.
+        """
         typ,ell,dell,t1,q1,t2,q2=[],[],[],[],[],[],[]
         for t1i in range(self.nbins) :
             for t2i in range(t1i,self.nbins) :
@@ -511,6 +626,14 @@ class PowerSpecter(PipelineStage) :
             return sacc.Binning(typ,ell,t1,q1,t2,q2,deltaLS=dell,windows=windows)
                 
     def run(self) :
+        """
+        Main function.
+        This stage:
+        - Produces measurements of the power spectrum with and without contaminant deprojections.
+        - Estimates the noise bias
+        - Estimates the covariance matrix
+        - Estimates the deprojection bias
+        """
         self.parse_input()
 
         print("Reading mask")
