@@ -427,6 +427,6 @@ def read_flat_map(filename,i_map=0,hdu=None) :
     return fmi,maps
 
 def compare_infos(fsk1,fsk2) :
-    """Checks whether two FlatMapInfo objects are compatible"
+    """Checks whether two FlatMapInfo objects are compatible"""
     if (fsk1.nx!=fsk2.nx) or (fsk1.ny!=fsk2.ny) or (fsk1.lx!=fsk2.lx) or (fsk1.ly!=fsk2.ly) :
         raise ValueError("Map infos are incompatible")
