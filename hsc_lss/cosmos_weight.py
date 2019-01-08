@@ -54,17 +54,16 @@ class COSMOSWeight(PipelineStage) :
         sel_fluxcut_i[cat['icmodel_flux']<10*cat['icmodel_flux_err']]=0
         # S/N in g
         sel_fluxcut_g=np.ones(len(cat),dtype=int);
-        #TODO: this is a bug leftover from the first pipeline
-        sel_fluxcut_i[cat['gcmodel_flux']<5*cat['gcmodel_flux_err']]=0
+        sel_fluxcut_g[cat['gcmodel_flux']<5*cat['gcmodel_flux_err']]=0
         # S/N in r
         sel_fluxcut_r=np.ones(len(cat),dtype=int);
-        sel_fluxcut_i[cat['rcmodel_flux']<5*cat['rcmodel_flux_err']]=0
+        sel_fluxcut_r[cat['rcmodel_flux']<5*cat['rcmodel_flux_err']]=0
         # S/N in z
         sel_fluxcut_z=np.ones(len(cat),dtype=int);
-        sel_fluxcut_i[cat['zcmodel_flux']<5*cat['zcmodel_flux_err']]=0
+        sel_fluxcut_z[cat['zcmodel_flux']<5*cat['zcmodel_flux_err']]=0
         # S/N in y
         sel_fluxcut_y=np.ones(len(cat),dtype=int);
-        sel_fluxcut_i[cat['ycmodel_flux']<5*cat['ycmodel_flux_err']]=0
+        sel_fluxcut_y[cat['ycmodel_flux']<5*cat['ycmodel_flux_err']]=0
         # S/N in grzy (at least 2 pass)
         sel_fluxcut_grzy=(sel_fluxcut_g+sel_fluxcut_r+sel_fluxcut_z+sel_fluxcut_y>=2)
         # Overall S/N
