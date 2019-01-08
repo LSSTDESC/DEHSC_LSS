@@ -8,7 +8,7 @@ This is done by running `python get_data.py`. A few points must be borne in mind
 This script does four things:
 1. Download all the catalog-level data from the PDR1 database needed for this pipeline.
 2. Add additional information to the downloaded files about the Arcturus mask.
-3. Download the COSMOS 30-band photometry data (Laigle et al. 2016).
+3. Download the COSMOS 30-band photometry data ([Laigle et al. 2016](https://arxiv.org/abs/1604.02350)).
 4. Download the photo-z pdfs for all sources in the fields analyzed.
 
 Running everything takes quite some time (O(1-2 days)).
