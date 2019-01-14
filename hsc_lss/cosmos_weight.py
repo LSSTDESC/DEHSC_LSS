@@ -130,7 +130,7 @@ class COSMOSWeight(PipelineStage) :
         #Get maximum distance
         distances=np.amax(distances,axis=1)
         #Find all photo-z objects within this maximum distance for each COSMOS object
-        tree_NN_lookup = spatial.cKDTree(photoz_sample, leafsize=2*self.config['n_neighbors'])
+        tree_NN_lookup = spatial.cKDTree(photoz_sample, leafsize=40)
         num_photoz=np.array([len(tree_NN_lookup.query_ball_point(t,d+1E-6)) 
                              for t,d in zip(train_sample,distances)])
         #Weights are ratio of number of photo-z neighbors to COSMOS neighbors

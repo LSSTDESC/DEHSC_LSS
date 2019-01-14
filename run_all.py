@@ -91,9 +91,15 @@ def mk_config(cov_type='ana',noi_type='ana',w_ssc=True,msk_syst=False,
 
 def run_pipe_all(conf,suffix) :
     cmd='cp '+conf+' hsc_lss_params/config.yml'
-    print(cmd)
+    #print(cmd)
+    os.system(cmd)
     for field in ['gama09h','gama15h','hectomap','vvds','wide12h','xmmlss'] :
         dirname="/global/cscratch1/sd/damonge/HSC_ceci/WIDE_"+field.upper()+'_out'
+        #Create output directory if not present
+        cmd="mkdir -p "+dirname+"/logs/"
+        #print(cmd)
+        os.system(cmd)
+
         #Clean up previous run
         cmd='rm -f '+dirname+'/*mcm* '
         cmd+=dirname+'/gaucov_sims.npz '
@@ -121,31 +127,34 @@ def run_pipe_all(conf,suffix) :
         os.system(cmd)
 
 
-#Original settings
-suff,conf=mk_config(dpj_level=0,dpj_bands=False)
-run_pipe_all(conf,suff)
+##Original settings
+#suff,conf=mk_config(dpj_level=0,dpj_bands=False)
+#run_pipe_all(conf,suff)
+
 #Fiducial settings
-mk_config()
+suff,conf=mk_config()
 run_pipe_all(conf,suff)
+'''
 #Minimal deprojection
-mk_config(dpj_level=0)
+suff,conf=mk_config(dpj_level=0)
 run_pipe_all(conf,suff)
 #Only deproject OCs in the i band
-mk_config(dpj_bands=False)
+suff,conf=mk_config(dpj_bands=False)
 run_pipe_all(conf,suff)
 #Do not include the SSC
-mk_config(w_ssc=False)
+suff,conf=mk_config(w_ssc=False)
 run_pipe_all(conf,suff)
 #Mask systematics
-mk_config(msk_syst=True)
+suff,conf=mk_config(msk_syst=True)
 run_pipe_all(conf,suff)
 #Simulated covariance
-mk_config(cov_type='sim')
+suff,conf=mk_config(cov_type='sim')
 run_pipe_all(conf,suff)
 #Simulated noise bias
-mk_config(noi_type='sim')
+suff,conf=mk_config(noi_type='sim')
 run_pipe_all(conf,suff)
 ##Arcturus mask
 ##This one affects more than just PowerSpecter
-#mk_config(mask_type='arcturus')
+#suff,conf=mk_config(mask_type='arcturus')
 #run_pipe_all(conf,suff)
+'''
