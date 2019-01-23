@@ -422,7 +422,7 @@ if (covar is not None) and o.compute_ssc :
   #Tracers
   cclt=[]
   z_b=np.array([0.0,0.5,1.0,2.0,4.0]);
-  b_b=np.array([0.81877956,1.09962214,1.44457603,1.65513987,2.61238931])
+  b_b=np.array([0.82,1.10,1.44,1.66,2.61])
   b_bf=interp1d(z_b,b_b)
   ng_data=np.zeros([len(tracers),4]);
   for i_t,t in enumerate(tracers) :

@@ -27,6 +27,8 @@ def main():
                         help='specify release version')
     parser.add_argument('--delete-job', '-D', action='store_true',
                         help='delete the job you submitted after your downloading')
+    parser.add_argument('--download-job', '-d', action='store_true',
+                        help='download the job you submitted')
     parser.add_argument('--format', '-f', dest='out_format', default='csv', choices=['csv', 'csv.gz', 'sqlite3', 'fits'],
                         help='specify output format')
     parser.add_argument('--nomail', '-M', action='store_true',
@@ -56,10 +58,11 @@ def main():
             preview(credential, sql, sys.stdout)
         else:
             job = submitJob(credential, sql, args.out_format)
-#            blockUntilJobFinishes(credential, job['id'])
-#            download(credential, job['id'], sys.stdout)
-#            if args.delete_job:
-#                deleteJob(credential, job['id'])
+            if args.download_job :
+                blockUntilJobFinishes(credential, job['id'])
+                download(credential, job['id'], sys.stdout)
+                if args.delete_job:
+                    deleteJob(credential, job['id'])
     except urllib2.HTTPError, e:
         if e.code == 401:
             print >> sys.stderr, 'invalid id or password.'
