@@ -1,20 +1,32 @@
 modules: hsc_lss
 
-launcher: local
+launcher: cori
 
 stages: 
     - name: ReduceCat
       nprocess: 1
+      partition: debug
+      walltime: 10
     - name: SystMapper
       nprocess: 1
+      partition: regular
+      walltime: 60
     - name: PDFMatch
       nprocess: 1
+      partition: regular
+      walltime: 60
     - name: COSMOSWeight
       nprocess: 1
+      partition: debug
+      walltime: 30
     - name: CatMapper
       nprocess: 1
+      partition: debug
+      walltime: 10
     - name: PowerSpecter
       nprocess: 1
+      partition: regular
+      walltime: 120
 
 
 inputs:
@@ -29,8 +41,8 @@ config: ./hsc_lss_params/config.yml
 
 resume: True
 
-output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_GAMA09H_out
+output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_GAMA09H_sirius_out
 
-log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_GAMA09H_out/logs
+log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_GAMA09H_sirius_out/logs
 
-pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_GAMA09H_out/logs/full_log.txt
+pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_GAMA09H_sirius_out/logs/full_log.txt

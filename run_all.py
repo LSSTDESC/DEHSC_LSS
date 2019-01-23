@@ -94,12 +94,12 @@ def run_pipe_all(conf,suffix) :
     #print(cmd)
     os.system(cmd)
     for field in ['gama09h','gama15h','hectomap','vvds','wide12h','xmmlss'] :
-        dirname="/global/cscratch1/sd/damonge/HSC_ceci/WIDE_"+field.upper()+'_out'
+        dirname="/global/cscratch1/sd/damonge/HSC_ceci/WIDE_"+field.upper()+'_sirius_out'
         #Create output directory if not present
         cmd="mkdir -p "+dirname+"/logs/"
         #print(cmd)
         os.system(cmd)
-
+        
         #Clean up previous run
         cmd='rm -f '+dirname+'/*mcm* '
         cmd+=dirname+'/gaucov_sims.npz '
@@ -107,17 +107,17 @@ def run_pipe_all(conf,suffix) :
         cmd+=dirname+'/*sacc'
         #print(cmd)
         os.system(cmd)
-        
+
         #Run pipeline
         cmd='ceci hsc_lss_params/in_'+field+'.yml'
-        #print(cmd)
         os.system(cmd)
-        
+
         #Move output
         dirend=dirname+'/'+suffix
         cmd='mkdir -p '+dirend
         #print(cmd)
         os.system(cmd)
+
         cmd='mv '+dirname+'/*mcm* '
         cmd+=dirname+'/gaucov_sims.npz '
         cmd+=dirname+'/windows_l.npz '
@@ -126,21 +126,23 @@ def run_pipe_all(conf,suffix) :
         #print(cmd)
         os.system(cmd)
 
-
-##Original settings
-#suff,conf=mk_config(dpj_level=0,dpj_bands=False)
-#run_pipe_all(conf,suff)
-
+#Original settings
+suff,conf=mk_config(dpj_level=0,dpj_bands=False,mask_type='sirius')
+run_pipe_all(conf,suff)
 #Fiducial settings
-suff,conf=mk_config()
+suff,conf=mk_config(mask_type='sirius')
 run_pipe_all(conf,suff)
+#Deproject only main contaminants
+suff,conf=mk_config(dpj_level=0,dpj_bands=True,mask_type='sirius')
+run_pipe_all(conf,suff)
+#Simulated covariance
+suff,conf=mk_config(cov_type='sim',mask_type='sirius')
+run_pipe_all(conf,suff)
+#Simulated covariance, only main contaminants
+suff,conf=mk_config(cov_type='sim',dpj_level=0,dpj_bands=True,mask_type='sirius')
+run_pipe_all(conf,suff)
+
 '''
-#Minimal deprojection
-suff,conf=mk_config(dpj_level=0)
-run_pipe_all(conf,suff)
-#Only deproject OCs in the i band
-suff,conf=mk_config(dpj_bands=False)
-run_pipe_all(conf,suff)
 #Do not include the SSC
 suff,conf=mk_config(w_ssc=False)
 run_pipe_all(conf,suff)

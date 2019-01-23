@@ -26,7 +26,7 @@ stages:
     - name: PowerSpecter
       nprocess: 1
       partition: regular
-      walltime: 120
+      walltime: 60
 
 
 inputs:
@@ -37,12 +37,12 @@ inputs:
     cosmos_hsc: /global/cscratch1/sd/damonge/HSC_ceci/PDR1_DEEP_COSMOS_forced.fits
     syst_masking_file: ./hsc_lss_params/systematic_cuts/WIDE_HECTOMAP_syst_cuts.txt
 
-config: ./hsc_lss_params/config.yml
+config: ./hsc_lss_params/config_test.yml
 
 resume: True
 
-output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_HECTOMAP_sirius_out
+output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_HECTOMAP_test
 
-log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_HECTOMAP_sirius_out/logs
+log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_HECTOMAP_test/logs
 
-pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_HECTOMAP_sirius_out/logs/full_log.txt
+pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_HECTOMAP_test/logs/full_log.txt
