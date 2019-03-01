@@ -35,7 +35,7 @@
 \emailAdd{third@one.univ}
 \emailAdd{fourth@one.univ}
 
-\abstract{With the increasing statistical power in Stage IV Dark Energy experiments, new analysis strategies must be developed and tested in order to fully exploit their data. In this work we present the current state-of-the-art clustering pipeline developed for the upcoming data from the LSST and use the public data from the Hiper-Suprime Camera Subaru Strategic Program first data release (DR1) as a proof concept. In addition, we obtain the first HOD resuts for these data (and compare with something else maybe??).}
+\abstract{With the increasing statistical power in Stage IV Dark Energy experiments, new analysis strategies must be developed and tested in order to fully exploit their data. In this work we present the current state-of-the-art clustering pipeline developed for the upcoming data from the LSST and use the public data from the Hyper-Suprime Camera Subaru Strategic Program (HSC-SSP) first data release (DR1) as a proof concept. In addition, we obtain the first HOD resuts for these data (and compare with something else maybe??).}
 
 \begin{document}
 \maketitle
@@ -45,104 +45,21 @@
 \label{sec:intro}
 
 $\cdots$ TBC, \citep{2006astro.ph..9591A}
-
-Here follow some examples of common features that you may wanto to use
-or build upon.
-
-For internal references use label-refs: see section~\ref{sec:intro}.
-Bibliographic citations can be done with cite: refs.~\cite{a,b,c}.
-When possible, align equations on the equal sign. The package
-\texttt{amsmath} is already loaded. See \eqref{eq:x}.
-\begin{equation}
-\label{eq:x}
-\begin{split}
-x &= 1 \,,
-\qquad
-y = 2 \,,
-\\
-z &= 3 \,.
-\end{split}
-\end{equation}
-Also, watch out for the punctuation at the end of the equations.
-
-
-If you want some equations without the tag (number), please use the available
-starred-environments. For example:
-\begin{equation*}
-x = 1
-\end{equation*}
-
-The amsmath package has many features. For example, you can use use
-\texttt{subequations} environment:
-\begin{subequations}\label{eq:y}
-\begin{align}
-\label{eq:y:1}
-a & = 1
-\\
-\label{eq:y:2}
-b & = 2
-\end{align}
-and it will continue to operate across the text also.
-\begin{equation}
-\label{eq:y:3}
-c = 3
-\end{equation}
-\end{subequations}
-The references will work as you'd expect: \eqref{eq:y:1},
-\eqref{eq:y:2} and \eqref{eq:y:3} are all part of \eqref{eq:y}.
-
-A similar solution is available for figures via the \texttt{subfigure}
-package (not loaded by default and not shown here).
-All figures and tables should be referenced in the text and should be
-placed at the top of the page where they are first cited or in
-subsequent pages. Positioning them in the source file
-after the paragraph where you first reference them usually yield good
-results. See figure~\ref{fig:i} and table~\ref{tab:i}.
-
-
-\begin{table}[tbp]
-\centering
-\begin{tabular}{|lr|c|}
-\hline
-x&y&x and y\\
-\hline
-a & b & a and b\\
-1 & 2 & 1 and 2\\
-$\alpha$ & $\beta$ & $\alpha$ and $\beta$\\
-\hline
-\end{tabular}
-\caption{\label{tab:i} We prefer to have borders around the tables.}
-\end{table}
-
-We discourage the use of inline figures (wrapfigure), as they may be
-difficult to position if the page layout changes.
-
-We suggest not to abbreviate: ``section'', ``appendix'', ``figure''
-and ``table'', but ``eq.'' and ``ref.'' are welcome. Also, please do
-not use \texttt{\textbackslash emph} or \texttt{\textbackslash it} for
-latin abbreviaitons: i.e., et al., e.g., vs., etc.
-
-
-
-\section{Sections}
-\subsection{And subsequent}
-\subsubsection{Sub-sections}
-\paragraph{Up to paragraphs.} We find that having more levels usually
-reduces the clarity of the article. Also, we strongly discourage the
-use of non-numbered sections (e.g.~\texttt{\textbackslash
-  subsubsection*}).  Please also see the use of
-``\texttt{\textbackslash texorpdfstring\{\}\{\}}'' to avoid warnings
-from the hyperref package when you have math in the section titles
-
-
-
-\appendix
-\section{Some title}
-Please always give a title also for appendices.
-
-
-
-
+\section{Data}
+\label{sec:data}
+In this work we use the public data products from HSC-SSP DR1~\citep{2018PASJ...70S...8A}. In particular, we generated a Python script \texttt{hscQuery.py}\footnote{\url{https://github.com/LSSTDESC/HyperSupremeStructure-HSC-LSS/blob/master/data_query/hscReleaseQuery.py}} to retrieve the data products available at \url{https://hsc-release.mtk.nao.ac.jp/datasearch/api/catalog_jobs/}. The data products obtained encompass the forced photometry object catalogs for the wide fields, the metadata and observing logs including the observing conditions, and the tables that include the photometric redshift information. We join the object catalog and the photometric redshift table by matching IDs in both tables. We restricted our queries to only include objects that pass the selection cuts included in~\citep{2018PASJ...70S..25M}
+\subsection{Data selection}
+\label{ssec:data_selection}
+\subsection{Mapping observing conditions}
+\label{ssec:observing_conditions}
+\section{Analysis}
+\label{sec:analysis}
+\subsection{Estimation of power-spectra}
+\label{ssec:cls}
+\subsection{HOD model}
+\label{ssec:HOD}
+\section{Discussion}
+\label{sec:discussion}
 
 \acknowledgments
 
