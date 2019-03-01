@@ -6,3 +6,10 @@
 *.sublime-project
 .ipynb_checkpoints/
 sql_utils/*.sql
+*.aux
+*.toc
+*log
+*blg
+*out
+*synctex*
+*bbl
