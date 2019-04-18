@@ -5,4 +5,4 @@
 *.sublime-workspace
 *.sublime-project
 .ipynb_checkpoints/
-sql_utils/*.sql
+data_query/*.sql
