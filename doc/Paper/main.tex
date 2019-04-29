@@ -11,7 +11,7 @@
 %\usepackage[colorlinks,linkcolor=red,citecolor=blue,urlcolor=blue ]{hyperref}
 \usepackage[utf8]{inputenc}
 \usepackage{lipsum}
-\newcommand{\nv}{\hat{\bf n}}
+\newcommand{\nv}{\vec{\theta}}
 \newcommand{\todo}[1]{{\bf TODO: #1}}
 
 \usepackage[T1]{fontenc} % if needed
@@ -45,8 +45,50 @@
   \lipsum[1]
 
 \section{Theory}\label{sec:theory}
-  \lipsum[2]
-  \todo{Describe galaxy clustering and HOD. Possibly also describe theory modelling behind covariance. }
+  \subsection{Projected quantities and power spectra}\label{ssec:theory.cellpk}
+    Our main observable is the projected overdensity of galaxies $\delta^i_g(\nv)$ as a function of sky position $\nv$ in a given redshift bin labelled by $i$. This is related to the 3D galaxy overdensity $\Delta_g$ through
+    \begin{equation}
+      \delta^i_g(\nv)=\int dz\,p^i(z)\,\Delta_g\left(t(z),\chi(z)\nv\right).
+    \end{equation}
+    Here $t(z)$ and $\chi(z)$ are the cosmic time and radial comoving distance as a function of redshift, and $p_i(z)$ is the redshift bin window function, given by the true redshift distribution of objects in the bin normalized to unit area.
+  
+    Given the small size of the sky patches covered by the HSC DR1, we will adopt the flat sky approximation for simplicity, in which case $\nv$ is a 2D vector. It is common to decompose $\delta^i_g(\nv)$ into its Fourier coefficients
+    \begin{equation}
+      a^i_{\bf l}\equiv \int\frac{d\theta^2}{2\pi}e^{-i{\bf l}\cdot\nv}\delta^i_g(\nv).
+    \end{equation}
+    The variance of the Fourier coefficients is the so-called angular power spectrum $\langle a^i_{\bf l}a^{j*}_{{\bf l}'}\rangle = C^{ij}_\ell\,\delta^{\cal D}({\bf l}-{\bf l}')$, where $\delta^{\cal D}$ is the 2D Dirac delta function. The 3D power spectrum $P_{gg}(z,{\bf k})$ is defined analogously for the 3D Fourier coefficients of $\Delta_g$. Both quantities are related to each other through:
+    \begin{equation}
+      C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)} p^i(z)p^j(z)\,P_{gg}\left(z,k=\frac{\ell+1/2}{\chi(z)}\right),
+    \end{equation}
+    where $H(z)$ is the expansion rate at redshift $z$, and we have used the so-called Limber approximation.
+  
+  \subsection{Magnification bias}\label{ssec:theory.mag}
+    Gravitational lensing alters the observed galaxy fluxes and distorts their observed positions. The combined effect, is a position-dependent modulation of the number density that distorts the clustering pattern.
+    In the presence of this effect, the equations in the previous section get slightly modified. The projected galaxy overdensity becomes:
+    \begin{equation}
+      \delta^i_g(\nv)=\int dz\,\left[p^i(z)\,\Delta_g-\frac{W_\mu^i(z)}{H(z)}\nabla_\theta^2\nabla^{-2}\Delta_M\right],
+    \end{equation}
+    where $\Delta_M$ is the 3D matter overdensity (we have omitted the dependence on $t$ and $\chi\nv$ for brevity) and $W_\mu$ is the magnification kernel
+    \begin{equation}
+      W_\mu(z)=\frac{3H_0^2\Omega_M(1+z)}{2}\int_z^\infty dz'\,p^i(z)\,\left(5s(z')-2\right)\,\frac{\chi(z')-\chi(z)}{\chi(z)\chi(z')}.
+    \end{equation}
+    Here, $H_0\equiv H(z=0)$, $\Omega_M$ is the cosmological matter fraction, and $s$ is the logarithmic slope of the cumulative apparent magnitude distribution:
+    \begin{equation}
+      s\equiv\frac{\partial \log_{10}N(<m)}{\partial m}.
+    \end{equation}
+    The angular power spectrum is then given by:
+    \begin{equation}
+      C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)}\left[p^ip^j\,P_{gg}+\left(p^iW_\mu^j+p^jW_\mu^i\right)\frac{\ell(\ell+1)}{Hk^2}P_{gm}+W_\mu^iW_\mu^j\left(\frac{\ell(\ell+1)}{Hk^2}\right)^2P_{mm}\right],
+    \end{equation}
+    where $P_{mm}$ is the 3D power spectrum of matter fluctuations, $P_{gm}$ is the galaxy-matter cross-spectrum and we have omitted the dependence of all quantities on $z$ or $k=(\ell+1/2)/\chi$ for brevity.
+
+  \subsection{Halo Occupation Distribution}\label{ssec:theory.hod}
+    \lipsum[2]
+    \todo{Describe our model for $P_gg$ (and possibly $P_{gM}$}
+    
+  \subsection{Covariance matrices}\label{ssec:theory.ssc}
+    \todo{Possibly also describe theory modelling behind covariance. }
+    \lipsum[3]
 
 \section{Data}\label{sec:data}
   \todo{Describe DR1 and sample selection \citep{2018arXiv180909148H}. Describe redshift binning.}
