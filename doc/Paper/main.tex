@@ -2,72 +2,95 @@
 \pdfoutput=1 % if your are submitting a pdflatex (i.e. if you have
              % images in pdf, png or jpg format)
 
-\usepackage{jcappub} % for details on the use of the package, please
-                     % see the JCAP-author-manual
+\usepackage{jcappub}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{amssymb,amsmath,bm}
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+%\usepackage[colorlinks,linkcolor=red,citecolor=blue,urlcolor=blue ]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{lipsum}
+\newcommand{\nv}{\hat{\bf n}}
+\newcommand{\todo}[1]{{\bf TODO: #1}}
 
 \usepackage[T1]{fontenc} % if needed
 \usepackage{natbib}
 \bibliographystyle{JHEP}
-\title{Clustering analysis of the HSC-SSP DR1 data as precursor for the LSST Dark Energy Survey Collaboration Analysis (or some fancier title)}
+\title{Tomographic galaxy clustering with the Subaru Hyper Suprime-Cam first year public data release}
 
+\author[a,1]{Alonso D.}
+\author[b]{Awan H.}
+\author[b]{Broussard A.}
+\author[b]{Gawiser E.}
+\author[b]{Gomes Z.}
+\author[b]{Lupton R.}
+\author[b]{Mandelbaum R.}
+\author[b]{Miyatake H.}
+\author[b]{Nicola A.}
+\author[b]{S\'anchez F.J.}
+\author[b]{Slosar A.}
 
-%% %simple case: 2 authors, same institution
-%% \author{A. Uthor}
-%% \author{and A. Nother Author}
-%% \affiliation{Institution,\\Address, Country}
+\affiliation[a]{Department of Physics, University of Oxford, Keble Road, Oxford, OX1 3RH, UK}
+\affiliation[b]{Some other sunnier place}
+\emailAdd{david.alonso@physics.ox.ac.uk}
 
-% more complex case: 4 authors, 3 institutions, 2 footnotes
-\author[a,b,1]{F. Irst,\note{Corresponding author.}}
-\author[c]{S. Econd,}
-\author[a,2]{T. Hird\note{Also at Some University.}}
-\author[a,2]{and Fourth}
-
-% The "\note" macro will give a warning: "Ignoring empty anchor..."
-% you can safely ignore it.
-
-\affiliation[a]{One University,\\some-street, Country}
-\affiliation[b]{Another University,\\different-address, Country}
-\affiliation[c]{A School for Advanced Studies,\\some-location, Country}
-
-% e-mail addresses: one for each author, in the same order as the authors
-\emailAdd{first@one.univ}
-\emailAdd{second@asas.edu}
-\emailAdd{third@one.univ}
-\emailAdd{fourth@one.univ}
-
-\abstract{With the increasing statistical power in Stage IV Dark Energy experiments, new analysis strategies must be developed and tested in order to fully exploit their data. In this work we present the current state-of-the-art clustering pipeline developed for the upcoming data from the LSST and use the public data from the Hyper-Suprime Camera Subaru Strategic Program (HSC-SSP) first data release (DR1) as a proof concept. In addition, we obtain the first HOD resuts for these data (and compare with something else maybe??).}
+\abstract{\lipsum[1]}
 
 \begin{document}
 \maketitle
 \flushbottom
 
-\section{Introduction}
-\label{sec:intro}
+\section{Introduction}\label{sec:intro}
+  \lipsum[1]
 
-$\cdots$ TBC, \citep{2006astro.ph..9591A}
-\section{Data}
-\label{sec:data}
-In this work we use the public data products from HSC-SSP DR1~\citep{2018PASJ...70S...8A}. In particular, we generated a Python script \texttt{hscQuery.py}\footnote{\url{https://github.com/LSSTDESC/HyperSupremeStructure-HSC-LSS/blob/master/data_query/hscReleaseQuery.py}} to retrieve the data products available at \url{https://hsc-release.mtk.nao.ac.jp/datasearch/api/catalog_jobs/}. The data products obtained encompass the forced photometry object catalogs for the wide fields, the metadata and observing logs including the observing conditions, and the tables that include the photometric redshift information. We join the object catalog and the photometric redshift table by matching IDs in both tables. We restricted our queries to only include objects that pass the selection cuts included in~\citep{2018PASJ...70S..25M}
-\subsection{Data selection}
-\label{ssec:data_selection}
-\subsection{Mapping observing conditions}
-\label{ssec:observing_conditions}
-\section{Analysis}
-\label{sec:analysis}
-\subsection{Estimation of power-spectra}
-\label{ssec:cls}
-\subsection{HOD model}
-\label{ssec:HOD}
-\section{Discussion}
-\label{sec:discussion}
+\section{Theory}\label{sec:theory}
+  \lipsum[2]
+  \todo{Describe galaxy clustering and HOD. Possibly also describe theory modelling behind covariance. }
+
+\section{Data}\label{sec:data}
+  \todo{Describe DR1 and sample selection \citep{2018arXiv180909148H}. Describe redshift binning.}
+  \lipsum[3]
+
+\section{Methods}\label{sec:methods}
+  \subsection{Systematics maps}\label{ssec:methods.syst}
+    \todo{Describe how we generate systematic maps}
+    \lipsum[3]
+
+  \subsection{Redshift distributions}\label{ssec:methods.nz}
+    \todo{Describe methods used to estimate $N(z)$.}
+    \lipsum[5]
+
+  \subsection{Angular power spectra}\label{ssec:methods.cell}
+    \todo{Describe how the $C_\ell$ estimator works, possibly also deprojection}
+    \lipsum[6]
+
+  \subsection{Covariance matrices}\label{ssec:methods.covar}
+    \todo{Describe covariance. Describe coaddition.}
+    \lipsum[7]
+    
+\section{Results}\label{sec:results}
+  \lipsum[8]
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/token_plot}
+    \caption{Blah}\label{fig:token}
+  \end{figure}
+  \todo{Things to discuss:}
+  \begin{enumerate}
+    \item Impact of systematics. Discuss star contamination in more detail.
+    \item Checks we've done: consistency between fields ($C_\ell$ and $N_{\rm gal}$), different masks, different levels of contaminant deprojection, different covariances.
+    \item Effects of deprojection.
+    \item Final contours.
+    \item ...
+  \end{enumerate}
+
+\section{Discussion}\label{sec:discussion}
+  \lipsum[9]
 
 \acknowledgments
 
-This is the most common positions for acknowledgments. A macro is
-available to maintain the same layout and spelling of the heading.
-
-\paragraph{Note added.} This is also a good position for notes added
-after the paper has been written.
+We thank the Backstreet Boys for useful comments and discussions.
 
 \bibliography{bibliography}
 
