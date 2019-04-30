@@ -2,8 +2,11 @@ import os
 import numpy as np
 
 def mk_config(cov_type='ana',noi_type='ana',w_ssc=True,msk_syst=False,
-              dpj_level=1,dpj_bands=True,mask_type='sirius') :
-    suffix='cov'+cov_type+'_noi'+noi_type+'_msk'+mask_type
+              dpj_level=1,dpj_bands=True,mask_type='sirius',cl_theory=False) :
+    suffix='cov'+cov_type
+    suffix+='_noi'+noi_type+'_msk'+mask_type
+    if cl_theory:
+        suffix+='_cltheory'
     if w_ssc :
         suffix+='_wssc'
     else :
@@ -61,11 +64,16 @@ def mk_config(cov_type='ana',noi_type='ana',w_ssc=True,msk_syst=False,
         stout+="    noise_bias_type: pois_sim\n"
     else :
         raise ValueError("Unkonwn noise method")
-    stout+="    guess_spectrum: NONE\n"
+    if cl_theory:
+        stout+="    guess_spectrum: /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/hsc_lss_params/cls_guess.txt\n"
+    else:
+        stout+="    guess_spectrum: NONE\n"
     if w_ssc :
         stout+="    add_ssc: True\n"
     else :
         stout+="    add_ssc: False\n"
+    stout+="    z_bias_nodes: [0.0,0.5,0.8,1.1,1.4,4.0]\n"
+    stout+="    b_bias_nodes: [1.2,1.3,1.2,1.4,1.6,2.6]\n"
     stout+="    mask_thr: 0.5\n"
     if msk_syst :
         stout+="    mask_systematics: True\n"
@@ -99,7 +107,8 @@ def run_pipe_all(conf,suffix) :
         cmd="mkdir -p "+dirname+"/logs/"
         #print(cmd)
         os.system(cmd)
-        
+
+        '''
         #Clean up previous run
         cmd='rm -f '+dirname+'/*mcm* '
         cmd+=dirname+'/gaucov_sims.npz '
@@ -109,9 +118,11 @@ def run_pipe_all(conf,suffix) :
         os.system(cmd)
 
         #Run pipeline
-        cmd='ceci hsc_lss_params/in_'+field+'.yml'
-        os.system(cmd)
+        cmd='ceci hsc_lss_params/in_'+field+'.yml &>log_'+field+'.txt --dry-run'
+        print(cmd)
+        #os.system(cmd)
 
+        '''
         #Move output
         dirend=dirname+'/'+suffix
         cmd='mkdir -p '+dirend
@@ -126,21 +137,31 @@ def run_pipe_all(conf,suffix) :
         #print(cmd)
         os.system(cmd)
 
-#Original settings
-suff,conf=mk_config(dpj_level=0,dpj_bands=False,mask_type='sirius')
+##Original settings
+#suff,conf=mk_config(dpj_level=0,dpj_bands=False,mask_type='sirius')
+#run_pipe_all(conf,suff)
+##Fiducial settings
+#suff,conf=mk_config(mask_type='sirius')
+#run_pipe_all(conf,suff)
+##Deproject only main contaminants, use theory power spectra
+suff,conf=mk_config(dpj_level=0,dpj_bands=True,mask_type='sirius',cl_theory=True)
 run_pipe_all(conf,suff)
-#Fiducial settings
-suff,conf=mk_config(mask_type='sirius')
-run_pipe_all(conf,suff)
-#Deproject only main contaminants
-suff,conf=mk_config(dpj_level=0,dpj_bands=True,mask_type='sirius')
-run_pipe_all(conf,suff)
-#Simulated covariance
-suff,conf=mk_config(cov_type='sim',mask_type='sirius')
-run_pipe_all(conf,suff)
-#Simulated covariance, only main contaminants
-suff,conf=mk_config(cov_type='sim',dpj_level=0,dpj_bands=True,mask_type='sirius')
-run_pipe_all(conf,suff)
+##Deproject only main contaminants
+#suff,conf=mk_config(dpj_level=0,dpj_bands=True,mask_type='sirius')
+#run_pipe_all(conf,suff)
+##Simulated covariance
+#suff,conf=mk_config(cov_type='sim',mask_type='sirius')
+#run_pipe_all(conf,suff)
+##Simulated covariance, only main contaminants
+#suff,conf=mk_config(cov_type='sim',dpj_level=0,dpj_bands=True,mask_type='sirius')
+#run_pipe_all(conf,suff)
+
+##Deproject only main contaminants, mask systematics
+#suff,conf=mk_config(dpj_level=0,dpj_bands=True,mask_type='sirius',msk_syst=True)
+#run_pipe_all(conf,suff)
+#Mask systematics
+#suff,conf=mk_config(dpj_level=1,dpj_bands=True,mask_type='sirius',msk_syst=True)
+#run_pipe_all(conf,suff)
 
 '''
 #Do not include the SSC

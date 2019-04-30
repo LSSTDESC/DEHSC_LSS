@@ -13,3 +13,4 @@ sql_utils/*.sql
 *out
 *synctex*
 *bbl
+data_query/*.sql
