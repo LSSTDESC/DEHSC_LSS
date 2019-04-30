@@ -287,22 +287,25 @@ class PowerSpecter(PipelineStage) :
         :param ld: list of multipoles at which the data power spectra have been measured.
         :param cld: list of power spectrum measurements from the data.
         """
+        lth=np.arange(2,self.lmax+1)
+        clth=np.zeros([self.ncross,len(lth)])
         if self.config['guess_spectrum']=='NONE' :
             print("Interpolating data power spectra")
-            lth=np.arange(2,self.lmax+1)
-            clth=np.zeros([self.ncross,len(lth)])
-            for i in range(self.ncross) :
-                clf=interp1d(ld,cld[i],bounds_error=False,fill_value=0,kind='linear')
-                clth[i,:]=clf(lth)
-                clth[i,lth<=ld[0]]=cld[i,0]
-                clth[i,lth>=ld[-1]]=cld[i,-1]
-        else :
-            print("Reading theory power spectra")
+            l_use=ld
+            cl_use=cld
+        else:
             data=np.loadtxt(self.config['guess_spectrum'],unpack=True)
-            lth=data[0]
-            clth=data[1:]
+            l_use=data[0]
+            cl_use=data[1:]
             if len(clth)!=self.ncross :
                 raise ValueError("Theory power spectra have a wrong shape")
+        #Interpolate
+        for i in range(self.ncross) :
+            clf=interp1d(l_use,cl_use[i],bounds_error=False,fill_value=0,kind='linear')
+            clth[i,:]=clf(lth)
+            clth[i,lth<=l_use[0]]=cl_use[i,0]
+            clth[i,lth>=l_use[-1]]=cl_use[i,-1]
+
         return lth,clth
 
     def get_power_spectra(self,trc,wsp,bpws) :
@@ -682,7 +685,9 @@ class PowerSpecter(PipelineStage) :
         binning_ww=self.get_sacc_binning(ell_eff,lini,lend,windows=windows)
 
         print("Computing power spectra")
+        print(" No deprojections")
         cls_wodpj,_=self.get_power_spectra(tracers_nc,wsp,bpws)
+        print(" W. deprojections")
         cls_wdpj,cls_wdpj_coupled=self.get_power_spectra(tracers_wc,wsp,bpws)
         self.ncross,self.nell=cls_wodpj.shape
 

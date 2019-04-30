@@ -1,6 +1,6 @@
 modules: hsc_lss
 
-launcher: cori
+launcher: local
 
 stages: 
     - name: ReduceCat
