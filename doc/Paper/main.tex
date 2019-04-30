@@ -46,6 +46,7 @@
 
 \section{Theory}\label{sec:theory}
   \subsection{Projected quantities and power spectra}\label{ssec:theory.cellpk}
+    \todo{cites everywhere}
     Our main observable is the projected overdensity of galaxies $\delta^i_g(\nv)$ as a function of sky position $\nv$ in a given redshift bin labelled by $i$. This is related to the 3D galaxy overdensity $\Delta_g$ through
     \begin{equation}
       \delta^i_g(\nv)=\int dz\,p^i(z)\,\Delta_g\left(t(z),\chi(z)\nv\right).
@@ -63,12 +64,13 @@
     where $H(z)$ is the expansion rate at redshift $z$, and we have used the so-called Limber approximation.
   
   \subsection{Magnification bias}\label{ssec:theory.mag}
+    \todo{cites everywhere}
     Gravitational lensing alters the observed galaxy fluxes and distorts their observed positions. The combined effect, is a position-dependent modulation of the number density that distorts the clustering pattern.
     In the presence of this effect, the equations in the previous section get slightly modified. The projected galaxy overdensity becomes:
     \begin{equation}
-      \delta^i_g(\nv)=\int dz\,\left[p^i(z)\,\Delta_g-\frac{W_\mu^i(z)}{H(z)}\nabla_\theta^2\nabla^{-2}\Delta_M\right],
+      \delta^i_g(\nv)=\int dz\,\left[p^i(z)\,\Delta_g+\frac{W_\mu^i(z)}{H(z)}\nabla_\theta^2\nabla^{-2}\Delta_m\right],
     \end{equation}
-    where $\Delta_M$ is the 3D matter overdensity (we have omitted the dependence on $t$ and $\chi\nv$ for brevity) and $W_\mu$ is the magnification kernel
+    where $\Delta_m$ is the 3D matter overdensity (we have omitted the dependence on $t$ and $\chi\nv$ for brevity) and $W_\mu$ is the magnification kernel
     \begin{equation}
       W_\mu(z)=\frac{3H_0^2\Omega_M(1+z)}{2}\int_z^\infty dz'\,p^i(z)\,\left(5s(z')-2\right)\,\frac{\chi(z')-\chi(z)}{\chi(z)\chi(z')}.
     \end{equation}
@@ -83,8 +85,32 @@
     where $P_{mm}$ is the 3D power spectrum of matter fluctuations, $P_{gm}$ is the galaxy-matter cross-spectrum and we have omitted the dependence of all quantities on $z$ or $k=(\ell+1/2)/\chi$ for brevity.
 
   \subsection{Halo Occupation Distribution}\label{ssec:theory.hod}
-    \lipsum[2]
-    \todo{Describe our model for $P_gg$ (and possibly $P_{gM}$}
+    In order to model $P_{gg}(z,k)$ we use a halo occupation distribution (HOD) model \todo{cites everywhere}. In this halo model-based presciption we model the galaxy content of dark matter haloes as a function of halo mass. Details about HOD parametrizations can be found in \todo{cite}. In short, the galaxy power spectrum receives contributions from the so-called 1-halo and 2-halo terms:
+    \begin{equation}
+      P_{gg}(z,k) = P_{gg,{\rm 1h}}(z,k) + P_{gg,{\rm 2h}}(z,k),
+    \end{equation}
+    where
+    \begin{align}
+      & P_{gg,{\rm 1h}}(k)=\frac{1}{\bar{n}_g^2} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[\bar{N}_s^2u_s^2(k)+2\bar{N}_su_s^2(k)\right],\\
+      & P_{gg,{\rm 1h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)^2\,P_{\rm lin}(k).\\
+    \end{align}
+    Here, $M$ represents halo mass, $dn/dM$ is the halo mass function, $\bar{N}_c(M)$ and $\bar{N}_s(M)$ are the mean number of central and satellite galaxies respectively, $u_s(k)$ is the Fourier transform of the normalized density profile of satellite galaxies, $P_{\rm lin}(k)$ is the linear matter power spectrum and $\bar{n}_g$ is the total mean galaxy density, given by
+    \begin{equation}
+      \bar{n}_g=\int dM\,\frac{dn}{dM}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
+    \end{equation}
+
+    Following \todo{cite}, we parametrise the number of centrals and satellites as a function of mass as:
+    \begin{align}
+      &\bar{N}_c(M)=\frac{1}{2}\left[1+{\rm erf}\left(\frac{\log(M/M_{\rm min})}{\sigma_{{\rm ln}M}}\right)\right],\\
+      &\bar{N}_s(M)=\Theta(M-M_0)\left(\frac{M-M_0}{M_1'}\right)^\alpha,
+    \end{align}
+    where $\Theta(x)$ is the Heavyside step function. Furthermore, we assume that $N_c$ follows a Bernoully distribution with probability $p=\bar{N}_c$, and that the number of satellites is Poisson-distributed with mean $\bar{N}_s$. Finally, we model the distribution of satellites to follow that of the dark matter, and therefore $u_s$ is a Navarro-Frenk-White profile, given by:
+    \begin{equation}
+      u_s(k|M)=\frac{\sin x\left[{\rm Si}\left((1+c)\,x\right)-{\rm Si}(x)\right]+\cos x\left[{\rm Ci}\left((1+c)x\right)-{\rm Ci}(x)\right]-\frac{\sin(cx)}{(1+c)x}}{{\bf ln}(1+c)-\frac{c}{1+c}},
+    \end{equation}
+    where $x=k R_\Delta/c$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. The concentration-mass relation $c(M)$ also depends on the choice of $\Delta$, and we follow the parametrization of Duffy et al. \todo{cite}.
+
+    \todo{Possibly extend this to describe $P_{gm}$}
     
   \subsection{Covariance matrices}\label{ssec:theory.ssc}
     \todo{Possibly also describe theory modelling behind covariance. }
