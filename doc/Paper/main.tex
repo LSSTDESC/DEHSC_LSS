@@ -83,7 +83,7 @@
     where
     \begin{align}
       & P_{gg,{\rm 1h}}(k)=\frac{1}{\bar{n}_g^2} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[\bar{N}_s^2u_s^2(k)+2\bar{N}_su_s^2(k)\right],\\
-      & P_{gg,{\rm 1h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)^2\,P_{\rm lin}(k).\\
+      & P_{gg,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)^2\,P_{\rm lin}(k).\\
     \end{align}
     Here, $M$ represents halo mass, $dn/dM$ is the halo mass function, $\bar{N}_c(M)$ and $\bar{N}_s(M)$ are the mean number of central and satellite galaxies respectively, $u_s(k)$ is the Fourier transform of the normalized density profile of satellite galaxies, $P_{\rm lin}(k)$ is the linear matter power spectrum and $\bar{n}_g$ is the total mean galaxy density, given by
     \begin{equation}
@@ -108,10 +108,22 @@
     \lipsum[3]
 
 \section{Data}\label{sec:data}
+  We use data from the Hyper Suprime-Cam Subaru Strategic Program first data release (HSC DR1 hereon). The release is extensively documented in \todo{cite}, and we only provide the details of the galaxy sample and associated data used for our clustering analysis. 
+  
+  \todo{General blurb about HSC DR1}
+  
+  We use a magnitude-limited sample constructed by imposing data cuts that are similar to those used to create the HSC shear catalog \todo{cite}. The exact cuts are summarized in Table \todo{make table}, and can be summarized as follows: besides a minimal set of quality cuts (selecting only primary detections with well-measured fluxes in all bands, removing objects near bad pixels, deblender artifacts \todo{check out the exact definitions in the schema browser once the website is up again}), we impose an overall apparent magnitude cut in the extinction-corrected band $i_{\rm corr}<24.5$. This choice was based on a study of the survey depth-completeness relation in order to select a homogeneous and complete sample of high-confidence ($>10\sigma$) detections (see Section \ref{ssec:methods.syst}). We also select only objects with significant detections ($>5\sigma$) in at least two of the 4 remaining bands ($g,\,r,\,z,\,y$), and remove all objects classified as stars by the data reduction pipeline \todo{check wording, maybe add a note about the fact that the s-g separator is binary for DR1}. The resulting sample has XXXX objects distributed across the 6 HSC DR1 fields as described in Table \todo{make table}.
+  
+  All objects have photometric redshift measurements from X different codes \todo{enumerate codes}. We use the best-fit redshift assigned by the {\tt ephor\_ab} method as a marker to divide the sample into 4 redshift bins containing roughly equal numbers of galaxies. A peliminary Fisher matrix study showed that the information content saturates quickly when slicing the data into finer redshift bins. The redshift bins are described in Table \todo{make table}, and the associated redshift distributions are described in Section \ref{ssec:methods.nz}.
+
   \todo{Describe DR1 and sample selection \citep{2018arXiv180909148H}. Describe redshift binning.}
   \lipsum[3]
 
 \section{Methods}\label{sec:methods}
+  \subsection{Survey mask}\label{ssec:methods.mask}
+    \todo{Describe mask. Maybe detail how we reconstructed it from the data.}
+    \lipsum[4]
+
   \subsection{Systematics maps}\label{ssec:methods.syst}
     \todo{Describe how we generate systematic maps}
     \lipsum[3]
