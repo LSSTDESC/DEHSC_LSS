@@ -140,8 +140,15 @@
     \todo{Add a figure showing one/all of the masks}
 
   \subsection{Systematics maps}\label{ssec:methods.syst}
-    \todo{Describe how we generate systematic maps}
-    \lipsum[3]
+    A number of astrophysical and observational systematic effects can affect the observed distribution of galaxies, and therefore may bias our inference of their clustering properties. To mitigate this effect we deproject maps of these systematics from our data, as described in Section \ref{ssec:methods.cell}. We generate maps of the most plausible sources of systematic variations in the galaxy number density:
+    \begin{enumerate}
+      \item {\bf Dust extinction}: we make maps of dust absorption in each band using the data from \todo{cite} projected onto the 6 HSC DR1 fields.
+      \item {\bf Star contamination}: we produce a map of the number density of stars using all objects passing our sample cuts but classified as stars by the star-galaxy separator. As described in Section \ref{ssec:methods.cell}, the method used to remove the impact of this systematic is slightly different from the rest.
+      \item {\bf Observing conditions}: the HSC DR1 provides metadata for each filter exposure, containing information about a number of observing conditions. We make coadded maps of these following a procedure similar to that described in \todo{cite}. For each pixel in our map we gather all exposures that fully or partially overlap with it. For each quantity $Q$ in filter $f$, this allows us to build a list of values of $Q$ for each exposure. We then compute the mean of these values weighted by the fractional area overlap between the exposure and the pixel for each exposure, and assign that value to the pixel. Following this procedure we produce maps of the following quantities: airmass, CCD temperature, seeing, point-spread function (PSF) ellipticity, exposure time, sky count level, root-mean square deviation of the sky count and number of visits.
+    \end{enumerate}
+    Figure \todo{make figure} shows examples of some of these maps.
+
+    \todo{Possibly justify only looking at the mean of the different quantities, and not other moments of their distribution}
 
   \subsection{Redshift distributions}\label{ssec:methods.nz}
     \todo{Describe methods used to estimate $N(z)$.}
