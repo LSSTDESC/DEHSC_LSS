@@ -167,16 +167,31 @@
   \subsection{Angular power spectra}\label{ssec:methods.cell}
     We compute angular power spectra using a flat-sky pseudo-$C_\ell$ (PCL) algorithm using {\tt NaMaster}\footnote{\url{https://github.com/LSSTDESC/NaMaster}}. The reader is referred to the code's paper \todo{cite} for a detailed description of the estimator, but we provide a brief summary here for completeness.
     
-    In the absence of a sky mask, the flat-sky auto-power spectrum could be simply estimated Fourier transforming a given map $a_{\bf l}={\rm FT}[a(\nv)]$ and averaging their its modulus squared over bins of $\ell\equiv|{\bf l}|$. In any practical situation, however, it will be desirable to apply weights on the map to e.g. downweight noisy areas or altogether remove pixels that haven't been observed. In this case the observed (``masked'') map is $a^{\rm obs}(\nv)=w(\nv)a(\nv)$, where $w(\nv)$ is a weight map. The Fourier coefficients of the observed map are therefore given by a convolution of the true Fourier coefficients with the Fourier transform of the maps, which therefore couples different $\ell$ modes in the original map. The result of using the na\"ive estimator of the power spectrum described above on the masked map is therefore a version of the true underlying power spectrum where different $\ell$s are coupled throught the so-called {\sl mode-coupling matrix} $M_{\ell\ell'}$:
+    In the absence of a sky mask, the flat-sky auto-power spectrum could be simply estimated Fourier transforming a given map $a_{\bf l}={\rm FT}[a(\nv),{\bf l}]$ (where ${\rm FT}$ denotes a Fourier transform operation, and ${\bf l}$ is a 2D wavenumber), and averaging its modulus squared over bins of $\ell\equiv|{\bf l}|$. In any practical situation, however, it will be desirable to apply weights on the map to e.g. downweight noisy areas or altogether remove pixels that haven't been observed. In this case the observed (``masked'') map is $a^{\rm obs}(\nv)=w(\nv)a(\nv)$, where $w(\nv)$ is a weight map. The Fourier coefficients of the observed map are therefore given by a convolution of the true Fourier coefficients with the Fourier transform of the maps, which therefore couples different $\ell$ modes in the original map. The result of using the na\"ive estimator of the power spectrum described above on the masked map is therefore a version of the true underlying power spectrum where different $\ell$s are coupled throught the so-called {\sl mode-coupling matrix} $M_{\ell\ell'}$:
     \begin{equation}
       C^{\rm obs}_\ell = \sum_{\ell'} M_{\ell\ell'}\,C^{\rm true}_{\ell'}.
     \end{equation}
     The PCL algorithm calculates the mode-coupling matrix analytically using the properties of the weight maps, and uses it to make an unbiased estimate of $C^{\rm true}_\ell$.
-
     
+    The overdensity maps used are constructed as $\delta_{g,p}=N_p/(\bar{N}\,w_p)-1$, where $N_p$ is the number of sources in pixel $p$, $w_p$ is the survey mask described in Section \ref{ssec:methods.mask}, quantifying the unmasked area fraction in each pixel, and $\bar{N}$ is the mean number of sources per pixel, estimated as $\bar{N}=\sum_p N_p/\sum_p w_p$.
     
-    \todo{Describe how the $C_\ell$ estimator works, possibly also deprojection}
-    \lipsum[6]
+    An important aspect of power spectrum estimation that is particularly relevant for galaxy clustering studies is accounting for the effect of sky contaminants on the final summary statistic. In this analysis we have done so using a technique called ``template deprojection''. We start by compiling a list of maps of quantities that can potentially cause artificial perturbations in the observed number density of sources. These include all the quantities described in Section \ref{ssec:methods.syst}. The method then assumes that, at first order, these contaminants affect the observed galaxy overdensity linearly:
+    \begin{equation}
+      \delta_g^{\rm obs}(\nv) = \delta_g^{\rm true}(\nv) + A_{\rm syst}\,\Delta_{\rm syst}(\nv),
+    \end{equation}
+    where $\Delta_{\rm syst}$ is a template map of the fluctuation of a given contaminant around its mean across the survey footprint, and $A_{\rm syst}$ is an unknown linear factor. Template deprojection methods avoid systematic biases by  removing all modes from the observed maps that are common to any of the systematic template maps. In practice this is achieved by obtaining the best-fit value of $A_{\rm syst}$, subtracting the corresponding best-fit contaminant contribution from the maps and analytically accounting for the associated loss of modes when computing the angular power spectrum. Further details of this method can be found in \todo{cite Elsner and namaster paper.}. We must note that star contamination is a special type of contaminant, since it is an additive contribution to the observed galaxy number density $n_g$, not its overdensity. In the simplest scenario, a fraction $f$ of stars contribute to the observed galaxy density: $n_g^{\rm obs}=n^{\rm true}_g+f\,n_s$, where $n_s$ is the local number density of stars. A fluctuation in the star density around the mean $\Delta_s(\nv)=n_s(\nv)/\bar{n}_s-1$, therefore produces both a multiplicative and an additive effect on $\delta_g$:
+    \begin{equation}
+      \delta_g^{\rm obs}(\nv) = (1-F_s)\,\delta_g^{\rm true}(\nv)+F_s\,\Delta_s(\nv),
+    \end{equation}
+    where $F_s$ is the fraction of the sample made out of stars (i.e. $F_s\equiv f\bar{n}_s/(\bar{n}_g+f\bar{n}_s)$ with the notation above). The linear term is taken care of by the deprojection procedure, and we correct the final map of $\delta_g$ by a factor $1/(1-F_s)$, where we estimate $F_s$ from the HSC deep COSMOS field as described in section \todo{address this in Section \ref{sec:results}}.
+    
+    Finally, a noise bias term must be subtracted from all auto-power spectra. In the case of galaxy clustering, and assuming this noise is entirely due to Poisson shot noise, this can be done analytically as described in \todo{cite}. In short, the noise power spectrum before mode-decoupling (i.e. before multiplying by the inverse mode-coupling matrix), can be calculated as:
+    \begin{equation}
+      \tilde{N}_\ell = \Omega_{\rm pix}\,\frac{\bar{w}}{\bar{N}},
+    \end{equation}
+    where $\bar{w}$ is the mean value of the survey mask across the map, $\bar{N}$ is the mean number density of sources per pixel, and $\Omega_{\rm pix}$ is the pixel area in units of steradians.
+    
+    \todo{More details may be needed on bandpower binning, bandpower windows, the exact procedure to compute $\tilde{N}_\ell$ etc.}
 
   \subsection{Covariance matrices}\label{ssec:methods.covar}
     \todo{Describe covariance. Describe coaddition.}
@@ -191,7 +206,7 @@
   \end{figure}
   \todo{Things to discuss:}
   \begin{enumerate}
-    \item Impact of systematics. Discuss star contamination in more detail.
+    \item Impact of systematics. Discuss star contamination in more detail (referenced above).
     \item Checks we've done: consistency between fields ($C_\ell$ and $N_{\rm gal}$), different masks, different levels of contaminant deprojection, different covariances.
     \item Effects of deprojection.
     \item Final contours.
