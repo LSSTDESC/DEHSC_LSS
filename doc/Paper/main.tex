@@ -19,6 +19,7 @@
 \newcommand{\mnras}{Monthly Notices of the RAS}
 \newcommand{\todo}[1]{{\bf TODO: #1}}
 
+\newcommand{\as}[1]{{\textcolor{blue}{[AS: #1]}}}
 
 \usepackage[T1]{fontenc} % if needed
 \usepackage{natbib}
@@ -32,14 +33,16 @@
 \affiliation[b]{Some other place}
 \emailAdd{irst.f@physics.msk.edu}
 
-\abstract{\lipsum[1]}
+\abstract{ We analyze the clustering of galaxies in the first year public release of the Hyper Suprimer-Cam data. Despite the relatively small footprints of the observed fields, the data are an excellent model for the very deep future photometric datasets such as LSST. We analyze the sample split into four tomographic redshift bins centered at $z=0.4,0.6\ldots$. We measure the auto and cross-correlations between all bins and find a good fit to the data on scales $k\lesssim 0.8 h$/Mpc using a halo model with no evidence for systematics errors. Our six parameter model is consistent with galaxy sample being dominated by central galaxies living in halos of mass $\log M/M_\odot \gtrsim 10 + 4(1+z)^{-1}$.  While we project out systematic templates in the power spectrum measurement we find that they do not appreciably change the results. \as{Is this true for cross-correlations?}. We find that cross-correlations strongly constrain the difference between the effective tomographic redshifts, but the data is strongly degenerate with respect to  coherent shifts in redshift.
+We test for magnification bias effect and constrain the lensing amplitude $A_L=3\pm 1$ consistent with standard lensing. 
+}
 
 \begin{document}
 \maketitle
 \flushbottom
 
 \section{Introduction}\label{sec:intro}
-  \lipsum[1]
+\lipsum[1]
 
 \section{Theory}\label{sec:theory}
   \subsection{Projected quantities and power spectra}\label{ssec:theory.cellpk}
@@ -212,7 +215,7 @@
   \lipsum[8]
   \begin{figure}
     \centering
-    \includegraphics[width=0.9\columnwidth]{figures/token_plot}
+%    \includegraphics[width=0.9\columnwidth]{figures/token_plot}
     \caption{Blah}\label{fig:token}
   \end{figure}
   \todo{Things to discuss:}
