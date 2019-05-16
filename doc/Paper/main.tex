@@ -178,7 +178,7 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     
     In the absence of a sky mask, the flat-sky auto-power spectrum could be simply estimated Fourier transforming a given map $a_{\bf l}={\rm FT}[a(\nv),{\bf l}]$ (where ${\rm FT}$ denotes a Fourier transform operation, and ${\bf l}$ is a 2D wavenumber), and averaging its modulus squared over bins of $\ell\equiv|{\bf l}|$. In any practical situation, however, it will be desirable to apply weights on the map to e.g. downweight noisy areas or altogether remove pixels that haven't been observed. In this case the observed (``masked'') map is $\tilde{a}(\nv)=w(\nv)a(\nv)$, where $w(\nv)$ is a weight map. The Fourier coefficients of the observed map are therefore given by a convolution of the true Fourier coefficients with the Fourier transform of the maps, which therefore couples different $\ell$ modes in the original map. The result of using the na\"ive estimator of the power spectrum described above on the masked map is therefore a version of the true underlying power spectrum where different $\ell$s are coupled throught the so-called {\sl mode-coupling matrix} $M_{\ell\ell'}$:
     \begin{equation}
-      \langle \tilde{C}^{ab}_\ell = \sum_{\ell'} M_{\ell\ell'}(w_a,w_b)\,C^{ab}_{\ell'}.
+      \left\langle \tilde{C}^{ab}_\ell \right\rangle = \sum_{\ell'} M_{\ell\ell'}(w_a,w_b)\,C^{ab}_{\ell'}.
     \end{equation}
     Here, $\tilde{C}^{ab}_\ell$ is the power spectrum of two observed fields $\tilde{a}=w_a\,a$ and $\tilde{b}=w_b\,b$, and $C^{ab}_\ell$ is the true power spectrum. The PCL algorithm calculates the mode-coupling matrix analytically using the properties of the weight maps, and uses it to make an unbiased estimate of $C^{ab}_\ell$.
     
@@ -220,19 +220,23 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     Where $M_{\ell\ell'}$ are the mode-coupling matrices described in the previous section, except now are computed from the products of two masks. This approach has been shown by \todo{cite} to yield a very good approximation for the power spectrum covariance, fully accounting for the effects of mode coupling due to survey geometry. \todo{we did check this against gaussian simulations for this paper too. Do we want to show this? We'd need to regenerate those simulations and the corresponding plots.}
     
     We compute the super-sample covariance contribution following the treatment of \todo{cite}:
+    \begin{align}
+      {\rm Cov}^{\rm SSC}\left(\tilde{C}^{ab}_\ell,\tilde{C}^{cd}_{\ell'}\right)=\int &\frac{dz}{H(z)}\left(\frac{H(z)}{\chi(z)}\right)^4\,p^a(z)p^b(z)p^c(z)p^d(z)\\&b^ab^bb^cb^d\,\frac{\partial P(z,k_\ell)}{\partial\delta_b}\,\frac{\partial P(z,k_{\ell'})}{\partial\delta_b}\sigma_b^2(z).
+    \end{align}
+    Here, $k_\ell=\ell/\chi-1/2$, $b^a$ is the lage-scale HOD bias for the $a$-th sample, computed as
     \begin{equation}
-      {\rm Cov}^{\rm SSC}\left(\tilde{C}^{ab}_\ell,\tilde{C}^{cd}_{\ell'}\right)
+      b^a=\frac{1}{\bar{n}_g^a}\int dM\,\frac{dn}{dM}b_h(M) \bar{N}_c^a(1+\bar{N}_s^a),
     \end{equation}
+    $\partial P(z,k)/\partial \delta_b$ is the response of the matter power spectrum to a long-wavelength density fluctuation, which we estimate using the halo model as described in \todo{cite}, and $\sigma_b^2$ is the variance of the long wavelength mode over the survey footprint:
+    \begin{equation}
+      \sigma_b^2 = \int \frac{dk_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
+    \end{equation}
+    Here, $W(k_\perp,z)$ is the Fourier transform of the survey footprint, which we approximate as a compact circle with the same area:
+    \begin{equation}
+      W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}).
+    \end{equation}
+    \todo{Describe how we coadd the power spectra of the different fields at some point}
 
-
-
-    
-    \todo{Things left to discuss:}
-    \begin{enumerate}
-      \item Describe SSC
-      \item Describe how we coadd the power spectra of the different fields.
-    \end{enumerate}
-    
 \section{Results}\label{sec:results}
   \lipsum[8]
   \begin{figure}
