@@ -176,11 +176,11 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
   \subsection{Angular power spectra}\label{ssec:methods.cell}
     We compute angular power spectra using a flat-sky pseudo-$C_\ell$ (PCL) algorithm \citep{2002ApJ...567....2H} using {\tt NaMaster}\footnote{\url{https://github.com/LSSTDESC/NaMaster}}. The reader is referred to the code's paper \cite{2019MNRAS.484.4127A} for a detailed description of the estimator, but we provide a brief summary here for completeness.
     
-    In the absence of a sky mask, the flat-sky auto-power spectrum could be simply estimated Fourier transforming a given map $a_{\bf l}={\rm FT}[a(\nv),{\bf l}]$ (where ${\rm FT}$ denotes a Fourier transform operation, and ${\bf l}$ is a 2D wavenumber), and averaging its modulus squared over bins of $\ell\equiv|{\bf l}|$. In any practical situation, however, it will be desirable to apply weights on the map to e.g. downweight noisy areas or altogether remove pixels that haven't been observed. In this case the observed (``masked'') map is $a^{\rm obs}(\nv)=w(\nv)a(\nv)$, where $w(\nv)$ is a weight map. The Fourier coefficients of the observed map are therefore given by a convolution of the true Fourier coefficients with the Fourier transform of the maps, which therefore couples different $\ell$ modes in the original map. The result of using the na\"ive estimator of the power spectrum described above on the masked map is therefore a version of the true underlying power spectrum where different $\ell$s are coupled throught the so-called {\sl mode-coupling matrix} $M_{\ell\ell'}$:
+    In the absence of a sky mask, the flat-sky auto-power spectrum could be simply estimated Fourier transforming a given map $a_{\bf l}={\rm FT}[a(\nv),{\bf l}]$ (where ${\rm FT}$ denotes a Fourier transform operation, and ${\bf l}$ is a 2D wavenumber), and averaging its modulus squared over bins of $\ell\equiv|{\bf l}|$. In any practical situation, however, it will be desirable to apply weights on the map to e.g. downweight noisy areas or altogether remove pixels that haven't been observed. In this case the observed (``masked'') map is $\tilde{a}(\nv)=w(\nv)a(\nv)$, where $w(\nv)$ is a weight map. The Fourier coefficients of the observed map are therefore given by a convolution of the true Fourier coefficients with the Fourier transform of the maps, which therefore couples different $\ell$ modes in the original map. The result of using the na\"ive estimator of the power spectrum described above on the masked map is therefore a version of the true underlying power spectrum where different $\ell$s are coupled throught the so-called {\sl mode-coupling matrix} $M_{\ell\ell'}$:
     \begin{equation}
-      C^{\rm obs}_\ell = \sum_{\ell'} M_{\ell\ell'}\,C^{\rm true}_{\ell'}.
+      \langle \tilde{C}^{ab}_\ell = \sum_{\ell'} M_{\ell\ell'}(w_a,w_b)\,C^{ab}_{\ell'}.
     \end{equation}
-    The PCL algorithm calculates the mode-coupling matrix analytically using the properties of the weight maps, and uses it to make an unbiased estimate of $C^{\rm true}_\ell$.
+    Here, $\tilde{C}^{ab}_\ell$ is the power spectrum of two observed fields $\tilde{a}=w_a\,a$ and $\tilde{b}=w_b\,b$, and $C^{ab}_\ell$ is the true power spectrum. The PCL algorithm calculates the mode-coupling matrix analytically using the properties of the weight maps, and uses it to make an unbiased estimate of $C^{ab}_\ell$.
     
     The overdensity maps used are constructed as $\delta_{g,p}=N_p/(\bar{N}\,w_p)-1$, where $N_p$ is the number of sources in pixel $p$, $w_p$ is the survey mask described in Section \ref{ssec:methods.mask}, quantifying the unmasked area fraction in each pixel, and $\bar{N}$ is the mean number of sources per pixel, estimated as $\bar{N}=\sum_p N_p/\sum_p w_p$.
     
@@ -203,11 +203,33 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \todo{More details may be needed on bandpower binning, bandpower windows, the exact procedure to compute $\tilde{N}_\ell$ etc.}
 
   \subsection{Covariance matrices}\label{ssec:methods.covar}
-    We use an analytical procedure to estimate the uncertainties of our measured power spectra, inspired in the methods used by \todo{cites}. As shown in \todo{cite}, the covariance matrix for large-scale structure data can be decomposed into a disconnected trispectrum part, essentially equivalent to the covariance of a Gaussian random field with the same power spectrum as the data, a connected part, caused by the non-Gaussian nature of the density field, and a super-sample covariance term (labelled SSC here), caused by the coherent shift in the amplitude of density fluctuations within the surveyed volume caused by long wavelength modes larger than the survey. As shown by \todo{cite}, the Gaussian and SSC terms dominate the covariance matrix for cosmic shear data, and the connected terms can be safely disregarded. Our fiducial covariance matrix is therefore constructed from these two contributions, which we estimate as follows:
-    \todo{Things to discuss:}
+    We use an analytical procedure to estimate the uncertainties of our measured power spectra, inspired in the methods used by \todo{cites}. As shown in \todo{cite}, the covariance matrix for large-scale structure data can be decomposed into a disconnected trispectrum part, essentially equivalent to the covariance of a Gaussian random field with the same power spectrum as the data, a connected part, caused by the non-Gaussian nature of the density field, and a super-sample covariance term (labelled SSC here), caused by the coherent shift in the amplitude of density fluctuations within the surveyed volume caused by long wavelength modes larger than the survey. As shown by \todo{cite}, the Gaussian and SSC terms dominate the covariance matrix for cosmic shear data, and the connected terms can be safely disregarded. Under the assumption that this results holds also for tomographic galaxy clustering, our fiducial covariance matrix is therefore constructed from these two contributions.
+    
+    We estimate the Gaussian covariance of the pseudo-$C_\ell$ estimator as described in \todo{cite}. In the absence of any approximations, the covariance of the observed power spectra is given by
+    \begin{equation}
+      {\rm Cov}\left(\tilde{C}^{ab}_\ell,\tilde{C}^{cd}_{\ell'}\right)=\sum_{{\bf l}_1,{\bf l}_2} C^{ac}_{\ell_1}C^{bd}_{\ell_2}W^a_{{\bf l}{\bf l}_1}W^b_{{\bf l}{\bf l}_2}W^c_{{\bf l}'{\bf l}_1}W^d_{{\bf l}'{\bf l}_2} + C^{ad}_{\ell_1}C^{bc}_{\ell_2}W^a_{{\bf l}{\bf l}_1}W^b_{{\bf l}{\bf l}_2}W^c_{{\bf l}'{\bf l}_2}W^d_{{\bf l}'{\bf l}_1},
+    \end{equation}
+    where $W^x_{{\bf l}{\bf l}'}$ are coupling coefficients depending only on the mask of $x$ (see \todo{Cite} for further details). In the absence of further approximations, computing the covariance matrix would therefore imply solving a 4-dimensional integral for each pair $(\ell,\ell')$. I.e. an $O(\ell_{\rm max}^6$ operation which easily becomes computationally unfeasible. Since the coupling coefficients $W^x_{{\bf l}{\bf l}'}$ are usually highly peaked around ${\bf l}={\bf l}'$, we can proceed further by approximating the power spectra to be constant within the support of $W^x_{{\bf l},{\bf l}'}$. Effectively this implies approximating
+    \begin{equation}
+      C^{ac}_{\ell_1}C^{bd}_{\ell_2}\simeq C^{ac}_{(\ell}C^{bd}_{\ell')}\equiv\frac{1}{2}\left(C^{ac}_\ell C^{bd}_{\ell'}+C^{ac}_{\ell'} C^{bd}_\ell\right).
+    \end{equation}
+    This allows us to simplify the expression above significantly, becoming
+    \begin{equation}
+      {\rm Cov}\left(\tilde{C}^{ab}_\ell,\tilde{C}^{cd}_{\ell'}\right)=(2\ell'+1)^{-1}\left[C^{ac}_{(\ell}C^{bd}_{\ell')}M_{\ell\ell'}(w_aw_c,w_bw_d)+C^{ad}_{(\ell}C^{bc}_{\ell')}M_{\ell\ell'}(w_aw_d,w_bw_c)\right].
+    \end{equation}
+    Where $M_{\ell\ell'}$ are the mode-coupling matrices described in the previous section, except now are computed from the products of two masks. This approach has been shown by \todo{cite} to yield a very good approximation for the power spectrum covariance, fully accounting for the effects of mode coupling due to survey geometry. \todo{we did check this against gaussian simulations for this paper too. Do we want to show this? We'd need to regenerate those simulations and the corresponding plots.}
+    
+    We compute the super-sample covariance contribution following the treatment of \todo{cite}:
+    \begin{equation}
+      {\rm Cov}^{\rm SSC}\left(\tilde{C}^{ab}_\ell,\tilde{C}^{cd}_{\ell'}\right)
+    \end{equation}
+
+
+
+    
+    \todo{Things left to discuss:}
     \begin{enumerate}
-      \item We use an analytic covariance made up of Gaussian $+$ SSC.
-      \item Describe how we fully account for survey geometry in Gaussian part. We have checked this against Gaussian simulations extensively.
+      \item Describe SSC
       \item Describe how we coadd the power spectra of the different fields.
     \end{enumerate}
     
