@@ -9,6 +9,9 @@ class DataFile:
         """
         return open(path, mode)
 
+class DummyFile(DataFile):
+    suffix=''
+
 class FitsFile(DataFile):
     """
     A data file in the FITS format.

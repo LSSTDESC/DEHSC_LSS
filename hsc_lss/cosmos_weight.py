@@ -146,7 +146,7 @@ class COSMOSWeight(PipelineStage) :
         t1=Table.from_pandas(pd.DataFrame(np.transpose([cat_matched[k] for k in keys_t1]),columns=keys_t1))
         t2=Table.from_pandas(pd.DataFrame(np.transpose(weights), columns= ['weight']))
         cat_weights=hstack([t1, t2])
-        cat_weights.write(self.get_output('cosmos_weights'))
+        cat_weights.write(self.get_output('cosmos_weights'),overwrite=True)
 
 if __name__ == '__main__':
     cls = PipelineStage.main()
