@@ -104,7 +104,7 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
       &\bar{N}_c(M)=\frac{1}{2}\left[1+{\rm erf}\left(\frac{\log(M/M_{\rm min})}{\sigma_{{\rm ln}M}}\right)\right],\\
       &\bar{N}_s(M)=\Theta(M-M_0)\left(\frac{M-M_0}{M_1'}\right)^\alpha,
     \end{align}
-    where $\Theta(x)$ is the Heavyside step function. Furthermore, we assume that $N_c$ follows a Bernoully distribution with probability $p=\bar{N}_c$, and that the number of satellites is Poisson-distributed with mean $\bar{N}_s$. Finally, we model the distribution of satellites to follow that of the dark matter, and therefore $u_s$ is a Navarro-Frenk-White profile, given by:
+    where $\Theta(x)$ is the Heavyside step function. Furthermore, we assume that $N_c$ follows a Bernoulli distribution with probability $p=\bar{N}_c$, and that the number of satellites is Poisson-distributed with mean $\bar{N}_s$. Finally, we model the distribution of satellites to follow that of the dark matter, and therefore $u_s$ is a Navarro-Frenk-White profile, given by:
     \begin{equation}
       u_s(k|M)=\frac{\sin x\left[{\rm Si}\left((1+c)\,x\right)-{\rm Si}(x)\right]+\cos x\left[{\rm Ci}\left((1+c)x\right)-{\rm Ci}(x)\right]-\frac{\sin(cx)}{(1+c)x}}{{\rm ln}(1+c)-\frac{c}{1+c}},
     \end{equation}
@@ -121,9 +121,76 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
   
   \todo{General blurb about HSC DR1}
   
-  We use a magnitude-limited sample constructed WIDE DR1 sample by imposing data cuts that are similar to those used to create the HSC shear catalog \cite{2018PASJ...70S..25M}. The exact cuts are summarized in Table \todo{make table}, and can be summarized as follows: besides a minimal set of quality cuts (selecting only primary detections with well-measured fluxes in all bands, removing objects near bad pixels, deblender artifacts \todo{check out the exact definitions in the schema browser once the website is up again}), we impose an overall apparent magnitude cut in the extinction-corrected band $i_{\rm corr}<24.5$. This choice was based on a study of the survey depth-completeness relation in order to select a homogeneous and complete sample of high-confidence ($>10\sigma$) detections (see Section \ref{ssec:methods.syst}). We also select only objects with significant detections ($>5\sigma$) in at least two of the 4 remaining bands ($g,\,r,\,z,\,y$), and remove all objects classified as stars by the data reduction pipeline \todo{check wording, maybe add a note about the fact that the s-g separator is binary for DR1}. The resulting sample has XXXX objects distributed across the 6 HSC DR1 fields as described in Table \todo{make table}.
+  We use a magnitude-limited sample constructed WIDE DR1 sample by imposing data cuts that are similar to those used to create the HSC shear catalog \cite{2018PASJ...70S..25M}. The exact cuts are shown in Table~\ref{tab:cuts_summary}, and can be summarized as follows: besides a minimal set of quality cuts (selecting only primary detections with well-measured fluxes in all bands, removing objects near bad pixels, deblender artifacts, etc.), we impose an overall apparent magnitude cut in the extinction-corrected band $i_{\rm corr}<24.5$. This choice was based on a study of the survey depth-completeness relation in order to select a homogeneous and complete sample of high-confidence ($>10\sigma$) detections (see Section \ref{ssec:methods.syst}). We also select only objects with significant detections ($>5\sigma$) in at least two of the 4 remaining bands ($g,\,r,\,z,\,y$), and remove all objects classified as stars by the data reduction pipeline, using the "extendedness`` classifier as described at \citet{2018PASJ...70S...5B}. The resulting sample has XXXX objects distributed across the 6 HSC DR1 fields as described in Table \todo{make table}.
   
-  All objects have photometric redshift measurements from X different codes \todo{enumerate codes} \cite{2018PASJ...70S...9T}. We use the best-fit redshift assigned by the {\tt ephor\_ab} method as a marker to divide the sample into 4 redshift bins containing roughly equal numbers of galaxies. A peliminary Fisher matrix study showed that the information content saturates quickly when slicing the data into finer redshift bins. The redshift bins are described in Table \todo{make table}, and the associated redshift distributions are described in Section \ref{ssec:methods.nz}.
+\begin{table}
+\centering
+\begin{tabular}{|c|c|}
+\hline
+ Variable & Condition \\
+ \hline
+ \texttt{forced.detect\_isPrimary} & =True\\
+  \texttt{forced.icmodel\_flags\_badcentroid} & =False\\
+  \texttt{forced.icentroid\_sdss\_flags} & =False\\
+  \texttt{forced.iflags\_pixel\_edge} & =False\\
+  \texttt{forced.iflags\_pixel\_interpolated\_center} & =False\\
+  \texttt{forced.iflags\_pixel\_saturated\_center} & =False\\
+  \texttt{forced.iflags\_pixel\_cr\_center} & =False\\
+  \texttt{forced.iflags\_pixel\_bad} & =False\\
+  \texttt{forced.iflags\_pixel\_suspect\_center} & =False\\
+   \texttt{ forced.iflags\_pixel\_clipped\_any} & =False\\
+   \texttt{ meas.ideblend\_skipped} & =False\\
+   \texttt{forced.icmodel\_mag} & $<$ 24.5\\ % Magnitude cut
+   \hline % Strict from here on
+   \texttt{ forced.gcentroid\_sdss\_flags} & =False\\
+   \texttt{ forced.rcentroid\_sdss\_flags} & =False\\
+   \texttt{ forced.zcentroid\_sdss\_flags} & =False\\
+   \texttt{ forced.ycentroid\_sdss\_flags} & =False\\
+   \texttt{ forced.gcmodel\_flux\_flags} & =False\\
+   \texttt{ forced.rcmodel\_flux\_flags} & =False\\
+   \texttt{ forced.icmodel\_flux\_flags} & =False\\
+   \texttt{ forced.zcmodel\_flux\_flags} & =False\\
+   \texttt{ forced.ycmodel\_flux\_flags} & =False\\
+   \texttt{ forced.gflux\_psf\_flags} & =False\\
+   \texttt{ forced.rflux\_psf\_flags} & =False\\
+   \texttt{ forced.iflux\_psf\_flags} & =False\\
+   \texttt{ forced.zflux\_psf\_flags} & =False\\
+   \texttt{ forced.yflux\_psf\_flags} & =False\\
+   \texttt{ forced.gflags\_pixel\_edge} & =False\\
+   \texttt{ forced.rflags\_pixel\_edge} & =False\\
+   \texttt{ forced.zflags\_pixel\_edge} & =False\\
+   \texttt{ forced.yflags\_pixel\_edge} & =False\\
+   \texttt{ forced.gflags\_pixel\_interpolated\_center} & =False\\
+   \texttt{ forced.rflags\_pixel\_interpolated\_center} & =False\\
+   \texttt{ forced.zflags\_pixel\_interpolated\_center} & =False\\
+   \texttt{ forced.yflags\_pixel\_interpolated\_center} & =False\\
+   \texttt{ forced.gflags\_pixel\_saturated\_center} & =False\\
+   \texttt{ forced.rflags\_pixel\_saturated\_center} & =False\\
+   \texttt{ forced.zflags\_pixel\_saturated\_center} & =False\\
+   \texttt{ forced.yflags\_pixel\_saturated\_center} & =False\\
+   \texttt{ forced.gflags\_pixel\_cr\_center} & =False\\
+   \texttt{ forced.rflags\_pixel\_cr\_center} & =False\\
+   \texttt{ forced.zflags\_pixel\_cr\_center} & =False\\
+   \texttt{ forced.yflags\_pixel\_cr\_center} & =False\\
+   \texttt{ forced.gflags\_pixel\_bad} & =False\\
+   \texttt{ forced.rflags\_pixel\_bad} & =False\\
+   \texttt{ forced.zflags\_pixel\_bad} & =False\\
+   \texttt{ forced.yflags\_pixel\_bad} & =False\\
+ \hline
+ \end{tabular}
+ \caption{Summary of the selection cuts performed to the original dataset to retrieve the sample considered for our analyses.}
+ \label{tab:cuts_summary}
+ \end{table}  
+ 
+ 
+ \begin{table}
+ \centering
+ \begin{tabular}{|c|c|}
+ \hline
+ Field & Number of objects \\
+ \hline
+ WIDE  
+  All objects have photometric redshift measurements from 6 different codes as presented in \citet{2018PASJ...70S...9T}. We use the best-fit redshift assigned by the {\tt ephor\_ab} method as a marker to divide the sample into 4 redshift bins containing roughly equal numbers of galaxies. A peliminary Fisher matrix study showed that the information content saturates quickly when slicing the data into finer redshift bins. The redshift bins are described in Table \todo{make table}, and the associated redshift distributions are described in Section \ref{ssec:methods.nz}.
 
   \todo{Describe DR1 and sample selection. Describe redshift binning.}
 
