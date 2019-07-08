@@ -6,3 +6,5 @@
 *.sublime-project
 .ipynb_checkpoints/
 data_query/*.sql
+core.*
+nmap.jpg

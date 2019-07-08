@@ -17,10 +17,14 @@ from hsc_lss.map_utils import createCountsMap
 from hsc_lss.tracer import Tracer
 import pymaster as nmt
 
+import matplotlib as mpl
+from matplotlib import pyplot as plt
+
+
 catalogs = glob('/global/cscratch1/sd/damonge/HSC_ceci/WIDE_*_sirius_out/')
 
 ell_bins = [100.0,200.0,300.0,400.0,600.0,800.0,1000.0,1400.0,1800.0,2200.0,3000.0,3800.0,4600.0,6200.0,7800.0,9400.0,12600.0,15800.0]
-z_bins = [0.15,0.50,0.75,1.00,1.50]
+pz_bins = [0.15,0.50,0.75,1.00,1.50]
 
 
 # modified from cat_mapper
@@ -36,7 +40,7 @@ def get_nmaps(catfolder, pz_code = 'ephor_ab', pz_mark = 'best') :
     cat=fits.open(catfolder + '/clean_catalog.fits')[1].data
     column_mark='pz_'+pz_mark+'_'+pz_code_col
 
-    for zi,zf in zip(pz_i, pz_f) :
+    for zi,zf in zip(pz_bins[:-1], pz_bins[1:]) :
         msk_bin=(cat[column_mark]<=zf) & (cat[column_mark]>zi)
         subcat=cat[msk_bin]
         masked_fraction = catfolder + '/masked_fraction.fits'
@@ -47,7 +51,7 @@ def get_nmaps(catfolder, pz_code = 'ephor_ab', pz_mark = 'best') :
 
 
 
-def get_nmaps_split(catfolder, pz_bins = [0.15,0.50,0.75,1.00,1.50]):
+def get_nmaps_split(catfolder):
 
     pz_i = pz_bins[:-1]
     pz_f = pz_bins[1:]
@@ -90,10 +94,10 @@ def get_nmaps_split(catfolder, pz_bins = [0.15,0.50,0.75,1.00,1.50]):
 
 
 
-def get_nmtmap(nmap_zbin):
+def get_nmtmap(catfolder, nmap_zbin):
 
     masked_fraction_file = catfolder + 'masked_fraction.fits'
-    masked_fraction = fits.open(masked_fraction_file)[0].data
+    masked_fraction = fits.open(masked_fraction_file)[0].data.ravel()
     fsk,_=read_flat_map(masked_fraction_file)
 
     mask_binary = np.ones_like(masked_fraction)
@@ -107,7 +111,7 @@ def get_nmtmap(nmap_zbin):
 
     field=nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly),
                                     weight.reshape([fsk.ny,fsk.nx]),
-                                    [delta.reshape([fsk.ny,fsk.nx])],templates=conts)
+                                    [delta.reshape([fsk.ny,fsk.nx])])
 
     return field
 
@@ -122,7 +126,7 @@ def get_power_spectra(field1, field2, bins):
         w = nmt.NmtWorkspaceFlat()
         w.compute_coupling_matrix(zbin1, zbin2, bins)
 
-        coupled_c_l = nmt.compute_coupled_cell_flat(zbin1, zbin2)
+        coupled_c_l = nmt.compute_coupled_cell_flat(zbin1, zbin2, bins)
         c_l.append(w.decouple_cell(coupled_c_l))
 
     return c_l
@@ -135,9 +139,9 @@ def get_power_spectra_all(catfolder):
 
     nmap, nmap_split1, nmap_split2 = get_nmaps_split(catfolder)
 
-    field0 = [get_nmap(thisnmap) for thisnmap in nmap]
-    field1 = [get_nmap(thisnmap) for thisnmap in nmap]
-    field2 = [get_nmap(thisnmap) for thisnmap in nmap]
+    field0 = [get_nmtmap(catfolder, thisnmap) for thisnmap in nmap]
+    field1 = [get_nmtmap(catfolder, thisnmap) for thisnmap in nmap_split1]
+    field2 = [get_nmtmap(catfolder, thisnmap) for thisnmap in nmap_split2]
 
     b = nmt.NmtBinFlat(ell_bins[:-1], ell_bins[1:])
 
@@ -164,9 +168,10 @@ def plot_power_spectra(catfolder):
     subplots = subplots.flatten()
     names = ['0,0', 's1,s1', 's1,s2', 's2,s2']
 
-    for x, (sp, cl, name) in enumerate(zip(subplots, cl_list, names)):
-        sp.plot(ells_uncoupled, cl)
-        sp.text(0.98, 0.02, name, transform = sp.transAxes, fontsize = 15)
+    for x, (sp, fieldcl, name) in enumerate(zip(subplots, cl_list, names)):
+        for y, zbin_cl in enumerate(fieldcl):
+            sp.plot(ells_uncoupled, zbin_cl)
+            sp.text(0.98, 0.02, name, transform = sp.transAxes, fontsize = 15)
 
 
     
