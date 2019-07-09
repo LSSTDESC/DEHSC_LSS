@@ -27,229 +27,237 @@ ell_bins = [100.0,200.0,300.0,400.0,600.0,800.0,1000.0,1400.0,1800.0,2200.0,3000
 pz_bins = [0.15,0.50,0.75,1.00,1.50]
 
 
-# modified from cat_mapper
-def get_nmaps(catfolder, pz_code = 'ephor_ab', pz_mark = 'best') :
-    """
-    Get number counts map from catalog
-    """
-    maps=[]
-    
-    if pz_code == 'ephor_ab':
-        pz_code_col = 'eab'
-    
-    cat=fits.open(catfolder + '/clean_catalog.fits')[1].data
-    column_mark='pz_'+pz_mark+'_'+pz_code_col
+class catalog:
+    def __init__(self, catfolder):
+        self.name = catfolder.split('_')[-3]
+        self.filepath = catfolder
 
-    for zi,zf in zip(pz_bins[:-1], pz_bins[1:]) :
-        msk_bin=(cat[column_mark]<=zf) & (cat[column_mark]>zi)
-        subcat=cat[msk_bin]
-        masked_fraction = catfolder + '/masked_fraction.fits'
-        fsk,_=read_flat_map(masked_fraction)
-        nmap=createCountsMap(subcat['ra'],subcat['dec'],fsk)
-        maps.append(nmap)
-    return np.array(maps)
+        self.cat = fits.open(self.filepath + 'clean_catalog.fits')[1].data
 
+        self.masked_fraction_fp = self.filepath + 'masked_fraction.fits'
+        self.masked_fraction = fits.open(self.masked_fraction_fp)[0].data.ravel()
+        self.mask_binary = np.ones_like(self.masked_fraction)
+        self.mask_binary[self.masked_fraction<0.5] = 0.
 
+        self.weight = self.masked_fraction * self.mask_binary
+        self.goodpix = np.where(self.mask_binary>0.1)[0]
 
-def get_nmaps_split(catfolder):
+        self.fsk,_ = read_flat_map(self.masked_fraction_fp)
 
-    pz_i = pz_bins[:-1]
-    pz_f = pz_bins[1:]
+        self.nmaps, self.nmaps_s1, self.nmaps_s2 = self.get_nmaps_split()
 
-    if catfolder[-1] != '/':
-        catfolder = catfolder + '/'
+        self.fields = [field(self, thisbin) for thisbin in self.nmaps]
+        self.fields_s1 = [field(self, thisbin) for thisbin in self.nmaps_s1]
+        self.fields_s2 = [field(self, thisbin) for thisbin in self.nmaps_s2]
 
-    thismap = get_nmaps(catfolder)
-    masked_fraction = catfolder + 'masked_fraction.fits'
-    fsk,_=read_flat_map(masked_fraction)
-    geometry = (fsk.ny, fsk.nx)
+        self.ell_bins = nmt.NmtBinFlat(ell_bins[:-1], ell_bins[1:])
+        self.ell_bins_uncpld = self.ell_bins.get_effective_ells()
 
-    newmaps = []
-    newmaps_split1 = []
-    newmaps_split2 = []
+        self.wsp = nmt.NmtWorkspaceFlat()
+        self.wsp.compute_coupling_matrix(self.fields[0].field, self.fields[0].field, self.ell_bins)
 
-    cutcounter = 0
-    bigcutcounter = 0
 
-    for binmap in thismap:
-        binmap_split1 = np.zeros(len(binmap))
-        
-        binmap_split1 = poisson(binmap/2.)
-        binmap_split2 = binmap - binmap_split1
-        cutcounter += len(np.where((binmap_split1 - binmap) > 0)[0])
-        bigcutcounter += len(np.where((binmap_split1 - binmap) > 2)[0])
-        
-        # Take care of "negative" galaxy count pixels
-        # Get rid of the negative galaxy counts while keeping binmap_split1 + binmap_split2 = binmap
-        
-        negative = np.where(binmap_split2 < 0)
-        binmap_split1[negative] = binmap_split1[negative] + binmap_split2[negative]
-        binmap_split2[negative] = 0
 
-        newmaps.append(binmap)
-        newmaps_split1.append(binmap_split1)
-        newmaps_split2.append(binmap_split2)
 
-    return newmaps, newmaps_split1, newmaps_split2
-
-
-
-def get_nmtmap(catfolder, nmap_zbin):
-
-    masked_fraction_file = catfolder + 'masked_fraction.fits'
-    masked_fraction = fits.open(masked_fraction_file)[0].data.ravel()
-    fsk,_=read_flat_map(masked_fraction_file)
-
-    mask_binary = np.ones_like(masked_fraction)
-
-    weight = masked_fraction * mask_binary
-    goodpix = np.where(mask_binary>0.1)[0]
-    Ngal = np.sum(nmap_zbin * mask_binary)
-    ndens = Ngal/np.sum(weight)
-    delta = np.zeros_like(weight)
-    delta[goodpix] = nmap_zbin[goodpix]/(ndens*masked_fraction[goodpix])-1
-
-    field=nmt.NmtFieldFlat(np.radians(fsk.lx),np.radians(fsk.ly),
-                                    weight.reshape([fsk.ny,fsk.nx]),
-                                    [delta.reshape([fsk.ny,fsk.nx])])
-
-    return field
-
-
-
-def get_power_spectra(field1, field2, bins):
-
-    c_l = []
-
-    for zbin1, zbin2 in zip(field1, field2):
-
-        w = nmt.NmtWorkspaceFlat()
-        w.compute_coupling_matrix(zbin1, zbin2, bins)
-
-        coupled_c_l = nmt.compute_coupled_cell_flat(zbin1, zbin2, bins)
-        c_l.append(w.decouple_cell(coupled_c_l))
-
-    return c_l
-
-
-
-
-
-def get_power_spectra_all(catfolder):
-
-    nmap, nmap_split1, nmap_split2 = get_nmaps_split(catfolder)
-
-    field0 = [get_nmtmap(catfolder, thisnmap) for thisnmap in nmap]
-    field1 = [get_nmtmap(catfolder, thisnmap) for thisnmap in nmap_split1]
-    field2 = [get_nmtmap(catfolder, thisnmap) for thisnmap in nmap_split2]
-
-    b = nmt.NmtBinFlat(ell_bins[:-1], ell_bins[1:])
-
-    ells_uncoupled = b.get_effective_ells()
-
-    pair_list = [(field0, field0), (field1, field1), (field1, field2), (field2, field2)]
-    
-    cl_list = []
-
-    for thisfield1, thisfield2 in pair_list:
-
-        cl_list.append(get_power_spectra(thisfield1, thisfield2, b))
-
-    return ells_uncoupled, cl_list
-
-
-
-def plot_power_spectra(catfolder):
-
-    ells_uncoupled, cl_list = get_power_spectra_all(catfolder)
-
-    fig, subplots = plt.subplots(2,2, figsize = (8,8))
-
-    subplots = subplots.flatten()
-    names = ['0,0', 's1,s1', 's1,s2', 's2,s2']
-
-    for x, (sp, fieldcl, name) in enumerate(zip(subplots, cl_list, names)):
-        for y, zbin_cl in enumerate(fieldcl):
-            sp.plot(ells_uncoupled, zbin_cl)
-            sp.text(0.98, 0.02, name, transform = sp.transAxes, fontsize = 15)
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-def plot_split_maps(save = False):
-
-    fullmap, splitmap1, splitmap2 = get_nmaps_split()
-
-    fig, ax = plt.subplots(len(newmaps), 2, figsize = (25,30), subplot_kw = {'projection': fsk.wcs})
-    for binmap1, binmap2, (axis1, axis2) in zip(newmaps_split1, newmaps_split2, ax):
-        fsk.view_map(binmap1, ax = axis1, addColorbar = False)
-        fsk.view_map(binmap2, ax = axis2, addColorbar = False)
-    
-    if save:
-        savefig('./nmap_split.pdf', bbox_inches = 'tight')
-
-
-
-class Tracer(object) :
-    def __init__(self,hdu_list,i_bin,fsk,mask_binary,masked_fraction,contaminants=None) :
+    # modified from cat_mapper
+    def get_nmaps(self, pz_code = 'ephor_ab', pz_mark = 'best') :
         """
-        Class used to define the information stored in each of the number density maps generated by CatMapper, which are then transformed into overdensity maps.
-        :param hdu_list: list of FITS HDUs containing the number density maps.
-        :param i_bin: which redshift bin to consider.
-        :param fsk: flatmaps.FlatSkyInfo object defining the geometry of the maps.
-        :param mask_binary: binary mask (which pixels to consider and which not to).
-        :param masked_fraction: masked fraction map.
-        :param contaminants: list of possible contaminant maps to deproject.
-        
-        This class then stores a number of data objects, the most important one being a pymaster `NmtFieldFlat` ready to use in power spectrum estimation.
+        Get number counts map from catalog
         """
-        #Read numbers map
-        self.fsk,nmap=read_flat_map(None,hdu=hdu_list[2*i_bin])
-        compare_infos(fsk,self.fsk)
+        maps=[]
+        
+        if pz_code == 'ephor_ab':
+            pz_code_col = 'eab'
+        
+        column_mark='pz_'+pz_mark+'_'+pz_code_col
 
-        #Read N(z)
-        self.nz_data=hdu_list[2*i_bin+1].data.copy()
+        for zi,zf in zip(pz_bins[:-1], pz_bins[1:]) :
+            msk_bin=(self.cat[column_mark]<=zf) & (self.cat[column_mark]>zi)
+            subcat=self.cat[msk_bin]
+            nmap=createCountsMap(subcat['ra'],subcat['dec'],self.fsk)
+            maps.append(nmap)
+        return np.array(maps)
 
-        #Make sure other maps are compatible
-        if not self.fsk.is_map_compatible(mask_binary) :
-            raise ValueError("Mask size is incompatible")
-        if not self.fsk.is_map_compatible(masked_fraction) :
-            raise ValueError("Mask size is incompatible")
-        if contaminants is not None :
-            for ic,c in enumerate(contaminants) :
-                if not self.fsk.is_map_compatible(c) :
-                    raise ValueError("%d-th contaminant template is incompatible"%ic)
-          
-        #Translate into delta map
-        self.masked_fraction=masked_fraction
-        self.weight=masked_fraction*mask_binary
-        goodpix=np.where(mask_binary>0.1)[0]
-        self.goodpix=goodpix
-        self.mask_binary=mask_binary
-        self.Ngal = np.sum(nmap*mask_binary)
-        ndens=np.sum(nmap*mask_binary)/np.sum(self.weight)
-        self.ndens_perad=ndens/(np.radians(self.fsk.dx)*np.radians(self.fsk.dy))
-        self.delta=np.zeros_like(self.weight)
-        self.delta[goodpix]=nmap[goodpix]/(ndens*masked_fraction[goodpix])-1
 
-        #Reshape contaminants
-        conts=None
-        if contaminants is not None :
-            conts=[[c.reshape([self.fsk.ny,self.fsk.nx])] for c in contaminants]
 
-        #Form NaMaster field
-        self.field=nmt.NmtFieldFlat(np.radians(self.fsk.lx),np.radians(self.fsk.ly),
-                                    self.weight.reshape([self.fsk.ny,self.fsk.nx]),
-                                    [self.delta.reshape([self.fsk.ny,self.fsk.nx])],
-templates=conts)
+    def get_nmaps_split(self):
+
+        pz_i = pz_bins[:-1]
+        pz_f = pz_bins[1:]
+
+        # thismap = get_nmaps(catfolder)
+        # masked_fraction = catfolder + 'masked_fraction.fits'
+        # fsk,_=read_flat_map(masked_fraction)
+        geometry = (self.fsk.ny, self.fsk.nx)
+
+        newmaps = []
+        newmaps_split1 = []
+        newmaps_split2 = []
+
+        cutcounter = 0
+        bigcutcounter = 0
+
+        for binmap in self.get_nmaps():
+            binmap_split1 = np.zeros(len(binmap))
+            
+            binmap_split1 = poisson(binmap/2.)
+            binmap_split2 = binmap - binmap_split1
+            cutcounter += len(np.where((binmap_split1 - binmap) > 0)[0])
+            bigcutcounter += len(np.where((binmap_split1 - binmap) > 2)[0])
+            
+            # Take care of "negative" galaxy count pixels
+            # Get rid of the negative galaxy counts while keeping binmap_split1 + binmap_split2 = binmap
+            
+            negative = np.where(binmap_split2 < 0)
+            binmap_split1[negative] = binmap_split1[negative] + binmap_split2[negative]
+            binmap_split2[negative] = 0
+
+            newmaps.append(binmap)
+            newmaps_split1.append(binmap_split1)
+            newmaps_split2.append(binmap_split2)
+
+        return newmaps, newmaps_split1, newmaps_split2
+
+
+
+    def get_power_spectra(self, field1, field2):
+
+        c_l = []
+
+        for zbin1, zbin2 in zip(field1, field2):
+
+            coupled_c_l = nmt.compute_coupled_cell_flat(zbin1.field, zbin2.field, self.ell_bins)
+            c_l.append(self.wsp.decouple_cell(coupled_c_l)[0])
+
+        return np.array(c_l)
+
+
+
+
+    def get_power_spectra_all(self):
+
+        pair_list = [(self.fields, self.fields), (self.fields_s1, self.fields_s1), 
+                (self.fields_s2, self.fields_s2), (self.fields_s1, self.fields_s2)]
+        
+        cl_list = []
+
+        for thisfield1, thisfield2 in pair_list:
+
+            cl_list.append(self.get_power_spectra(thisfield1, thisfield2))
+
+        return cl_list
+
+
+
+    def plot_power_spectra(self):
+
+        cl_list = self.get_power_spectra_all()
+
+        fig, subplots = plt.subplots(2,2, figsize = (8,8))
+
+        subplots = subplots.flatten()
+        names = ['0,0', 's1,s1', 's2,s2', 's1,s2']
+
+        for x, (sp, fieldcl, name) in enumerate(zip(subplots, cl_list, names)):
+            for y, zbin_cl in enumerate(fieldcl):
+                sp.plot(self.ell_bins_uncpld, zbin_cl)
+                sp.text(0.02, 0.02, name, transform = sp.transAxes, fontsize = 18, ha = 'left', va = 'bottom')
+
+            sp.set_xscale('log')
+            sp.set_yscale('log')
+            # sp.set_xlabel(r'$\ell$')
+            # sp.set_ylabel(r'C_$\ell$')
+
+
+        fig.text(0.5, 0.05, r'$\ell$', fontsize = 24)
+        fig.text(0.06, 0.5, r'C$_\ell$', fontsize = 24, ha = 'center', va = 'center', rotation = 'vertical')
+        fig.text(0.5, 0.9, self.name, fontsize = 24, ha = 'center', va = 'bottom')
+
+        return fig, subplots
+
+
+
+    def plot_shotnoise_test(self):
+
+        cl_list = self.get_power_spectra_all()
+
+        fig = plt.figure(figsize = (8,8))
+        sp = fig.add_subplot(111)
+
+        names = ['0,0', 's1,s1', 's2,s2', 's1,s2']
+
+        s1s1 = cl_list[1]
+        s2s2 = cl_list[2]
+        s1s2 = cl_list[3]
+
+        for x, (zbin11, zbin22, zbin12, noise) in enumerate(zip(s1s1, s2s2, s1s2, self.calc_shotnoise(self.fields))):
+
+            sp.plot(self.ell_bins_uncpld, noise, linewidth = 1.5, color = 'C' + str(x), zorder = 0, alpha = 0.4)
+            sp.plot(self.ell_bins_uncpld, 0.25 * (zbin11 + zbin22 - 2.*zbin12), linewidth = 2, color = 'C' + str(x), zorder = 1)
+
+        sp.set_xscale('log')
+        sp.set_yscale('log')
+
+        sp.plot([],[],linewidth = 1.5, color = 'C0', alpha = 0.4, label = 'Analytic')
+        sp.plot([],[],linewidth = 2, color = 'C0', label = 'Split Map')
+
+        sp.legend(loc = 'upper right', fontsize = 18)
+
+        sp.set_xlabel(r'$\ell$', fontsize = 20)
+        sp.set_ylabel('Estimated Shot Noise', fontsize = 20)
+        sp.set_title(self.name, fontsize = 24)
+
+        # fig.text(0.5, 0.03, r'$\ell$', fontsize = 20)
+        # fig.text(0.06, 0.5, r'<s1,s1> + <s2, s2> - 2 <s1, s2>', fontsize = 20, ha = 'center', va = 'center', rotation = 'vertical')
+        # fig.text(0.02, 0.5, r'Estimated Shot Noise', fontsize = 20, ha = 'center', va = 'center', rotation = 'vertical')
+        # fig.text(0.5, 0.9, catname, fontsize = 24, ha = 'center', va = 'bottom')
+
+
+
+        return fig, sp
+
+
+    # Modified from powerspecter.py
+    def calc_shotnoise(self, fieldlist):
+
+        nbins = len(pz_bins)-1
+        nell = len(self.ell_bins_uncpld)
+
+        nls_all=np.zeros([nbins, nell])
+        for i in range(nbins) :
+            corrfac=np.sum(self.weight)/(self.fsk.nx*self.fsk.ny)
+            nl=np.ones(nell)*corrfac/fieldlist[i].ndens_perad
+            nls_all[i]=self.wsp.decouple_cell([nl])[0]
+        return nls_all
+
+
+
+
+
+
+    def plot_split_maps(save = False):
+
+        fullmap, splitmap1, splitmap2 = get_nmaps_split()
+
+        fig, ax = plt.subplots(len(newmaps), 2, figsize = (25,30), subplot_kw = {'projection': fsk.wcs})
+        for binmap1, binmap2, (axis1, axis2) in zip(newmaps_split1, newmaps_split2, ax):
+            fsk.view_map(binmap1, ax = axis1, addColorbar = False)
+            fsk.view_map(binmap2, ax = axis2, addColorbar = False)
+        
+        if save:
+            savefig('./nmap_split.pdf', bbox_inches = 'tight')
+
+
+
+class field:
+    def __init__(self, catalog, nmap_zbin):
+        
+        Ngal = np.sum(nmap_zbin * catalog.mask_binary)
+        self.ndens = Ngal/np.sum(catalog.weight)
+        self.ndens_perad=self.ndens/(np.radians(catalog.fsk.dx)*np.radians(catalog.fsk.dy))
+        self.delta = np.zeros_like(catalog.weight)
+        self.delta[catalog.goodpix] = nmap_zbin[catalog.goodpix]/(self.ndens*catalog.masked_fraction[catalog.goodpix])-1
+
+        self.field = nmt.NmtFieldFlat(np.radians(catalog.fsk.lx),np.radians(catalog.fsk.ly),
+                                        catalog.weight.reshape([catalog.fsk.ny,catalog.fsk.nx]),
+                                        [self.delta.reshape([catalog.fsk.ny,catalog.fsk.nx])])
