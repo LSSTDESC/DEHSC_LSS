@@ -30,6 +30,9 @@ pz_bins = [0.15,0.50,0.75,1.00,1.50]
 
 class catalog:
     def __init__(self, catfolder):
+        """
+        Holds all of the information relevant to a given HSC field
+        """
         self.name = catfolder.split('_')[-3]
         self.filepath = catfolder
 
@@ -59,28 +62,13 @@ class catalog:
 
 
 
-
-    # modified from cat_mapper
-    def get_nmaps(self, pz_code = 'ephor_ab', pz_mark = 'best') :
-        """
-        Get number counts map from catalog
-        """
-        maps=[]
-        
-        if pz_code == 'ephor_ab':
-            pz_code_col = 'eab'
-        
-        column_mark='pz_'+pz_mark+'_'+pz_code_col
-
-        for zi,zf in zip(pz_bins[:-1], pz_bins[1:]) :
-            msk_bin=(self.cat[column_mark]<=zf) & (self.cat[column_mark]>zi)
-            subcat=self.cat[msk_bin]
-            nmap=createCountsMap(subcat['ra'],subcat['dec'],self.fsk)
-            maps.append(nmap)
-        return np.array(maps)
-
-
+    # Modified from catmapper.py
     def get_nmaps_split(self, pz_code = 'ephor_ab', pz_mark = 'best'):
+        """
+        Calculates the number map for a given catalog and splits it into two halves.
+
+        Returns the full number map, 1st split, and 2nd split
+        """
 
         maps = []
         maps_split1 = []
@@ -108,6 +96,10 @@ class catalog:
 
     def get_power_spectra(self, field1, field2):
 
+        """
+        Calculates the power spectrum for a given pair of number maps
+        """
+
         c_l = []
 
         for zbin1, zbin2 in zip(field1, field2):
@@ -122,6 +114,10 @@ class catalog:
 
     def get_power_spectra_all(self):
 
+        """
+        Calculates the power spectra for various combinations of the original and split number maps
+        """
+
         pair_list = [(self.fields, self.fields), (self.fields_s1, self.fields_s1), 
                 (self.fields_s2, self.fields_s2), (self.fields_s1, self.fields_s2)]
         
@@ -135,7 +131,29 @@ class catalog:
 
 
 
+    # Modified from powerspecter.py
+    def calc_shotnoise(self, fieldlist):
+        """
+        Calculates the theoretical shot noise for a list of redshift bins
+        """
+
+        nbins = len(pz_bins)-1
+        nell = len(self.ell_bins_uncpld)
+
+        nls_all=np.zeros([nbins, nell])
+        for i in range(nbins) :
+            corrfac=np.sum(self.weight)/(self.fsk.nx*self.fsk.ny)
+            nl=np.ones(nell)*corrfac/fieldlist[i].ndens_perad
+            nls_all[i]=self.wsp.decouple_cell([nl])[0]
+        return nls_all
+
+
+
     def plot_power_spectra(self, yaxis = 'log'):
+
+        """
+        Plots the power spectra for <N,N>, <s1,s1>, <s2,s2>, <s1,s2> where N is the original number map and s1, s2 are the two split halves
+        """
 
         cl_list = self.get_power_spectra_all()
 
@@ -164,6 +182,10 @@ class catalog:
 
 
     def plot_shotnoise_test(self):
+
+        """
+        Plots the shot noise estimate from 0.25*(<s1,s1> + <s2,s2> - 2<s1,s2>) and the theoretically calculated shot noise for a catalog
+        """
 
         cl_list = self.get_power_spectra_all()
 
@@ -199,33 +221,15 @@ class catalog:
         return fig, sp
 
 
-    def plot_shotnoise_avg_test(self):
-
-        cl_list = self.get_power_spectra_all()
-
-        fig = plt.figure(figsize = (8,8))
-        sp = fig.add_subplot(111)
-
-
-
-
-    # Modified from powerspecter.py
-    def calc_shotnoise(self, fieldlist):
-
-        nbins = len(pz_bins)-1
-        nell = len(self.ell_bins_uncpld)
-
-        nls_all=np.zeros([nbins, nell])
-        for i in range(nbins) :
-            corrfac=np.sum(self.weight)/(self.fsk.nx*self.fsk.ny)
-            nl=np.ones(nell)*corrfac/fieldlist[i].ndens_perad
-            nls_all[i]=self.wsp.decouple_cell([nl])[0]
-        return nls_all
 
 
 class field:
     def __init__(self, catalog, nmap_zbin):
         
+        """
+        Holds all of the relevant information for a given redshift bin number map
+        """
+
         Ngal = np.sum(nmap_zbin * catalog.mask_binary)
         self.ndens = Ngal/np.sum(catalog.weight)
         self.ndens_perad=self.ndens/(np.radians(catalog.fsk.dx)*np.radians(catalog.fsk.dy))
@@ -239,6 +243,10 @@ class field:
 
 
 def plot_shotnoise_avg_test():
+
+    """
+    Plots the average shot noise estimates across all of the HSC fields
+    """
 
     ells = None
     theoretical_noise = [[] for x in range(len(pz_bins)-1)]
