@@ -16,6 +16,7 @@ from hsc_lss.flatmaps import read_flat_map, FlatMapInfo
 from hsc_lss.map_utils import createCountsMap
 from hsc_lss.tracer import Tracer
 import pymaster as nmt
+from tqdm import tqdm
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
@@ -79,44 +80,29 @@ class catalog:
         return np.array(maps)
 
 
+    def get_nmaps_split(self, pz_code = 'ephor_ab', pz_mark = 'best'):
 
-    def get_nmaps_split(self):
+        maps = []
+        maps_split1 = []
+        maps_split2 = []
 
-        pz_i = pz_bins[:-1]
-        pz_f = pz_bins[1:]
+        if pz_code == 'ephor_ab':
+            pz_code_col = 'eab'
 
-        # thismap = get_nmaps(catfolder)
-        # masked_fraction = catfolder + 'masked_fraction.fits'
-        # fsk,_=read_flat_map(masked_fraction)
-        geometry = (self.fsk.ny, self.fsk.nx)
+        column_mark='pz_'+pz_mark+'_'+pz_code_col
 
-        newmaps = []
-        newmaps_split1 = []
-        newmaps_split2 = []
-
-        cutcounter = 0
-        bigcutcounter = 0
-
-        for binmap in self.get_nmaps():
-            binmap_split1 = np.zeros(len(binmap))
-            
-            binmap_split1 = poisson(binmap/2.)
-            binmap_split2 = binmap - binmap_split1
-            cutcounter += len(np.where((binmap_split1 - binmap) > 0)[0])
-            bigcutcounter += len(np.where((binmap_split1 - binmap) > 2)[0])
-            
-            # Take care of "negative" galaxy count pixels
-            # Get rid of the negative galaxy counts while keeping binmap_split1 + binmap_split2 = binmap
-            
-            negative = np.where(binmap_split2 < 0)
-            binmap_split1[negative] = binmap_split1[negative] + binmap_split2[negative]
-            binmap_split2[negative] = 0
-
-            newmaps.append(binmap)
-            newmaps_split1.append(binmap_split1)
-            newmaps_split2.append(binmap_split2)
-
-        return newmaps, newmaps_split1, newmaps_split2
+        for zi,zf in zip(pz_bins[:-1], pz_bins[1:]) :
+            msk_bin=(self.cat[column_mark]<=zf) & (self.cat[column_mark]>zi)
+            subcat=self.cat[msk_bin]
+            index_split1 = np.random.choice(np.arange(len(subcat['ra'])), int(len(subcat['ra'])/2), replace = False)
+            index_split2 = np.delete(np.arange(len(subcat['ra'])), index_split1)
+            nmap=createCountsMap(subcat['ra'],subcat['dec'],self.fsk)
+            nmap_split1 = createCountsMap(subcat['ra'][index_split1], subcat['dec'][index_split1], self.fsk)
+            nmap_split2 = createCountsMap(subcat['ra'][index_split2], subcat['dec'][index_split2], self.fsk)
+            maps.append(nmap)
+            maps_split1.append(nmap_split1)
+            maps_split2.append(nmap_split2)
+        return np.array(maps), np.array(maps_split1), np.array(maps_split2)
 
 
 
@@ -149,7 +135,7 @@ class catalog:
 
 
 
-    def plot_power_spectra(self):
+    def plot_power_spectra(self, yaxis = 'log'):
 
         cl_list = self.get_power_spectra_all()
 
@@ -164,7 +150,7 @@ class catalog:
                 sp.text(0.02, 0.02, name, transform = sp.transAxes, fontsize = 18, ha = 'left', va = 'bottom')
 
             sp.set_xscale('log')
-            sp.set_yscale('log')
+            sp.set_yscale(yaxis)
             # sp.set_xlabel(r'$\ell$')
             # sp.set_ylabel(r'C_$\ell$')
 
@@ -183,8 +169,6 @@ class catalog:
 
         fig = plt.figure(figsize = (8,8))
         sp = fig.add_subplot(111)
-
-        names = ['0,0', 's1,s1', 's2,s2', 's1,s2']
 
         s1s1 = cl_list[1]
         s2s2 = cl_list[2]
@@ -212,9 +196,17 @@ class catalog:
         # fig.text(0.02, 0.5, r'Estimated Shot Noise', fontsize = 20, ha = 'center', va = 'center', rotation = 'vertical')
         # fig.text(0.5, 0.9, catname, fontsize = 24, ha = 'center', va = 'bottom')
 
-
-
         return fig, sp
+
+
+    def plot_shotnoise_avg_test(self):
+
+        cl_list = self.get_power_spectra_all()
+
+        fig = plt.figure(figsize = (8,8))
+        sp = fig.add_subplot(111)
+
+
 
 
     # Modified from powerspecter.py
@@ -231,24 +223,6 @@ class catalog:
         return nls_all
 
 
-
-
-
-
-    def plot_split_maps(save = False):
-
-        fullmap, splitmap1, splitmap2 = get_nmaps_split()
-
-        fig, ax = plt.subplots(len(newmaps), 2, figsize = (25,30), subplot_kw = {'projection': fsk.wcs})
-        for binmap1, binmap2, (axis1, axis2) in zip(newmaps_split1, newmaps_split2, ax):
-            fsk.view_map(binmap1, ax = axis1, addColorbar = False)
-            fsk.view_map(binmap2, ax = axis2, addColorbar = False)
-        
-        if save:
-            savefig('./nmap_split.pdf', bbox_inches = 'tight')
-
-
-
 class field:
     def __init__(self, catalog, nmap_zbin):
         
@@ -261,3 +235,56 @@ class field:
         self.field = nmt.NmtFieldFlat(np.radians(catalog.fsk.lx),np.radians(catalog.fsk.ly),
                                         catalog.weight.reshape([catalog.fsk.ny,catalog.fsk.nx]),
                                         [self.delta.reshape([catalog.fsk.ny,catalog.fsk.nx])])
+
+
+
+def plot_shotnoise_avg_test():
+
+    ells = None
+    theoretical_noise = [[] for x in range(len(pz_bins)-1)]
+    shot_estimate = [[] for x in range(len(pz_bins)-1)]
+
+    for catnum, catalog_fp in enumerate(tqdm(catalogs)):
+
+        thiscat = catalog(catalog_fp)
+
+        if not hasattr(ells, '__iter__'):
+            ells = thiscat.ell_bins_uncpld
+
+        cl_list = thiscat.get_power_spectra_all()
+
+        s1s1 = cl_list[1]
+        s2s2 = cl_list[2]
+        s1s2 = cl_list[3]
+
+        for zbin11, zbin22, zbin12, noise, this_theor_noise, this_shot_est in zip(s1s1, s2s2, s1s2, thiscat.calc_shotnoise(thiscat.fields), theoretical_noise, shot_estimate):
+
+            this_theor_noise.append(noise)
+            this_shot_est.append(0.25 * (zbin11 + zbin22 - 2.*zbin12))
+
+    theoretical_noise = np.array(theoretical_noise)
+    shot_estimate = np.array(shot_estimate)
+
+    avg_theoretical_noise = np.average(theoretical_noise, axis = 1)
+    avg_shot_estimate = np.average(shot_estimate, axis = 1)
+
+    fig = plt.figure(figsize = (8,8))
+    sp = fig.add_subplot(111)
+
+    for znum, (this_atn, this_ase) in enumerate(zip(avg_theoretical_noise, avg_shot_estimate)):
+
+        sp.plot(ells, avg_theoretical_noise[znum], linewidth = 1.5, color = 'C' + str(znum), zorder = 0, alpha = 0.4)
+        sp.plot(ells, avg_shot_estimate[znum], linewidth = 2, color = 'C' + str(znum), zorder = 1)
+
+    sp.set_xscale('log')
+    sp.set_yscale('log')
+
+    sp.plot([],[],linewidth = 1.5, color = 'C0', alpha = 0.4, label = 'Analytic')
+    sp.plot([],[],linewidth = 2, color = 'C0', label = 'Split Map')
+
+    sp.legend(loc = 'upper right', fontsize = 18)
+
+    sp.set_xlabel(r'$\ell$', fontsize = 20)
+    sp.set_ylabel('Estimated Shot Noise', fontsize = 20)
+    
+    return fig, sp
