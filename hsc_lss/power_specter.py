@@ -28,9 +28,9 @@ class PowerSpecter(PipelineStage) :
                     'depth_cut':24.5,'band':'i','mask_thr':0.5,'guess_spectrum':'NONE',
                     'gaus_covar_type':'analytic','oc_all_bands':True,
                     'mask_systematics':False,'noise_bias_type':'analytic',
-                    'output_run_dir':None}
+                    'output_run_dir':None,'sys_collapse_type':'avg'}
 
-    def read_map_bands(self,fname,read_bands,bandname) :
+    def read_map_bands(self,fname,read_bands,bandname,offset=0) :
         """
         Reads maps from file.
         :param fname: file name
@@ -38,14 +38,18 @@ class PowerSpecter(PipelineStage) :
         :param bandname: if `read_bands==False`, then read only the map for this band.
         """
         if read_bands :
-            i_map=-1
+            i_map=[0+5*offset,
+                   1+5*offset,
+                   2+5*offset,
+                   3+5*offset,
+                   4+5*offset]
         else :
-            i_map=['g','r','i','z','y'].index(bandname)
+            i_map=['g','r','i','z','y'].index(bandname)+5*offset
         fskb,temp=read_flat_map(fname,i_map=i_map)
         compare_infos(self.fsk,fskb)
-        if i_map!=-1 :
+        if not read_bands:
             temp=[temp]
-    
+
         return temp
 
     def get_sacc_windows(self,wsp) :
@@ -408,9 +412,10 @@ class PowerSpecter(PipelineStage) :
                                     dtype=[('name','|U32'),('band','|U4'),('gl','|U4'),('thr','<f8')])
             for d in data_syst :
                 #Read systematic
-                if d['name'].startswith('oc_') :
-                    sysmap=self.read_map_bands(self.get_input(d['name'][3:]+'_maps'),False,d['band'])[0]
-                elif d['name']=='dust' :
+                if d['name'].startswith('oc_'):
+                    sysmap=self.read_map_bands(self.get_input(d['name'][3:]+'_maps'),False,d['band'],
+                                               offset=self.sys_map_offset)[0]
+                elif d['name']=='dust':
                     sysmap=self.read_map_bands(self.get_input('dust_map'),False,d['band'])[0]
                 else :
                     raise KeyError("Unknown systematic name "+d['name'])
@@ -467,7 +472,8 @@ class PowerSpecter(PipelineStage) :
         #Observing conditions
         for oc in self.config['oc_dpj_list'] :
             for t in self.read_map_bands(self.get_input(oc+'_maps'),
-                                         self.config['oc_all_bands'],self.config['band']) :
+                                         self.config['oc_all_bands'],
+                                         self.config['band'],offset=self.sys_map_offset) :
                 temps.append(t)
         temps=np.array(temps)
         #Remove mean
@@ -500,6 +506,12 @@ class PowerSpecter(PipelineStage) :
         if self.config['guess_spectrum']!='NONE' :
             if not os.path.isfile(self.config['guess_spectrum']) :
                 raise ValueError('Guess spectrum must be either \'NONE\' or an existing ASCII file')
+        if self.config['sys_collapse_type']=='average':
+            self.sys_map_offset=0
+        elif self.config['sys_collapse_type']=='median':
+            self.sys_map_offset=2
+        else:
+            raise ValueError('Systematic map flattening mode %s unknown. Use \'average\' or \'median\''%(self.config['sys_collapse_type']))
 
         return
 
