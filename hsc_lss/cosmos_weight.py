@@ -105,6 +105,7 @@ class COSMOSWeight(PipelineStage) :
         mask=dist_2d.degree*60*60<1 #        
         cat_good=cat[mask]
         cat30_good=cat30[cosmos_index[mask]]
+        cosmos_index_matched = cosmos_index[mask]
 
         t1=Table.from_pandas(pd.DataFrame(cat30_good))
         keys_t2=['gcmodel_mag','rcmodel_mag','icmodel_mag','zcmodel_mag',
@@ -142,10 +143,12 @@ class COSMOSWeight(PipelineStage) :
         ####
         # Write output
         keys_t1=['ALPHA_J2000','DELTA_J2000','gcmodel_mag','rcmodel_mag','icmodel_mag','zcmodel_mag','ycmodel_mag',
-              'pz_best_eab','pz_best_frz','pz_best_nnz','PHOTOZ']
+              'pz_best_eab','pz_best_frz','pz_best_nnz','PHOTOZ', \
+              'MNUV', 'MU', 'MB', 'MV', 'MR', 'MI', 'MZ', 'MY', 'MJ', 'MH', 'MK']
         t1=Table.from_pandas(pd.DataFrame(np.transpose([cat_matched[k] for k in keys_t1]),columns=keys_t1))
         t2=Table.from_pandas(pd.DataFrame(np.transpose(weights), columns= ['weight']))
-        cat_weights=hstack([t1, t2])
+        t3=Table.from_pandas(pd.DataFrame(np.transpose(cosmos_index_matched), columns= ['cosmos_index_matched']))
+        cat_weights=hstack([t1, t2, t3])
         cat_weights.write(self.get_output('cosmos_weights'),overwrite=True)
 
 if __name__ == '__main__':
