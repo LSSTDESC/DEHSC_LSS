@@ -15,18 +15,22 @@ class SystMapper(PipelineStage) :
     outputs=[('ccdtemp_maps',FitsFile),('airmass_maps',FitsFile),('exptime_maps',FitsFile),
              ('skylevel_maps',FitsFile),('sigma_sky_maps',FitsFile),('seeing_maps',FitsFile),
              ('ellipt_maps',FitsFile),('nvisit_maps',FitsFile)]
-    config_options={'hist_nbins':40}
+    config_options={'ccd_drop':[9]}
 
     def run(self) :
         bands=['g','r','i','z','y']
         quants=['ccdtemp','airmass','exptime','skylevel','sigma_sky','seeing','ellipt']
-        quants_islog=[False,False,False,True,True,False,False]
 
         print("Reading sample map")
         fsk,mp=read_flat_map(self.get_input('masked_fraction'))
 
         print("Reading metadata")
         data=fits.open(self.get_input('frames_data'))[1].data
+        #Drop CCDs if needed
+        for ccd_id in self.config['ccd_drop']:
+            msk=data['ccd_id']!=ccd_id
+            print('will drop %d frames from bad CCDs'%(np.sum(~msk)))
+            data=data[msk]
 
         print("Computing frame coords")
         ix_ll,iy_ll,in_ll=fsk.pos2pix2d(data['llcra'],data['llcdecl'])
@@ -36,6 +40,7 @@ class SystMapper(PipelineStage) :
         #Keep only frames that fit inside the field
         is_in=np.logical_or(in_ll,np.logical_or(in_ul,np.logical_or(in_ur,in_lr)))
         data=data[is_in]
+        coadd_weights=1./data['skylevel']
         nframes=len(data)
         ix_ll=ix_ll[is_in]; iy_ll=iy_ll[is_in]; 
         ix_ul=ix_ul[is_in]; iy_ul=iy_ul[is_in]; 
@@ -81,28 +86,29 @@ class SystMapper(PipelineStage) :
             #Estimate intersection area
             def get_intersect_area(px) :
                 return pfr.intersection(px).area
-            areas=list(map(get_intersect_area,pix_in_range[touched]))
+            areas=np.array(list(map(get_intersect_area,pix_in_range[touched])))
             pix_areas.append(areas)
 
         print("Computing systematics maps")
         #Initialize maps
         nvisits={b:np.zeros_like(mp) for b in bands}
         oc_maps={}
-        for l,q in zip(quants_islog,quants) :
-            oc_maps[q]={b:ObsCond(q,data[q],fsk.nx,fsk.ny,nbins=self.config['hist_nbins'],is_log=l) 
-                        for b in bands}
+        for q in quants :
+            oc_maps[q]={b:ObsCond(q,fsk.nx,fsk.ny) for b in bands}
         #Fill maps    
         for ip,pfr in enumerate(polyframe) :
             band=data['filter'][ip]
             indices=pix_indices[ip]
             areas=pix_areas[ip]
-            nvisits[band][pix_indices[ip]]+=pix_areas[ip]
+            weight=coadd_weights[ip]
+            nvisits[band][indices]+=areas
             for quant in quants :
-                d=data[quant][ip]
-                if d<=-9999. :
-                    continue
-                ib=oc_maps[quant][band].get_bin_number(d)
-                oc_maps[quant][band].map[indices,ib]+=areas
+                oc_maps[quant][band].add_frame(indices,data[quant][ip],areas*weight)
+
+        #Close maps
+        for q in quants:
+            for b in bands:
+                oc_maps[q][b].complete_map()
 
         print("Saving maps")
         #Nvisits
@@ -111,8 +117,12 @@ class SystMapper(PipelineStage) :
         fsk.write_flat_map(self.get_output('nvisit_maps'),maps_save,descripts)
         #Observing conditions
         for q in quants :
-            maps_save=np.array([oc_maps[q][b].collapse_map_mean() for b in bands])
-            descripts=np.array(['mean '+q+'-'+b for b in bands])
+            maps_save=np.array([oc_maps[q][b].collapse_map_mean() for b in bands] +
+                               [oc_maps[q][b].collapse_map_std() for b in bands] +
+                               [oc_maps[q][b].collapse_map_median() for b in bands])
+            descripts=np.array(['mean '+q+'-'+b for b in bands] +
+                               ['std '+q+'-'+b for b in bands] +
+                               ['median '+q+'-'+b for b in bands])
             fsk.write_flat_map(self.get_output(q+'_maps'),maps_save,descripts)
 
 

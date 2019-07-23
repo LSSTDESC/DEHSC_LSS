@@ -12,7 +12,7 @@ ReduceCat:
     depth_method: fluxerr
 
 SystMapper:
-    hist_nbins: 40
+    ccd_drop: [9]
 
 COSMOSWeight:
     n_neighbors: 20
