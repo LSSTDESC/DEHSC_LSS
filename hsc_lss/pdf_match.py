@@ -31,7 +31,9 @@ class PDFMatch(PipelineStage) :
 
         #Read pdfs from frames
         for alg in pz_algs :
-            if os.path.isfile(prefix_out+"_"+alg+".fits") :
+            filename=prefix_out+"_"+alg+".fits"
+            str_out+=alg+" "+filename+"\n"
+            if os.path.isfile(filename) :
                 print(alg+" found")
                 continue
 
@@ -102,7 +104,6 @@ class PDFMatch(PipelineStage) :
             # save it
             hdul = fits.HDUList([primary_hdu, pdf_hdu, bin_hdu])
             filename=prefix_out+"_"+alg+".fits"
-            str_out+=alg+" "+filename+"\n"
             hdul.writeto(filename, overwrite=True)
             
             print('\nSaved %s'%filename)

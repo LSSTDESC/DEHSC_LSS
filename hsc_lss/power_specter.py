@@ -28,7 +28,7 @@ class PowerSpecter(PipelineStage) :
                     'depth_cut':24.5,'band':'i','mask_thr':0.5,'guess_spectrum':'NONE',
                     'gaus_covar_type':'analytic','oc_all_bands':True,
                     'mask_systematics':False,'noise_bias_type':'analytic',
-                    'output_run_dir':None,'sys_collapse_type':'avg'}
+                    'output_run_dir':None,'sys_collapse_type':'average'}
 
     def read_map_bands(self,fname,read_bands,bandname,offset=0) :
         """
@@ -38,16 +38,16 @@ class PowerSpecter(PipelineStage) :
         :param bandname: if `read_bands==False`, then read only the map for this band.
         """
         if read_bands :
-            i_map=[0+5*offset,
-                   1+5*offset,
-                   2+5*offset,
-                   3+5*offset,
-                   4+5*offset]
+            temp=[]
+            for i in range(5):
+                i_map=i+5*offset
+                fskb,t=read_flat_map(fname,i_map=i_map)
+                compare_infos(self.fsk,fskb)
+                temp.append(t)
         else :
             i_map=['g','r','i','z','y'].index(bandname)+5*offset
-        fskb,temp=read_flat_map(fname,i_map=i_map)
-        compare_infos(self.fsk,fskb)
-        if not read_bands:
+            fskb,temp=read_flat_map(fname,i_map=i_map)
+            compare_infos(self.fsk,fskb)
             temp=[temp]
 
         return temp

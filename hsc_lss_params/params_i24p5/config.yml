@@ -40,3 +40,4 @@ PowerSpecter:
     oc_all_bands: True
 #    oc_all_bands: False
     output_run_dir: CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1
+    sys_collapse_type: average
