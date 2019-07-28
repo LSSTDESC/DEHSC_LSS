@@ -11,12 +11,15 @@
 %\usepackage[colorlinks,linkcolor=red,citecolor=blue,urlcolor=blue ]{hyperref}
 \usepackage[utf8]{inputenc}
 \usepackage{lipsum}
+\usepackage{xfrac}
+\usepackage{aas_macros}
+\usepackage{mathrsfs}
 \newcommand{\nv}{\vec{\theta}}
-\newcommand{\pasj}{Publications of the ASJ}
-\newcommand{\aap}{Astronomy and Astrophysics}
-\newcommand{\apj}{Astrophysical Journal}
-\newcommand{\apjs}{Astrophysical Journal, Supplement}
-\newcommand{\mnras}{Monthly Notices of the RAS}
+%\newcommand{\pasj}{Publications of the ASJ}
+%\newcommand{\aap}{Astronomy and Astrophysics}
+%\newcommand{\apj}{Astrophysical Journal}
+%\newcommand{\apjs}{Astrophysical Journal, Supplement}
+%\newcommand{\mnras}{Monthly Notices of the RAS}
 \newcommand{\todo}[1]{{\bf TODO: #1}}
 
 \newcommand{\as}[1]{{\textcolor{blue}{[AS: #1]}}}
@@ -111,10 +114,6 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     where $x=k R_\Delta/c$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. The concentration-mass relation $c(M)$ also depends on the choice of $\Delta$, and we follow the parametrization of Duffy et al. \todo{cite}.
 
     \todo{Possibly extend this to describe $P_{gm}$}
-    
-  \subsection{Covariance matrices}\label{ssec:theory.ssc}
-    \todo{Possibly also describe theory modelling behind covariance. }
-    \lipsum[3]
 
 \section{Data}\label{sec:data}
   We use data from the Hyper Suprime-Cam Subaru Strategic Program first data release (HSC DR1 hereon)\footnote{https://hsc-release.mtk.nao.ac.jp}. The release is extensively documented in \cite{2018PASJ...70S...8A}, and we only provide the details of the galaxy sample and associated data used for our clustering analysis.
@@ -183,13 +182,13 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
  \end{table}  
  
  
- \begin{table}
- \centering
- \begin{tabular}{|c|c|}
- \hline
- Field & Number of objects \\
- \hline
- WIDE  
+% \begin{table}
+% \centering
+% \begin{tabular}{|c|c|}
+% \hline
+% Field & Number of objects \\
+% \hline
+% WIDE  
   All objects have photometric redshift measurements from 6 different codes as presented in \citet{2018PASJ...70S...9T}. We use the best-fit redshift assigned by the {\tt ephor\_ab} method as a marker to divide the sample into 4 redshift bins containing roughly equal numbers of galaxies. A peliminary Fisher matrix study showed that the information content saturates quickly when slicing the data into finer redshift bins. The redshift bins are described in Table \todo{make table}, and the associated redshift distributions are described in Section \ref{ssec:methods.nz}.
 
   \todo{Describe DR1 and sample selection. Describe redshift binning.}
@@ -270,7 +269,8 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \todo{More details may be needed on bandpower binning, bandpower windows, the exact procedure to compute $\tilde{N}_\ell$ etc.}
 
   \subsection{Covariance matrices}\label{ssec:methods.covar}
-    We use an analytical procedure to estimate the uncertainties of our measured power spectra, inspired in the methods used by \todo{cites}. As shown in \todo{cite}, the covariance matrix for large-scale structure data can be decomposed into a disconnected trispectrum part, essentially equivalent to the covariance of a Gaussian random field with the same power spectrum as the data, a connected part, caused by the non-Gaussian nature of the density field, and a super-sample covariance term (labelled SSC here), caused by the coherent shift in the amplitude of density fluctuations within the surveyed volume caused by long wavelength modes larger than the survey. As shown by \todo{cite}, the Gaussian and SSC terms dominate the covariance matrix for cosmic shear data, and the connected terms can be safely disregarded. Under the assumption that this results holds also for tomographic galaxy clustering, our fiducial covariance matrix is therefore constructed from these two contributions.
+  
+We use an analytical procedure to estimate the uncertainties of our measured power spectra, inspired in the methods used by \todo{cites}. As shown in \todo{cite}, the covariance matrix for large-scale structure data can be decomposed into a disconnected trispectrum part, essentially equivalent to the covariance of a Gaussian random field with the same power spectrum as the data, a connected part, caused by the non-Gaussian nature of the density field, and a super-sample covariance term (labelled SSC here), caused by the coherent shift in the amplitude of density fluctuations within the surveyed volume caused by long wavelength modes larger than the survey. 
     
     We estimate the Gaussian covariance of the pseudo-$C_\ell$ estimator as described in \todo{cite}. In the absence of any approximations, the covariance of the observed power spectra is given by
     \begin{equation}
@@ -286,23 +286,62 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{equation}
     Where $M_{\ell\ell'}$ are the mode-coupling matrices described in the previous section, except now are computed from the products of two masks. This approach has been shown by \todo{cite} to yield a very good approximation for the power spectrum covariance, fully accounting for the effects of mode coupling due to survey geometry. \todo{we did check this against gaussian simulations for this paper too. Do we want to show this? We'd need to regenerate those simulations and the corresponding plots.}
     
-    We compute the super-sample covariance contribution following the treatment of \todo{cite}:
-    \begin{align}
-      {\rm Cov}^{\rm SSC}\left(\tilde{C}^{ab}_\ell,\tilde{C}^{cd}_{\ell'}\right)=\int &\frac{dz}{H(z)}\left(\frac{H(z)}{\chi(z)}\right)^4\,p^a(z)p^b(z)p^c(z)p^d(z)\\&b^ab^bb^cb^d\,\frac{\partial P(z,k_\ell)}{\partial\delta_b}\,\frac{\partial P(z,k_{\ell'})}{\partial\delta_b}\sigma_b^2(z).
-    \end{align}
-    Here, $k_\ell=\ell/\chi-1/2$, $b^a$ is the lage-scale HOD bias for the $a$-th sample, computed as
-    \begin{equation}
-      b^a=\frac{1}{\bar{n}_g^a}\int dM\,\frac{dn}{dM}b_h(M) \bar{N}_c^a(1+\bar{N}_s^a),
-    \end{equation}
-    $\partial P(z,k)/\partial \delta_b$ is the response of the matter power spectrum to a long-wavelength density fluctuation, which we estimate using the halo model as described in \todo{cite}, and $\sigma_b^2$ is the variance of the long wavelength mode over the survey footprint:
-    \begin{equation}
-      \sigma_b^2 = \int \frac{dk_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
-    \end{equation}
-    Here, $W(k_\perp,z)$ is the Fourier transform of the survey footprint, which we approximate as a compact circle with the same area:
-    \begin{equation}
-      W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}).
-    \end{equation}
-    \todo{Describe how we coadd the power spectra of the different fields at some point}
+The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we estimate this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as
+\begin{equation}
+\mathrm{Cov}_{\mathrm{NG}}(C^{AB}_{\ell}, C^{CD}_{\ell'}) = \int \int \mathrm{d}\theta \;\mathrm{d}\chi \; \frac{q^{A}(\chi)q^{B}(\chi)q^{C}(\chi)q^{D}(\chi)}{\chi^{6}} \; T^{ABCD}(\sfrac{\ell}{\chi}, \sfrac{\ell'}{\chi}, \theta).
+\end{equation}
+Using the halo model, the connected part of the trispectrum $T^{ABCD}$ is given by (e.g. \cite{Takada:2013}):
+\begin{equation}
+T^{ABCD} = T^{ABCD, 1h} + (T^{ABCD, 2h}_{22} + T^{ABCD, 2h}_{13}) + T^{ABCD, 3h} + T^{ABCD, 4h},
+\end{equation}
+where
+\begin{align}
+&T^{ABCD, 1h}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = I^{0}_{ABCD}(k_{1}, k_{2}, k_{3}, k_{4}), \\
+&T^{ABCD, 2h}_{22}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = P_{\mathrm{lin}}(k_{12})I^{1}_{AB}(k_{1}, k_{2})I^{1}_{CD}(k_{3}, k_{4}) + 2 \; \mathrm{perm.}, \\
+&T^{ABCD, 2h}_{13}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = P_{\mathrm{lin}}(k_{1})I^{1}_{A}(k_{1})I^{1}_{BCD}(k_{2}, k_{3}, k_{4}) + 3 \; \mathrm{perm.}, \\
+&T^{ABCD, 3h}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = B^{\mathrm{PT}}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{34})I^{1}_{A}(k_{1})I^{1}_{B}(k_{2})I^{1}_{CD}(k_{3}, k_{4}) + 5 \; \mathrm{perm.}, \\
+&T^{ABCD, 4h}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = T^{\mathrm{PT}}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4})I^{1}_{A}(k_{1})I^{1}_{B}(k_{2})I^{1}_{C}(k_{3})I^{1}_{D}(k_{4}).
+\end{align}
+The quantities $B^{\mathrm{PT}}$ and $T^{\mathrm{PT}}$ denote the matter bi- and trispectrum respectively, as estimated using perturbation theory. The full expressions for these terms can be found in \cite{Takada:2013}. Finally, $I^{i}_{j}$ denotes the generic halo model integral, defined as (e.g. \cite{Krause:2017}):
+\begin{align}
+I^{i}_{A}(k) &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) \langle \tilde{u}_{A}(k, M) \rangle, \\
+I^{i}_{AB}(k, k') &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) b_{B, i}(M) \langle \tilde{u}_{A}(k, M) \tilde{u}_{B}(k', M) \rangle, \\
+I^{i}_{ABC}(k, k', k'') &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) b_{B, i}(M) b_{C, i}(M) \langle \tilde{u}_{A}(k, M) \tilde{u}_{B}(k', M) \tilde{u}_{C}(k'', M) \rangle, \\
+I^{i}_{ABCD}(k, k', k'', k''') &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) b_{B, i}(M) b_{C, i}(M) b_{D, i}(M) \times \\ &\langle \tilde{u}_{A}(k, M) \tilde{u}_{B}(k', M) \tilde{u}_{C}(k'', M) \tilde{u}_{D}(k''', M) \rangle.
+\end{align}
+For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution.
+
+Finally, we compute the super-sample covariance contribution following the treatment of \todo{cite}:
+\begin{align}
+\mathrm{Cov}_{\mathrm{SSC}}(C^{AB}_{\ell}, C^{CD}_{\ell'}) = \int & \mathrm{d}\chi \;\frac{q^{A}(\chi)q^{B}(\chi)q^{C}(\chi)q^{D}(\chi)}{\chi^{4}} \times \\ &\frac{\partial P_{AB}(\sfrac{\ell}{\chi}, z(\chi))}{\partial \delta_{b}}\frac{\partial P_{CD}(\sfrac{\ell'}{\chi}, z(\chi))}{\partial \delta_{b}}\sigma^{2}_{b}(z(\chi)).
+\end{align}
+The quantity $\frac{\partial P(k, z)}{\partial \delta_b}$ is the response of the matter power spectrum to a long-wavelength density fluctuation, which we estimate using the halo model as\footnote{We note that we also consider an alternative SSC model, in which we estimate the response of the matter power spectrum as the linearly biased response for the matter field. We find our parameter constraints to be unaffected by this change.} (e.g. \cite{Krause:2017}):
+\begin{align}
+\frac{\partial P_{AB}(k, z)}{\partial \delta_{b}} &= \left( \frac{68}{21} - \frac{1}{3}\frac{\mathrm{d}\log{k^{3} P_{\mathrm{lin}}}(k, z)}{\mathrm{d}\log k} \right) I_{A}^{1}(k)I_{B}^{1}(k)P_{\mathrm{lin}}(k, z) + I_{AB}^{1}(k, k) \\ &- (b_{A} + b_{B})P_{AB}(k, z).
+\end{align}
+Furthermore, $b_{A}$ denotes the large-scale HOD bias for the $A$-th sample, computed as
+\begin{equation}
+b_{A}=\frac{1}{\bar{n}_{g, A}}\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}b_{1}(M) \bar{N}_{c, A}(1+\bar{N}_{s, A}),
+\end{equation}
+and $\sigma_b^2(z)$ is the variance of the long wavelength mode over the survey footprint, which we estimate as
+\begin{equation}
+\sigma_b^2(z) = \int \frac{\mathrm{d}k_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
+\end{equation}
+Here, $W(k_\perp,z)$ is the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set:
+\begin{equation}
+W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}).
+\end{equation}
+ \todo{Describe how we coadd the power spectra of the different fields at some point}
+
+\subsection{Parameter constraints}\label{ssec:methods.constr}
+In order to derive constraints on HOD, cosmological and systematics parameters, we assume the joint likelihood of all auto- and cross-power spectra to be Gaussian 
+\begin{align}
+\mathscr{L}(D \vert \theta) = \frac{1}{[(2\pi)^{d}\det{C}]^{\sfrac{1}{2}}} e^{-\frac{1}{2}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})^{\mathrm{T}}C^{-1}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})}.
+\label{eq:likelihood}
+\end{align}
+The quantity $C$ denotes the joint covariance matrix, which we estimate analytically for a cosmological model \todo{bla} and keep constant during parameter estimation.
+We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. For all sampled parameters, we assume flat, uniform priors. We sample the parameter set \todo{bla}. The sampled parameters are shown alongside their priors in Tab. \todo{bla}.
+
 
 \section{Results}\label{sec:results}
   \lipsum[8]
