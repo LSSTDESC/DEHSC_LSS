@@ -22,7 +22,8 @@ class MapDiagnoser(PipelineStage) :
         binmask=mask>0
 
         # N_g/<N_g>
-        ng_use=ng_map[binmask]*np.sum(mask[binmask])/(mask[binmask]*np.sum(mask[binmask]*ng_map[binmask]))
+        ng_mean=np.sum(ng_map[binmask])/np.sum(mask[binmask])
+        ng_use=ng_map[binmask]/(ng_mean*mask[binmask])
         # S/<S>
         sys_mean=np.mean(sys_map[binmask])
         sys_use=sys_map[binmask]/sys_mean
