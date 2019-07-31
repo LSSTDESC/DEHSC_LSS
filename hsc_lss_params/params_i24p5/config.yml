@@ -6,6 +6,8 @@ global:
     flat_project: CAR
     mask_type: sirius
     band: i
+    mask_thr: 0.5
+    sys_collapse_type: average
 
 ReduceCat:
     min_snr: 10.
@@ -32,7 +34,6 @@ PowerSpecter:
 #    noise_bias_type: pois_sim
     guess_spectrum: /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/hsc_lss_params/cls_guess_i24p5.txt
 #    guess_spectrum: NONE
-    mask_thr: 0.5
     mask_systematics: False
 #    mask_systematics: True
     oc_dpj_list: [airmass,seeing,sigma_sky]
@@ -40,4 +41,3 @@ PowerSpecter:
     oc_all_bands: True
 #    oc_all_bands: False
     output_run_dir: CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1
-    sys_collapse_type: average

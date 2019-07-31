@@ -494,7 +494,7 @@ class PowerSpecter(PipelineStage) :
         """
         # This is a hack to get the path of the root output directory.
         # It should be easy to get this from ceci, but I don't know how to.
-        self.output_dir=self.get_output('dummy')[:-6]
+        self.output_dir=self.get_output('dummy')[:-5]
         if self.config['output_run_dir'] is not None:
             self.output_dir+=self.config['output_run_dir']+'/'
         if not os.path.isdir(self.output_dir):

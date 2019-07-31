@@ -19,6 +19,9 @@ class DataFile:
 class DummyFile(DataFile):
     suffix=''
 
+class DirFile(DataFile):
+    suffix=None
+
 class FitsFile(DataFile):
     """
     A data file in the FITS format.
