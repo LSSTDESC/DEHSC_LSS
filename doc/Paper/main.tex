@@ -315,19 +315,19 @@ Finally, we compute the super-sample covariance contribution following the treat
 \begin{align}
 \mathrm{Cov}_{\mathrm{SSC}}(C^{AB}_{\ell}, C^{CD}_{\ell'}) = \int & \mathrm{d}\chi \;\frac{q^{A}(\chi)q^{B}(\chi)q^{C}(\chi)q^{D}(\chi)}{\chi^{4}} \times \\ &\frac{\partial P_{AB}(\sfrac{\ell}{\chi}, z(\chi))}{\partial \delta_{b}}\frac{\partial P_{CD}(\sfrac{\ell'}{\chi}, z(\chi))}{\partial \delta_{b}}\sigma^{2}_{b}(z(\chi)).
 \end{align}
-The quantity $\frac{\partial P(k, z)}{\partial \delta_b}$ is the response of the matter power spectrum to a long-wavelength density fluctuation, which we estimate using the halo model as\footnote{We note that we also consider an alternative SSC model, in which we estimate the response of the matter power spectrum as the linearly biased response for the matter field. We find our parameter constraints to be unaffected by this change.} (e.g. \cite{Krause:2017}):
+The quantity $\frac{\partial P(k, z)}{\partial \delta_b}$ is the response of the matter power spectrum to a long-wavelength density fluctuation, which we estimate using the halo model and results from perturbation theory as\footnote{We note that we also consider an alternative SSC model, in which we estimate the response of the matter power spectrum as the linearly biased response for the matter field. We find our parameter constraints to be unaffected by this change.} (e.g. \cite{Krause:2017}):
 \begin{align}
 \frac{\partial P_{AB}(k, z)}{\partial \delta_{b}} &= \left( \frac{68}{21} - \frac{1}{3}\frac{\mathrm{d}\log{k^{3} P_{\mathrm{lin}}}(k, z)}{\mathrm{d}\log k} \right) I_{A}^{1}(k)I_{B}^{1}(k)P_{\mathrm{lin}}(k, z) + I_{AB}^{1}(k, k) \\ &- (b_{A} + b_{B})P_{AB}(k, z).
 \end{align}
-Furthermore, $b_{A}$ denotes the large-scale HOD bias for the $A$-th sample, computed as
+The quantity $b_{A}$ denotes the large-scale HOD bias for the $A$-th sample, computed as
 \begin{equation}
 b_{A}=\frac{1}{\bar{n}_{g, A}}\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}b_{1}(M) \bar{N}_{c, A}(1+\bar{N}_{s, A}),
 \end{equation}
-and $\sigma_b^2(z)$ is the variance of the long wavelength mode over the survey footprint, which we estimate as
+and $\sigma_b^2(z)$ is the variance of the long wavelength mode over the survey footprint, given by
 \begin{equation}
 \sigma_b^2(z) = \int \frac{\mathrm{d}k_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
 \end{equation}
-Here, $W(k_\perp,z)$ is the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set:
+Finally $W(k_\perp,z)$ denotes the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set:
 \begin{equation}
 W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}).
 \end{equation}
