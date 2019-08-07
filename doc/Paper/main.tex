@@ -82,7 +82,7 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
       s\equiv\frac{\partial \log_{10}N(<m)}{\partial m}.
     \end{equation}
     The angular power spectrum is then given by:
-    \begin{equation}
+    \begin{equation}\label{eq:cell_gg_wmag}
       C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)}\left[p^ip^j\,P_{gg}+\left(p^iW_\mu^j+p^jW_\mu^i\right)\frac{\ell(\ell+1)}{Hk^2}P_{gm}+W_\mu^iW_\mu^j\left(\frac{\ell(\ell+1)}{Hk^2}\right)^2P_{mm}\right],
     \end{equation}
     where $P_{mm}$ is the 3D power spectrum of matter fluctuations, $P_{gm}$ is the galaxy-matter cross-spectrum and we have omitted the dependence of all quantities on $z$ or $k=(\ell+1/2)/\chi$ for brevity.
@@ -101,6 +101,7 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \begin{equation}
       \bar{n}_g=\int dM\,\frac{dn}{dM}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
     \end{equation}
+    A central assumption in standard HOD parametrizations is that centrals/satellites follow a binomial/Poisson distribution.
 
     Following \todo{cite}, we parametrise the number of centrals and satellites as a function of mass as:
     \begin{align}
@@ -113,85 +114,101 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{equation}
     where $x=k R_\Delta/c$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. The concentration-mass relation $c(M)$ also depends on the choice of $\Delta$, and we follow the parametrization of Duffy et al. \todo{cite}.
 
-    \todo{Possibly extend this to describe $P_{gm}$}
+    In order to include lensing magnification in the theory prediction, we also need to model the galaxy-matter and matter-matter power spectra (see Eq. \ref{eq:cell_gg_wmag}). Following the HOD parametrization, the 1-halo and 2-halo contributions to $P_{gm}(k)$ are given by:
+    \begin{align}
+      & P_{gm,{\rm 1h}}(k)=\frac{1}{\bar{n}_g\bar{\rho}_M} \int dM\,\frac{dn}{dM} M\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right],\\
+      & P_{gm,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM}\,b_h(M)\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)\,P_{\rm lin}(k),
+    \end{align}
+    where $\bar{\rho}_M$ is the comoving matter density. $P_{mm}(k)$ is simply given by the {\tt Halofit} parametrization of \todo{cite}.
+
+    It is a well-known fact that the simple halo model implementation described here is not able to accurately describe the ``quasi-linear'' scales in the transition between the 1-halo and 2-halo-dominated regimes, corresponding to $k\sim0.1\,{\rm Mpc}^{-1}$ at $z\sim0$ \todo{cite}. To correct for this inaccuracy, we simply multiply $P_{gg}$ and $P_{gm}$ by a universal scale-dependent factor, given by the ratio between the {\tt Halofit} and the pure halo model predictions for $P_{mm}$:
+    \begin{equation}
+      R(z,k)=\frac{P^{\rm Halofit}_{mm}(z,k)}{P^{\rm halo\,model}_{mm}(z,k)}.
+    \end{equation}
 
 \section{Data}\label{sec:data}
+  \begin{table}
+  \centering
+  \begin{tabular}{|l|l|}
+  \hline
+   {\bf Cut} & {\bf Comment} \\
+   \hline
+   \texttt{detect\_is\_primary}=True & Basic quality cuts, \\
+   \texttt{icmodel\_flags\_badcentroid}=False & see \cite{2018PASJ...70S..25M,2018PASJ...70S...5B}\\
+   \texttt{icentroid\_sdss\_flags}=False & \\
+   \texttt{iflags\_pixel\_edge}=False & \\
+   \texttt{iflags\_pixel\_interpolated\_center}=False & \\
+   \texttt{iflags\_pixel\_saturated\_center}=False & \\
+   \texttt{iflags\_pixel\_cr\_center}=False & \\
+   \texttt{iflags\_pixel\_bad}=False & \\
+   \texttt{iflags\_pixel\_suspect\_center}=False & \\
+   \texttt{iflags\_pixel\_clipped\_any}=False & \\
+   \texttt{meas.ideblend\_skipped}=False & \\
+   \texttt{iblendedness\_abs\_flux}$<10^{-0.375}$ & \\
+   \hline % Strict from here on
+   \texttt{[g,r,z,y]centroid\_sdss\_flags}=False & Strict photometry cuts\\
+   \texttt{[g,r,i,z,y]cmodel\_flux\_flags}=False & \\
+   \texttt{[g,r,i,z,y]flux\_psf\_flags}=False & \\
+   \texttt{[g,r,z,y]flags\_pixel\_edge}=False & \\
+   \texttt{[g,r,z,y]flags\_pixel\_interpolated\_center}=False & \\
+   \texttt{[g,r,z,y]flags\_pixel\_saturated\_center}=False & \\
+   \texttt{[g,r,z,y]flags\_pixel\_cr\_center}=False & \\
+   \texttt{[g,r,z,y]flags\_pixel\_bad}=False & \\
+   \hline
+   \texttt{icmodel\_mag}$-$\texttt{a\_i} $<$ 24.5 & Magnitude limit\\ % Magnitude cut
+   \hline
+   \texttt{icmodel\_flux}$>10\,$\texttt{icmodel\_flux\_err} & 10$\sigma$ detections\\
+   \hline
+   \texttt{[g,r,y,z]cmodel\_flux}$>5\,$\texttt{[g,r,y,z]cmodel\_flux\_err} & 5$\sigma$ detection  (required \\
+   & only in 2 other bands)\\
+   \hline
+   \texttt{iclassification\_extendedness}=1 & Star-galaxy separator\\
+   \hline
+  \end{tabular}
+  \caption{Summary of the selection cuts performed to the original dataset to retrieve the sample considered in our analysis.} \label{tab:cuts_summary}
+  \end{table}  
+
+  \begin{table}
+  \centering
+  \begin{tabular}{|l|r|c|l|}
+   \hline
+   {\bf Field name} & $N_{\rm gal}$ & {\bf Area} (deg$^2$) & $f_{\rm sky}$ \\
+   \hline
+   GAMA09H  & 1,697,713 & 14.5 & $3.5\times10^{-4}$ \\
+   GAMA15H  & 1,695,364 & 15.1 & $3.7\times10^{-4}$ \\
+   HECTOMAP &   639,970 &  5.1 & $1.2\times10^{-4}$ \\
+   VVDS     & 2,340,965 & 20.6 & $5.0\times10^{-4}$ \\
+   WIDE12H  & 1,220,816 & 11.6 & $2.8\times10^{-4}$ \\
+   XMMLSS   & 2,139,629 & 20.8 & $5.0\times10^{-4}$ \\
+   \hline
+   Total    & 9734457 & 87.7 & $2.1\times10^{-3}$ \\
+   \hline
+  \end{tabular}
+  \caption{Summary of the 6 different fields used in our analysis. The second column lists the number of galaxies in the DR1 catalog passing the cuts in Table \ref{tab:cuts_summary}. The third and fourth columns show the area and corresponding sky fraction covered by each field. The area was calculated as the sum of pixel areas allowed by the sky mask described in Section \ref{ssec:methods.mask}.} \label{tab:field_summary}
+  \end{table}  
+
+  \begin{table}
+  \centering
+  \begin{tabular}{|l|l|l|l|}
+    \hline
+    $z_{\rm phot}^{\rm ini}$ & $z_{\rm phot}^{\rm end}$ & $\bar{z}$ & $N_{\rm gal}$ \\
+    \hline
+    0.15 & 0.5  & 0.57 & 1,750,274 \\
+    0.5  & 0.75 & 0.68 & 1,766,939 \\
+    0.75 & 1.0  & 0.91 & 1,702,685 \\
+    1.0  & 1.5  & 1.26 & 1,752,359 \\
+    \hline
+  \end{tabular}
+  \caption{Summary of the 4 redshift bins used in our analysis. The first two columns show the photo-$z$ bin edges. We used the {\tt photoz\_best} redshift estimator for the photo-$z$ code {\tt ephor\_ab} to assign galaxies to different bins. The second column shows the mean redshift of each bin calculated from the fiducial redshift distributions described in Section \ref{ssec:methods.nz}. The last column shows the number of galaxies in each bin. The bin edges were chosen to roughly contain an equal number of galaxies in each of them.} \label{tab:bins_summary}
+  \end{table}
+  
   We use data from the Hyper Suprime-Cam Subaru Strategic Program first data release (HSC DR1 hereon)\footnote{https://hsc-release.mtk.nao.ac.jp}. The release is extensively documented in \cite{2018PASJ...70S...8A}, and we only provide the details of the galaxy sample and associated data used for our clustering analysis.
   
   \todo{General blurb about HSC DR1}
   
-  We use a magnitude-limited sample constructed WIDE DR1 sample by imposing data cuts that are similar to those used to create the HSC shear catalog \cite{2018PASJ...70S..25M}. The exact cuts are shown in Table~\ref{tab:cuts_summary}, and can be summarized as follows: besides a minimal set of quality cuts (selecting only primary detections with well-measured fluxes in all bands, removing objects near bad pixels, deblender artifacts, etc.), we impose an overall apparent magnitude cut in the extinction-corrected band $i_{\rm corr}<24.5$. This choice was based on a study of the survey depth-completeness relation in order to select a homogeneous and complete sample of high-confidence ($>10\sigma$) detections (see Section \ref{ssec:methods.syst}). We also select only objects with significant detections ($>5\sigma$) in at least two of the 4 remaining bands ($g,\,r,\,z,\,y$), and remove all objects classified as stars by the data reduction pipeline, using the "extendedness`` classifier as described at \citet{2018PASJ...70S...5B}. The resulting sample has XXXX objects distributed across the 6 HSC DR1 fields as described in Table \todo{make table}.
-  
-\begin{table}
-\centering
-\begin{tabular}{|c|c|}
-\hline
- Variable & Condition \\
- \hline
- \texttt{forced.detect\_isPrimary} & =True\\
-  \texttt{forced.icmodel\_flags\_badcentroid} & =False\\
-  \texttt{forced.icentroid\_sdss\_flags} & =False\\
-  \texttt{forced.iflags\_pixel\_edge} & =False\\
-  \texttt{forced.iflags\_pixel\_interpolated\_center} & =False\\
-  \texttt{forced.iflags\_pixel\_saturated\_center} & =False\\
-  \texttt{forced.iflags\_pixel\_cr\_center} & =False\\
-  \texttt{forced.iflags\_pixel\_bad} & =False\\
-  \texttt{forced.iflags\_pixel\_suspect\_center} & =False\\
-   \texttt{ forced.iflags\_pixel\_clipped\_any} & =False\\
-   \texttt{ meas.ideblend\_skipped} & =False\\
-   \texttt{forced.icmodel\_mag} & $<$ 24.5\\ % Magnitude cut
-   \hline % Strict from here on
-   \texttt{ forced.gcentroid\_sdss\_flags} & =False\\
-   \texttt{ forced.rcentroid\_sdss\_flags} & =False\\
-   \texttt{ forced.zcentroid\_sdss\_flags} & =False\\
-   \texttt{ forced.ycentroid\_sdss\_flags} & =False\\
-   \texttt{ forced.gcmodel\_flux\_flags} & =False\\
-   \texttt{ forced.rcmodel\_flux\_flags} & =False\\
-   \texttt{ forced.icmodel\_flux\_flags} & =False\\
-   \texttt{ forced.zcmodel\_flux\_flags} & =False\\
-   \texttt{ forced.ycmodel\_flux\_flags} & =False\\
-   \texttt{ forced.gflux\_psf\_flags} & =False\\
-   \texttt{ forced.rflux\_psf\_flags} & =False\\
-   \texttt{ forced.iflux\_psf\_flags} & =False\\
-   \texttt{ forced.zflux\_psf\_flags} & =False\\
-   \texttt{ forced.yflux\_psf\_flags} & =False\\
-   \texttt{ forced.gflags\_pixel\_edge} & =False\\
-   \texttt{ forced.rflags\_pixel\_edge} & =False\\
-   \texttt{ forced.zflags\_pixel\_edge} & =False\\
-   \texttt{ forced.yflags\_pixel\_edge} & =False\\
-   \texttt{ forced.gflags\_pixel\_interpolated\_center} & =False\\
-   \texttt{ forced.rflags\_pixel\_interpolated\_center} & =False\\
-   \texttt{ forced.zflags\_pixel\_interpolated\_center} & =False\\
-   \texttt{ forced.yflags\_pixel\_interpolated\_center} & =False\\
-   \texttt{ forced.gflags\_pixel\_saturated\_center} & =False\\
-   \texttt{ forced.rflags\_pixel\_saturated\_center} & =False\\
-   \texttt{ forced.zflags\_pixel\_saturated\_center} & =False\\
-   \texttt{ forced.yflags\_pixel\_saturated\_center} & =False\\
-   \texttt{ forced.gflags\_pixel\_cr\_center} & =False\\
-   \texttt{ forced.rflags\_pixel\_cr\_center} & =False\\
-   \texttt{ forced.zflags\_pixel\_cr\_center} & =False\\
-   \texttt{ forced.yflags\_pixel\_cr\_center} & =False\\
-   \texttt{ forced.gflags\_pixel\_bad} & =False\\
-   \texttt{ forced.rflags\_pixel\_bad} & =False\\
-   \texttt{ forced.zflags\_pixel\_bad} & =False\\
-   \texttt{ forced.yflags\_pixel\_bad} & =False\\
- \hline
- \end{tabular}
- \caption{Summary of the selection cuts performed to the original dataset to retrieve the sample considered for our analyses.}
- \label{tab:cuts_summary}
- \end{table}  
- 
- 
-% \begin{table}
-% \centering
-% \begin{tabular}{|c|c|}
-% \hline
-% Field & Number of objects \\
-% \hline
-% WIDE  
-  All objects have photometric redshift measurements from 6 different codes as presented in \citet{2018PASJ...70S...9T}. We use the best-fit redshift assigned by the {\tt ephor\_ab} method as a marker to divide the sample into 4 redshift bins containing roughly equal numbers of galaxies. A peliminary Fisher matrix study showed that the information content saturates quickly when slicing the data into finer redshift bins. The redshift bins are described in Table \todo{make table}, and the associated redshift distributions are described in Section \ref{ssec:methods.nz}.
+  We use a magnitude-limited sample constructed from the WIDE DR1 sample by imposing data cuts that are similar to those used to create the HSC shear catalog \cite{2018PASJ...70S..25M}. The exact cuts are shown in Table~\ref{tab:cuts_summary}, and can be summarized as follows: besides a minimal set of quality cuts (selecting only primary detections with well-measured fluxes in all bands, removing objects near bad pixels, deblender artifacts, etc.), we impose an overall apparent magnitude cut in the extinction-corrected band $i_{\rm corr}<24.5$. This choice was based on a study of the survey depth-completeness relation in order to select a homogeneous and complete sample of high-confidence ($>10\sigma$) detections (see Section \ref{ssec:methods.syst}). We also select only objects with significant detections ($>5\sigma$) in at least two of the 4 remaining bands ($g,\,r,\,z,\,y$), and remove all objects classified as stars by the data reduction pipeline, using the "extendedness`` classifier as described in \cite{2018PASJ...70S..25M,2018PASJ...70S...5B}. The resulting sample has 9,734,457 objects and covers $\sim88$ square degress distributed across the 6 HSC DR1 fields described in Table \ref{tab:field_summary}.
 
-  \todo{Describe DR1 and sample selection. Describe redshift binning.}
+  All objects have photometric redshift measurements from 6 different codes as presented in \cite{2018PASJ...70S...9T}. We use the {\tt photoz\_best} redshift estimator assigned by the {\tt ephor\_ab} method as a marker to divide the sample into 4 redshift bins containing roughly equal numbers of galaxies. The {\tt photoz\_best} estimator is defined to minimize the risk that the true galaxy redshift lie outside the range $z_{\rm true}\pm 0.15(1+z_{\rm true})$, where $z_{\rm true}$ is the galaxie's true redshift. A peliminary Fisher matrix study showed that the information content saturates quickly when slicing the data into finer redshift bins. The redshift bins are described in Table \ref{tab:bins_summary}, and the associated redshift distributions are discussed in Section \ref{ssec:methods.nz}.
 
 \section{Methods}\label{sec:methods}
   The following sections describe the methods used to construct the data vector of angular power spectra and its covariance matrix used to constrain the parameters of our model.
