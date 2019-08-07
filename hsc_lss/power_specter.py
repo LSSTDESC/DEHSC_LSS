@@ -252,19 +252,20 @@ class PowerSpecter(PipelineStage) :
                 cls_coupled.append(cl_coupled[0])
         return np.array(cls_all),np.array(cls_coupled)
 
-    def get_covar(self,lth,clth,bpws,wsp,temps,cl_dpj_all) :
+    def get_covar(self,lth,clth,bpws,tracers,wsp,temps,cl_dpj_all) :
         """
         Estimate the power spectrum covariance
         :param lth: list of multipoles.
         :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
         :param bpws: NaMaster bandpowers.
+        :params tracers: tracers.
         :param wsp: NaMaster workspace.
-        :param temps: list of contaminatn templates.
+        :param temps: list of contaminant templates.
         :params cl_dpj_all: list of deprojection biases for each bin pair combination.
         """
         if self.config['gaus_covar_type']=='analytic' :
             print("Computing analytical Gaussian covariance")
-            cov=self.get_covar_analytic(lth,clth,bpws,wsp)
+            cov=self.get_covar_analytic(lth,clth,bpws,tracers,wsp)
         elif self.config['gaus_covar_type']=='gaus_sim' :
             print("Computing simulated Gaussian covariance")
             cov=self.get_covar_gaussim(lth,clth,bpws,wsp,temps,cl_dpj_all)
@@ -286,14 +287,15 @@ class PowerSpecter(PipelineStage) :
         
         return wsp
 
-    def get_covar_mcm(self,wsp) :
+    def get_covar_mcm(self,tracers,bpws):
         """
         Get NmtCovarianceWorkspaceFlat for our mask
         """
         cwsp=nmt.NmtCovarianceWorkspaceFlat()
         if not os.path.isfile(self.get_output_fname('cov_mcm',ext='dat')) :
             print("Computing covariance MCM")
-            cwsp.compute_coupling_coefficients(wsp,wsp)
+            cwsp.compute_coupling_coefficients(tracers[0].field,
+                                               tracers[0].field,bpws)
             cwsp.write_to(self.get_output_fname('cov_mcm',ext='dat'))
         else :
             print("Reading covariance MCM")
@@ -356,12 +358,13 @@ class PowerSpecter(PipelineStage) :
         covar=np.cov(cells_sims.T)
         return covar
 
-    def get_covar_analytic(self,lth,clth,bpws,wsp) :
+    def get_covar_analytic(self,lth,clth,bpws,tracers,wsp) :
         """
         Estimate the power spectrum covariance analytically
         :param lth: list of multipoles.
         :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
         :param bpws: NaMaster bandpowers.
+        :param tracers: tracers.
         :param wsp: NaMaster workspace.
         """
         #Create a dummy file for the covariance MCM
@@ -369,7 +372,7 @@ class PowerSpecter(PipelineStage) :
         f.close()
 
         covar=np.zeros([self.ncross*self.nell,self.ncross*self.nell])
-        cwsp=self.get_covar_mcm(wsp)
+        cwsp=self.get_covar_mcm(tracers,bpws)
 
         ix_1=0
         for i1 in range(self.nbins) :
@@ -381,7 +384,8 @@ class PowerSpecter(PipelineStage) :
                         ca1b2=clth[self.ordering[i1,j2]]
                         ca2b1=clth[self.ordering[j1,i2]]
                         ca2b2=clth[self.ordering[j1,j2]]
-                        cov_here=nmt.gaussian_covariance_flat(cwsp,lth,ca1b1,ca1b2,ca2b1,ca2b2)
+                        cov_here=nmt.gaussian_covariance_flat(cwsp,0,0,0,0,
+                                                              lth,[ca1b1],[ca1b2],[ca2b1],[ca2b2],wsp)
                         covar[ix_1*self.nell:(ix_1+1)*self.nell,:][:,ix_2*self.nell:(ix_2+1)*self.nell]=cov_here
                         ix_2+=1
                 ix_1+=1
@@ -435,6 +439,8 @@ class PowerSpecter(PipelineStage) :
                 print(' '+d['name']+d['gl']+'%.3lf'%(d['thr'])+
                       ' removes ~%.2lf per-cent of the available sky'%((1-fsky_post/fsky_pre)*100))
             print(' All systematics remove %.2lf per-cent of the sky'%((1-np.sum(msk_syst)/np.sum(msk_bi))*100))
+            self.fsk.write_flat_map(self.get_output_fname("mask_syst",ext="fits"),msk_syst)
+
             msk_bi*=msk_syst
 
         return msk_bi,mskfrac,mp_depth
@@ -494,7 +500,7 @@ class PowerSpecter(PipelineStage) :
         """
         # This is a hack to get the path of the root output directory.
         # It should be easy to get this from ceci, but I don't know how to.
-        self.output_dir=self.get_output('dummy')[:-5]
+        self.output_dir=self.get_output('dummy',final_name=True)[:-5]
         if self.config['output_run_dir'] is not None:
             self.output_dir+=self.config['output_run_dir']+'/'
         if not os.path.isdir(self.output_dir):
@@ -647,16 +653,17 @@ class PowerSpecter(PipelineStage) :
         cls_wdpj,cls_deproj=self.get_dpj_bias(tracers_wc,lth,clth,cls_wdpj_coupled,wsp,bpws)
 
         print("Computing covariance")
-        cov_wodpj=self.get_covar(lth,clth,bpws,wsp,None,None)
+        cov_wodpj=self.get_covar(lth,clth,bpws,tracers_wc,wsp,None,None)
         if self.config['gaus_covar_type']=='analytic' :
             cov_wdpj=cov_wodpj.copy()
         else :
-            cov_wdpj=self.get_covar(lth,clth,bpws,wsp,temps,cls_deproj)
+            cov_wdpj=self.get_covar(lth,clth,bpws,tracers_wc,wsp,temps,cls_deproj)
 
         print("Computing noise bias")
         nls=self.get_noise(tracers_nc,wsp,bpws)
 
         print("Writing output")
+        print(self.get_output_fname('noi_bias',ext='sacc'))
         self.write_vector_to_sacc(self.get_output_fname('noi_bias',ext='sacc'),tracers_sacc,
                                   binning_nw,nls,verbose=False)
         self.write_vector_to_sacc(self.get_output_fname('dpj_bias',ext='sacc'),tracers_sacc,
