@@ -45,6 +45,6 @@ plot_syst('Sky level','skylevel_maps.fits','i',savename='../doc/Paper/figures/sy
 plot_syst('Sky level','skylevel_maps.fits','y',savename='../doc/Paper/figures/syst_skylevel_y.pdf')
 plot_syst('Depth','depth_map.fits',None,units='mag.',savename='../doc/Paper/figures/syst_depth.pdf')
 plot_syst('Dust','dust_map.fits',None,units='mag.',savename='../doc/Paper/figures/syst_dust.pdf')
-plot_syst('Star count','star_map.fits',None,savename='../doc/Paper/figures/syst_dust.pdf')
+plot_syst('Star count','star_map.fits',None,savename='../doc/Paper/figures/syst_star.pdf')
 
 plt.show()
