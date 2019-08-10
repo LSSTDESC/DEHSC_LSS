@@ -14,6 +14,7 @@
 \usepackage{xfrac}
 \usepackage{aas_macros}
 \usepackage{mathrsfs}
+\usepackage{subfigure}
 \newcommand{\nv}{\vec{\theta}}
 %\newcommand{\pasj}{Publications of the ASJ}
 %\newcommand{\aap}{Astronomy and Astrophysics}
@@ -79,7 +80,8 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{equation}
     Here, $H_0\equiv H(z=0)$, $\Omega_M$ is the cosmological matter fraction, and $s$ is the logarithmic slope of the cumulative apparent magnitude distribution:
     \begin{equation}
-      s\equiv\frac{\partial \log_{10}N(<m)}{\partial m}.
+      s(z) \equiv \frac{\partial \log_{10}N(<m, z)}{\partial m}.
+      \label{eq:s-func}
     \end{equation}
     The angular power spectrum is then given by:
     \begin{equation}\label{eq:cell_gg_wmag}
@@ -389,12 +391,23 @@ We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly
 
 
 \section{Results}\label{sec:results}
-  \lipsum[8]
-  \begin{figure}
-    \centering
-%    \includegraphics[width=0.9\columnwidth]{figures/token_plot}
-    \caption{Blah}\label{fig:token}
-  \end{figure}
+\subsection{Power spectra}
+\subsection{Covariance matrix}
+\subsection{Constraints on HOD parameters}
+\subsubsection{Magnification bias}
+In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to the gravitational lensing effect of the intervening LSS. This effect is usually termed magnification bias. The statistical distribution of galaxies is mainly affected by magnification bias as it increases observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification bias can dominate over the intrinsic clustering signal for cross-correlations between widely separated redshift bins. As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification bias signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification bias in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from several deep patches, called DEEP and UDEEP. We repeat the above analysis on these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift in our fiducial WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen from the Figure, the three estimates agree well with each other.
+
+\begin{figure}
+\begin{center}
+\subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for lowest tomographic redshift bin.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
+\subfigure[$s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
+\caption{Illustration of data-driven estimation of $s(z)$ for galaxy sample used in our analysis.} 
+\label{fig:s-func-estimation}
+\end{center}
+\end{figure}
+
+Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification bias. In order to determine the best-fit model parameters accounting for magnification bias we run two different MCMCs: in the first case, we fix the magnification bias amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification bias parameter that scales the amplitude of the magnification kernel and we fit it alongside the other parameters.
+
   \todo{Things to discuss:}
   \begin{enumerate}
     \item Impact of systematics. Discuss star contamination in more detail (referenced above).
