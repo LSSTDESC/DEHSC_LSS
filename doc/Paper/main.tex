@@ -24,6 +24,7 @@
 \newcommand{\todo}[1]{{\bf TODO: #1}}
 
 \newcommand{\as}[1]{{\textcolor{blue}{[AS: #1]}}}
+\newcommand{\an}[1]{{\textcolor{magenta}{[AN: #1]}}}
 
 \usepackage[T1]{fontenc} % if needed
 \usepackage{natbib}
@@ -284,7 +285,7 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{enumerate}
     There are a number of caveats associated with this method to estimate redshift distributions. First, the COSMOS 30-band photometric redshifts are not as good as a purely spectroscopic sample in terms of redshift accuracy and precision. Secondly, the small area covered by COSMOS may lead to sample variance uncertainties in the inferred redshift distributions that are difficult to quantify, particularly if the colour-redshift relation has an environmental dependence. Finally, the photo-$z$ codes used in HSC DR1 were trained on the COSMOS 30-band data, which could lead to circularity in the estimation of the redshift distributions.
     
-    In order to study the dependence of our results on the method used to estimate the redshift distributions, we have also produced alternative estimates through a stacking approach. In this case, for a given photo-$z$ code, we produce and estimate of the redshift distribution of each tomographic bin by adding the photo-$z$ probability distributions of all objects in that bin. Following this procedure we generate 4 alternative estimates of $p^i(z)$ for the photo-$z$ codes {\tt demp}, {\tt ephor}, {\tt ephor\_ab} and {\tt frankenz} (see \cite{2018PASJ...70S...9T}). The different redshift distributions for all tomographic bins and photo-$z$ methods are shown in Figure \ref{fig:nzs}. The different distributions are visually compatible with each other, although it must be noted that this is, to some extent, by construction, given that the different photo-$z$ codes were trained with the same data from the COSMOS 30-band catalog.
+    In order to study the dependence of our results on the method used to estimate the redshift distributions, we have also produced alternative estimates through a stacking approach. In this case, for a given photo-$z$ code, we produce and estimate of the redshift distribution of each tomographic bin by adding the photo-$z$ probability distributions of all objects in that bin. Following this procedure we generate 4 alternative estimates of $p^i(z)$ for the photo-$z$ codes {\tt demp}, {\tt ephor}, {\tt ephor\_ab} and {\tt frankenz} (see \cite{2018PASJ...70S...9T}) \an{What about NNPZ? I am asking because it is in the catalogs but I never got it to work as the pzs are all nan.}. The different redshift distributions for all tomographic bins and photo-$z$ methods are shown in Figure \ref{fig:nzs}. The different distributions are visually compatible with each other, although it must be noted that this is, to some extent, by construction, given that the different photo-$z$ codes were trained with the same data from the COSMOS 30-band catalog.
 
   \subsection{Angular power spectra}\label{ssec:methods.cell}
     We compute angular power spectra using a flat-sky pseudo-$C_\ell$ (PCL) algorithm \citep{2002ApJ...567....2H} using {\tt NaMaster}\footnote{\url{https://github.com/LSSTDESC/NaMaster}}. The reader is referred to the code's paper \cite{2019MNRAS.484.4127A} for a detailed description of the estimator, but we provide a brief summary here for completeness.
@@ -400,13 +401,35 @@ In addition to intrinsic correlations between galaxy positions, there exist seve
 \begin{figure}
 \begin{center}
 \subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for lowest tomographic redshift bin.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
-\subfigure[$s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
+\subfigure[Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
 \caption{Illustration of data-driven estimation of $s(z)$ for galaxy sample used in our analysis.} 
 \label{fig:s-func-estimation}
 \end{center}
 \end{figure}
 
 Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification bias. In order to determine the best-fit model parameters accounting for magnification bias we run two different MCMCs: in the first case, we fix the magnification bias amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification bias parameter that scales the amplitude of the magnification kernel and we fit it alongside the other parameters.
+
+\subsubsection{Interpretation of HOD results}
+
+In order to understand the observed trend of decreasing $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ with redshift, it would be ideal to look at the rest-frame properties of the galaxies considered in our analysis and how these change as a function of redshift. However, computing k-corrections and absolute magnitudes for broad-band photometric data can be challenging and we therefore choose and alternative approach. We cross-match galaxies passing our selection criteria within the HSC COSMOS field to galaxies also included in the COSMOS 30-band photometric catalog of \cite{2016ApJS..224...24L}. The COSMOS 30-band catalog contains, among others, absolute magnitudes in Subaru \texttt{B}-band, $M_{B}$, and Subaru \texttt{r+}-band, $M_{R}$. Using these quantities, we construct color-magnitude diagrams for all cross-matched galaxies. Fig.~\ref{fig:color-mag} shows the $M_{B}-M_{R}$ color as a function of $M_{R}$ magnitude for 10 equally spaced redshift bins in $z \in [0.15, 1.5]$\footnote{The galaxies are split into redshift bins according to COSMOS 30-band photometric redshifts. We note that we have repeated the analysis splitting the sample according to HSC \texttt{Ephor AB} photometric redshifts, finding consistent results.}. \an{We could also show the plot for the HSC splitting. What do you prefer?} In this diagram, red galaxies populate the high $M_{B}-M_{R}$ color, high $M_{R}$ magnitude plane, while blue galaxies tend to have lower $M_{B}-M_{R}$ and $M_{R}$. As can be seen from the figure, red galaxies increasingly drop-out of the high redshift samples. We can quantify this effect by computing the fraction of red galaxies in our sample as a function of redshift: we empirically determine the separation between the blue and red clouds (denoted by the solid lines in the figure) and compute the fraction of galaxies in the red cloud as $f_{R} = \sfrac{N_{R}}{(N_{R}+N_{B})}$, where $N_{R}$ denotes the number of galaxies above the separation line, while $N_{B}$ is the number of galaxies below the line. Consistent with the figure, we find decreasing $f_{R}$ as a function of redshift. 
+
+This suggests that red galaxies increasingly drop-out of our sample due to the applied magnitude limit of $m_{\mathrm{lim}, i} < 24.5$.
+
+%\begin{figure}
+%\begin{center}
+%\includegraphics[scale=0.55]{figures/color-magnitude_cut=pz_best_eab_nbin=4_weights=True.pdf}
+%\caption{Synopsis of the framework for integrated probe combination employed in this work.}
+%\label{fig:color-mag}
+%\end{center}
+%\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/color-magnitude_cut=COSMOS30_nbin=10_weights=True.pdf}
+\caption{Color-magnitude diagrams of COSMOS 30-band galaxies cross-matched to HSC galaxies passing our selection cuts for 10 tomographic redshift bins $z \in [0.15, 1.5]$.}
+\label{fig:color-mag}
+\end{center}
+\end{figure}
 
   \todo{Things to discuss:}
   \begin{enumerate}
