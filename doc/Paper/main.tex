@@ -26,6 +26,8 @@
 \newcommand{\as}[1]{{\textcolor{blue}{[AS: #1]}}}
 \newcommand{\an}[1]{{\textcolor{magenta}{[AN: #1]}}}
 
+\newcommand\Tstrut{\rule{0pt}{3ex}}   
+
 \usepackage[T1]{fontenc} % if needed
 \usepackage{natbib}
 \bibliographystyle{JHEP}
@@ -128,6 +130,13 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \begin{equation}
       R(z,k)=\frac{P^{\rm Halofit}_{mm}(z,k)}{P^{\rm halo\,model}_{mm}(z,k)}.
     \end{equation}
+    
+We expect mean galaxy properties to evolve as a function of redshift for the magnitude-limited sample considered in this analysis. Instead of fitting a separate HOD model to each redshift bin, we fit redshift-dependent functions to $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$ and choose a functional form given by:
+\begin{equation}
+M_{i}(z) = M_{i} + M_{i, p} \left(\frac{1}{1+z} - \frac{1}{1+z_{p}}\right),
+\end{equation}
+where $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto-power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters. 
+
 
 \section{Data}\label{sec:data}
   \begin{table}
@@ -388,8 +397,25 @@ In order to derive constraints on HOD, cosmological and systematics parameters, 
 \label{eq:likelihood}
 \end{align}
 The quantity $C$ denotes the joint covariance matrix, which we estimate analytically for a cosmological model \todo{bla} and keep constant during parameter estimation.
-We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. For all sampled parameters, we assume flat, uniform priors. We sample the parameter set \todo{bla}. The sampled parameters are shown alongside their priors in Tab. \todo{bla}.
+We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. For all sampled parameters, we assume flat, uniform priors. We sample the parameter set \todo{bla}. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}.
 
+\begin{table*}
+\caption{Parameters varied in the MCMC with their respective priors and posterior means. The uncertainties denote the $68 \%$ c.l..} \label{tab:params}
+\begin{center}
+\begin{tabular}{ccc}
+\hline\hline 
+Parameter & Prior & Posterior mean\\ \hline \Tstrut                             
+$M_{\mathrm{min}}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
+$M_{\mathrm{min}, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
+$M_{0}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\
+$M_{0, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
+$M_{1}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
+$M_{1, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
+$\Delta z_{i}$ & flat $\in [-0.2., \,0.2]$ & $- \pm -$ \\
+\hline\hline 
+\end{tabular}
+\end{center}
+\end{table*} 
 
 \section{Results}\label{sec:results}
 \subsection{Power spectra}
