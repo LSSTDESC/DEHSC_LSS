@@ -346,52 +346,50 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{equation}
     Where $M_{\ell\ell'}$ are the mode-coupling matrices described in the previous section, except now they are computed from the products of two masks. This approach has been shown by \cite{2019arXiv190611765G} to yield a very good approximation for the power spectrum covariance, fully accounting for the effects of mode coupling due to survey geometry. \todo{we did check this against gaussian simulations for this paper too. Do we want to show this? We'd need to regenerate those simulations and the corresponding plots.}
     
-The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we estimate this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as
-\begin{equation}
-\mathrm{Cov}_{\mathrm{NG}}(C^{AB}_{\ell}, C^{CD}_{\ell'}) = \int \int \mathrm{d}\theta \;\mathrm{d}\chi \; \frac{q^{A}(\chi)q^{B}(\chi)q^{C}(\chi)q^{D}(\chi)}{\chi^{6}} \; T^{ABCD}(\sfrac{\ell}{\chi}, \sfrac{\ell'}{\chi}, \theta).
-\end{equation}
-Using the halo model, the connected part of the trispectrum $T^{ABCD}$ is given by (e.g. \cite{Takada:2013}):
-\begin{equation}
-T^{ABCD} = T^{ABCD, 1h} + (T^{ABCD, 2h}_{22} + T^{ABCD, 2h}_{13}) + T^{ABCD, 3h} + T^{ABCD, 4h},
-\end{equation}
-where
-\begin{align}
-&T^{ABCD, 1h}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = I^{0}_{ABCD}(k_{1}, k_{2}, k_{3}, k_{4}), \\
-&T^{ABCD, 2h}_{22}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = P_{\mathrm{lin}}(k_{12})I^{1}_{AB}(k_{1}, k_{2})I^{1}_{CD}(k_{3}, k_{4}) + 2 \; \mathrm{perm.}, \\
-&T^{ABCD, 2h}_{13}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = P_{\mathrm{lin}}(k_{1})I^{1}_{A}(k_{1})I^{1}_{BCD}(k_{2}, k_{3}, k_{4}) + 3 \; \mathrm{perm.}, \\
-&T^{ABCD, 3h}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = B^{\mathrm{PT}}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{34})I^{1}_{A}(k_{1})I^{1}_{B}(k_{2})I^{1}_{CD}(k_{3}, k_{4}) + 5 \; \mathrm{perm.}, \\
-&T^{ABCD, 4h}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4}) = T^{\mathrm{PT}}(\mathbf{k}_{1}, \mathbf{k}_{2}, \mathbf{k}_{3}, \mathbf{k}_{4})I^{1}_{A}(k_{1})I^{1}_{B}(k_{2})I^{1}_{C}(k_{3})I^{1}_{D}(k_{4}).
-\end{align}
-The quantities $B^{\mathrm{PT}}$ and $T^{\mathrm{PT}}$ denote the matter bi- and trispectrum respectively, as estimated using perturbation theory. The full expressions for these terms can be found in \cite{Takada:2013}. Finally, $I^{i}_{j}$ denotes the generic halo model integral, defined as (e.g. \cite{Krause:2017}):
-\begin{align}
-I^{i}_{A}(k) &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) \langle \tilde{u}_{A}(k, M) \rangle, \\
-I^{i}_{AB}(k, k') &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) b_{B, i}(M) \langle \tilde{u}_{A}(k, M) \tilde{u}_{B}(k', M) \rangle, \\
-I^{i}_{ABC}(k, k', k'') &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) b_{B, i}(M) b_{C, i}(M) \langle \tilde{u}_{A}(k, M) \tilde{u}_{B}(k', M) \tilde{u}_{C}(k'', M) \rangle, \\
-I^{i}_{ABCD}(k, k', k'', k''') &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M} b_{A, i}(M) b_{B, i}(M) b_{C, i}(M) b_{D, i}(M) \times \\ &\langle \tilde{u}_{A}(k, M) \tilde{u}_{B}(k', M) \tilde{u}_{C}(k'', M) \tilde{u}_{D}(k''', M) \rangle.
-\end{align}
-For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution.
+    The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we estimate this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as \todo{I think there must be something missing here, since this should depend on $f_{\rm sky}$ at least (e.g. see Eq. 9 of \url{https://arxiv.org/pdf/0810.4170.pdf}). Also, you need to define $\theta$ or write this in terms of integrals over ${\bf l}$ and ${\bf l}'$.} \todo{Also, you need to define the $q$s.}
+    \begin{equation}
+      \mathrm{Cov}_{\mathrm{NG}}(C^{ab}_{\ell}, C^{cd}_{\ell'}) = \int \int \mathrm{d}\theta \;\mathrm{d}\chi \; \frac{q^{a}(\chi)q^{b}(\chi)q^{c}(\chi)q^{d}(\chi)}{\chi^{6}} \; T^{abcd}(\sfrac{\ell}{\chi}, \sfrac{\ell'}{\chi}, \theta).
+    \end{equation}
+    Using the halo model, the connected part of the trispectrum $T^{ABCD}$ is given by (e.g. \cite{Takada:2013}):
+    \begin{equation}
+      T^{abcd} = T^{abcd, 1h} + (T^{abcd, 2h}_{22} + T^{abcd, 2h}_{13}) + T^{abcd, 3h} + T^{abcd, 4h},
+    \end{equation}
+    where
+    \begin{align}
+      &T^{abcd, 1h}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = I^{0}_{abcd}(k_{a}, k_{b}, k_{c}, k_{d}), \\
+      &T^{abcd, 2h}_{22}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = P_{\mathrm{lin}}(k_{ab})I^{1}_{ab}(k_{a}, k_{b})I^{1}_{cd}(k_{c}, k_{d}) + 2 \; \mathrm{perm.}, \\
+      &T^{abcd, 2h}_{13}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = P_{\mathrm{lin}}(k_{a})I^{1}_{a}(k_{a})I^{1}_{bcd}(k_{b}, k_{b}, k_{c}) + 3 \; \mathrm{perm.}, \\
+      &T^{abcd, 3h}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = B^{\mathrm{PT}}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{cd})I^{1}_{a}(k_{a})I^{1}_{b}(k_{b})I^{1}_{cd}(k_{c}, k_{d}) + 5 \; \mathrm{perm.}, \\
+      &T^{abcd, 4h}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = T^{\mathrm{PT}}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d})I^{1}_{a}(k_{a})I^{1}_{b}(k_{b})I^{1}_{c}(k_{c})I^{1}_{d}(k_{d}).
+    \end{align}
+    Here, ${\bf k}_{ab}\equiv {\bf k}_a+{\bf k}_b$, and the quantities $B^{\mathrm{PT}}$ and $T^{\mathrm{PT}}$ denote the matter bi- and trispectrum respectively, as estimated using tree-level perturbation theory. The full expressions for these terms can be found in \cite{Takada:2013}. Finally, $I^{n}_{a_1...b_m}$ denotes the generic halo model integral, defined as (e.g. \cite{Krause:2017}):
+    \begin{align}
+      I^{n}_{a_1...a_m}(k_1,...,k_m) &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M}b_{h, n}(M)  \left\langle\prod_{i=1}^m \left[\tilde{u}_{a_i}(k_i, M) \right]\right\rangle, \\
+    \end{align}
+    where $b_{h,1}(M)\equiv b_h(M)$ is the halo bias, $b_{h,0}\equiv1$, and $\tilde{u}_{a_i}$ is the halo profile for the $i$-th field being correlated (e.g. the HOD profile described in Section \ref{ssec:theory.hod} in the case of galaxy clustering). For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution. \todo{if we don't really use the halo model expressions above, we should provide the actual expression we use and omit the above.} \todo{Also, do you want to say anything about shot noise terms?}
 
-Finally, we compute the super-sample covariance contribution following the treatment of \todo{cite}:
-\begin{align}
-\mathrm{Cov}_{\mathrm{SSC}}(C^{AB}_{\ell}, C^{CD}_{\ell'}) = \int & \mathrm{d}\chi \;\frac{q^{A}(\chi)q^{B}(\chi)q^{C}(\chi)q^{D}(\chi)}{\chi^{4}} \times \\ &\frac{\partial P_{AB}(\sfrac{\ell}{\chi}, z(\chi))}{\partial \delta_{b}}\frac{\partial P_{CD}(\sfrac{\ell'}{\chi}, z(\chi))}{\partial \delta_{b}}\sigma^{2}_{b}(z(\chi)).
-\end{align}
-The quantity $\frac{\partial P(k, z)}{\partial \delta_b}$ is the response of the matter power spectrum to a long-wavelength density fluctuation, which we estimate using the halo model and results from perturbation theory as\footnote{We note that we also consider an alternative SSC model, in which we estimate the response of the matter power spectrum as the linearly biased response for the matter field. We find our parameter constraints to be unaffected by this change.} (e.g. \cite{Krause:2017}):
-\begin{align}
-\frac{\partial P_{AB}(k, z)}{\partial \delta_{b}} &= \left( \frac{68}{21} - \frac{1}{3}\frac{\mathrm{d}\log{k^{3} P_{\mathrm{lin}}}(k, z)}{\mathrm{d}\log k} \right) I_{A}^{1}(k)I_{B}^{1}(k)P_{\mathrm{lin}}(k, z) + I_{AB}^{1}(k, k) \\ &- (b_{A} + b_{B})P_{AB}(k, z).
-\end{align}
-The quantity $b_{A}$ denotes the large-scale HOD bias for the $A$-th sample, computed as
-\begin{equation}
-b_{A}=\frac{1}{\bar{n}_{g, A}}\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}b_{1}(M) \bar{N}_{c, A}(1+\bar{N}_{s, A}),
-\end{equation}
-and $\sigma_b^2(z)$ is the variance of the long wavelength mode over the survey footprint, given by
-\begin{equation}
-\sigma_b^2(z) = \int \frac{\mathrm{d}k_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
-\end{equation}
-Finally $W(k_\perp,z)$ denotes the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set:
-\begin{equation}
-W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}).
-\end{equation}
- \todo{Describe how we coadd the power spectra of the different fields at some point}
+    Finally, we compute the super-sample covariance contribution following the treatment of \todo{cite}:
+    \begin{align}
+       \mathrm{Cov}_{\mathrm{SSC}}(C^{ab}_{\ell}, C^{cd}_{\ell'}) = \int & \mathrm{d}\chi \;\frac{q^{a}(\chi)q^{b}(\chi)q^{c}(\chi)q^{d}(\chi)}{\chi^{4}} \times \\ &\frac{\partial P_{ab}(\sfrac{\ell}{\chi}, z(\chi))}{\partial \delta_{\rm LS}}\frac{\partial P_{cd}(\sfrac{\ell'}{\chi}, z(\chi))}{\partial \delta_{\rm LS}}\sigma^{2}_{b}(z(\chi)).
+    \end{align}
+    The quantity $\partial P_{ab}(k, z)/\partial \delta_{\rm LS}$ is the response of the matter power spectrum to a large-scale density fluctuation, which we estimate using the halo model and results from perturbation theory as\footnote{We note that we also consider an alternative SSC model, in which we estimate the response of the matter power spectrum as the linearly biased response for the matter field. We find our parameter constraints to be unaffected by this change.} (e.g. \cite{Krause:2017}):
+    \begin{align}
+      \frac{\partial P_{ab}(k, z)}{\partial \delta_{\rm LS}} &= \left( \frac{68}{21} - \frac{1}{3}\frac{\mathrm{d}\log{k^{3} P_{\mathrm{lin}}}(k, z)}{\mathrm{d}\log k} \right) I_{a}^{1}(k)I_{b}^{1}(k)P_{\mathrm{lin}}(k, z) + I_{ab}^{1}(k, k) \\ &- (b_{a} + b_{b})P_{ab}(k, z).
+    \end{align}
+    The quantity $b_{a}$ denotes the large-scale HOD bias for the $a$-th sample, computed as
+    \begin{equation}
+      b_{a}=\frac{1}{\bar{n}_{g, a}}\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}b_{h}(M) \bar{N}_{c, a}(1+\bar{N}_{s, a}),
+    \end{equation}
+    and $\sigma_b^2(z)$ is the variance of the long wavelength mode over the survey footprint, given by
+    \begin{equation}
+      \sigma_b^2(z) = \int \frac{\mathrm{d}k_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
+    \end{equation}
+    Finally $W(k_\perp,z)$ denotes the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set:
+    \begin{equation}
+      W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s)}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}),
+    \end{equation}
+    where $J_1(x)$ is the cylindrical Bessel function of order 1.
+    
 
 \subsection{Parameter constraints}\label{ssec:methods.constr}
 In order to derive constraints on HOD, cosmological and systematics parameters, we assume the joint likelihood of all auto- and cross-power spectra to be Gaussian 
