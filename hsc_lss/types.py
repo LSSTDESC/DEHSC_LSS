@@ -9,6 +9,19 @@ class DataFile:
         """
         return open(path, mode)
 
+    @classmethod
+    def make_name(cls, tag):
+        if cls.suffix:
+            return f'{tag}.{cls.suffix}'
+        else:
+            return tag
+
+class DummyFile(DataFile):
+    suffix=''
+
+class DirFile(DataFile):
+    suffix=None
+
 class FitsFile(DataFile):
     """
     A data file in the FITS format.

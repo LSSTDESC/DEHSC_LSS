@@ -23,6 +23,10 @@ stages:
       nprocess: 1
       partition: debug
       walltime: 10
+    - name: MapDiagnoser
+      nprocess: 1
+      partition: debug
+      walltime: 10
     - name: PowerSpecter
       nprocess: 1
       partition: regular
@@ -37,12 +41,12 @@ inputs:
     cosmos_hsc: /global/cscratch1/sd/damonge/HSC_ceci/PDR1_DEEP_COSMOS_forced.fits
     syst_masking_file: ./hsc_lss_params/systematic_cuts/WIDE_VVDS_syst_cuts.txt
 
-config: ./hsc_lss_params/config.yml
+config: ./hsc_lss_params/params_i22p5/config.yml
 
 resume: True
 
-output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_VVDS_sirius_out
+output_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_VVDS_sirius_i22p5_out
 
-log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_VVDS_sirius_out/logs
+log_dir: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_VVDS_sirius_i22p5_out/logs
 
-pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_VVDS_sirius_out/logs/full_log.txt
+pipeline_log: /global/cscratch1/sd/damonge/HSC_ceci/WIDE_VVDS_sirius_i22p5_out/logs/full_log.txt

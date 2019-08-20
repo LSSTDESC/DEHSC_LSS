@@ -1,5 +1,5 @@
 from ceci import PipelineStage
-from .types import FitsFile,ASCIIFile,BinaryFile,NpzFile,SACCFile
+from .types import FitsFile,ASCIIFile,BinaryFile,NpzFile,SACCFile,DummyFile
 import numpy as np
 from .flatmaps import read_flat_map,compare_infos
 from astropy.io import fits
@@ -17,9 +17,7 @@ class PowerSpecter(PipelineStage) :
             ('skylevel_maps',FitsFile),('sigma_sky_maps',FitsFile),('seeing_maps',FitsFile),
             ('ellipt_maps',FitsFile),('nvisit_maps',FitsFile),('cosmos_weights',FitsFile),
             ('syst_masking_file',ASCIIFile)]
-    outputs=[('mcm',BinaryFile),('cov_mcm',BinaryFile),('gaucov_sims',NpzFile),
-             ('windows_l',NpzFile),('noi_bias',SACCFile),('dpj_bias',SACCFile),
-             ('power_spectra_wdpj',SACCFile),('power_spectra_wodpj',SACCFile)]
+    outputs=[('dummy',DummyFile)]
     config_options={'ell_bpws':[100.0,200.0,300.0,
                                 400.0,600.0,800.0,
                                 1000.0,1400.0,1800.0,
@@ -27,14 +25,12 @@ class PowerSpecter(PipelineStage) :
                                 4600.0,6200.0,7800.0,
                                 9400.0,12600.0,15800.0],
                     'oc_dpj_list': ['airmass','seeing','sigma_sky'],
-                    'z_bias_nodes':[0.00,0.50,1.00,2.00,4.00],
-                    'b_bias_nodes':[0.82,1.10,1.44,1.66,2.61],
                     'depth_cut':24.5,'band':'i','mask_thr':0.5,'guess_spectrum':'NONE',
-                    'gaus_covar_type':'analytic','oc_all_bands':True,'add_ssc':False,
+                    'gaus_covar_type':'analytic','oc_all_bands':True,
                     'mask_systematics':False,'noise_bias_type':'analytic',
-                    'ssc_response_prefix':'none'}
+                    'output_run_dir':None,'sys_collapse_type':'average'}
 
-    def read_map_bands(self,fname,read_bands,bandname) :
+    def read_map_bands(self,fname,read_bands,bandname,offset=0) :
         """
         Reads maps from file.
         :param fname: file name
@@ -42,14 +38,18 @@ class PowerSpecter(PipelineStage) :
         :param bandname: if `read_bands==False`, then read only the map for this band.
         """
         if read_bands :
-            i_map=-1
+            temp=[]
+            for i in range(5):
+                i_map=i+5*offset
+                fskb,t=read_flat_map(fname,i_map=i_map)
+                compare_infos(self.fsk,fskb)
+                temp.append(t)
         else :
-            i_map=['g','r','i','z','y'].index(bandname)
-        fskb,temp=read_flat_map(fname,i_map=i_map)
-        compare_infos(self.fsk,fskb)
-        if i_map!=-1 :
+            i_map=['g','r','i','z','y'].index(bandname)+5*offset
+            fskb,temp=read_flat_map(fname,i_map=i_map)
+            compare_infos(self.fsk,fskb)
             temp=[temp]
-    
+
         return temp
 
     def get_sacc_windows(self,wsp) :
@@ -59,7 +59,7 @@ class PowerSpecter(PipelineStage) :
         #Compute window functions
         nbands=wsp.wsp.bin.n_bands
         l_arr=np.arange(self.lmax+1)
-        if not os.path.isfile(self.get_output('windows_l')) :
+        if not os.path.isfile(self.get_output_fname('windows_l',ext='npz')) :
             print("Computing window functions")
             windows=np.zeros([nbands,self.lmax+1])
             t_hat=np.zeros(self.lmax+1);
@@ -67,10 +67,10 @@ class PowerSpecter(PipelineStage) :
                 t_hat[il]=1.;
                 windows[:,il]=wsp.decouple_cell(wsp.couple_cell(l_arr,[t_hat]))
                 t_hat[il]=0.;
-            np.savez(self.get_output('windows_l')[:-4],windows=windows)
+            np.savez(self.get_output_fname('windows_l'),windows=windows)
         else :
             print("Reading window functions")
-            windows=np.load(self.get_output('windows_l'))['windows']
+            windows=np.load(self.get_output_fname('windows_l',ext='npz'))['windows']
 
         windows_sacc=[]
         #i_x=0
@@ -171,78 +171,6 @@ class PowerSpecter(PipelineStage) :
 
         return nls_all
 
-    def get_covar_ssc(self,tracers,ell_eff) :
-        """
-        Get an estimate of the super-sample covariance.
-        :param tracers: list of Tracers.
-        :param ell_eff: list of multipoles at which to estimate the SSC.
-        """
-        #Compute number density and uncertainty on it from cosmic variance
-        import pyccl as ccl
-        from scipy.special import jv
-        #Cosmology
-        cosmo=ccl.Cosmology(Omega_c=0.27,Omega_b=0.049,h=0.67,sigma8=0.83,w0=-1.,wa=0.,n_s=0.96)
-
-        #Sky fraction
-        f_sky=np.sum(self.msk_bi*self.mskfrac)*self.area_pix/(4*np.pi)
-
-        #Tracers
-        cclt=[]
-        z_b=np.array(self.config['z_bias_nodes'])
-        b_b=np.array(self.config['b_bias_nodes'])
-        b_bf=interp1d(z_b,b_b)
-        ng_data=np.zeros([len(tracers),4]);
-        for i_t,t in enumerate(tracers) :
-            zarr=(t.nz_data['z_i']+t.nz_data['z_f'])*0.5
-            narr=t.nz_data['nz_cosmos']
-            barr=b_bf(zarr)
-            cclt.append(ccl.NumberCountsTracer(cosmo,has_rsd=False,dndz=(zarr,narr),
-                                               bias=(zarr,barr)))
-
-            larr=np.arange(3001)
-            cell=ccl.angular_cl(cosmo,cclt[i_t],cclt[i_t],larr) # A = pi*th^2
-            theta_s=np.sqrt(self.area_patch/np.pi)
-            well=np.ones(len(larr)); well[1:]=2*jv(1,larr[1:]*theta_s)/(larr[1:]*theta_s); well=well**2
-            ngals=t.ndens_perad*(np.radians(t.fsk.dx)*np.radians(t.fsk.dy))*np.sum(t.weight)
-            sigma_c=ngals*np.sqrt(np.sum(larr*cell*well/(2*np.pi)))
-            sigma_p=np.sqrt(ngals)
-            ng_data[i_t,0]=ngals/self.area_patch
-            ng_data[i_t,1]=sigma_p/self.area_patch
-            ng_data[i_t,2]=sigma_c/self.area_patch
-            ng_data[i_t,3]=np.sqrt(sigma_p**2+sigma_c**2)/self.area_patch
-
-        #SSC init
-        def get_response_func() :
-            zarr=np.array([4.,3.,2.,1.,0.])
-            resp2d=[]
-            for iz,z in enumerate(zarr) :
-                kresph,_,_,_,resp1d=np.loadtxt(self.config['ssc_response_prefix']+"_z%d.txt"%(int(z)),
-                                               unpack=True)
-                resp2d.append(resp1d)
-            kresp=kresph*0.67
-            aresp=1./(1.+zarr)
-            resp2d=np.array(resp2d)
-            return ccl.Pk2D(a_arr=aresp,lk_arr=np.log(kresp),pk_arr=resp2d,is_logp=False)
-        respf=get_response_func()
-        ssc_wsp=ccl.SSCWorkspace(cosmo,f_sky,cclt[0],cclt[0],cclt[0],cclt[0],ell_eff,respf)
-
-        #SSC compute
-        covar_ssc=np.zeros([self.ncross*self.nell,self.ncross*self.nell])
-        iv=0
-        for i1 in range(self.nbins) :
-            for i2  in range(i1,self.nbins) :
-                jv=0
-                for j1 in range(self.nbins) :
-                    for j2  in range(j1,self.nbins) :
-                        mat=ccl.angular_cl_ssc_from_workspace(ssc_wsp,cosmo,
-                                                              cclt[i1],cclt[i2],
-                                                              cclt[j1],cclt[j2])
-                        covar_ssc[iv*self.nell:(iv+1)*self.nell,jv*self.nell:(jv+1)*self.nell]=mat
-                        jv+=1
-                iv+=1
-        
-        return ng_data,covar_ssc
-
     def get_dpj_bias(self,trc,lth,clth,cl_coupled,wsp,bpws) :
         """
         Estimate the deprojection bias
@@ -254,9 +182,9 @@ class PowerSpecter(PipelineStage) :
         :param bpws: NaMaster bandpowers.
         """
         #Compute deprojection bias
-        if os.path.isfile(self.get_output('dpj_bias')) :
+        if os.path.isfile(self.get_output_fname('dpj_bias',ext='sacc')) :
             print("Reading deprojection bias")
-            s=sacc.SACC.loadFromHDF(self.get_output('dpj_bias'))
+            s=sacc.SACC.loadFromHDF(self.get_output_fname('dpj_bias',ext='sacc'))
             cls_deproj_all=s.mean.vector.reshape([self.ncross,self.nell])
         else :
             print("Computing deprojection bias")
@@ -324,19 +252,20 @@ class PowerSpecter(PipelineStage) :
                 cls_coupled.append(cl_coupled[0])
         return np.array(cls_all),np.array(cls_coupled)
 
-    def get_covar(self,lth,clth,bpws,wsp,temps,cl_dpj_all) :
+    def get_covar(self,lth,clth,bpws,tracers,wsp,temps,cl_dpj_all) :
         """
         Estimate the power spectrum covariance
         :param lth: list of multipoles.
         :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
         :param bpws: NaMaster bandpowers.
+        :params tracers: tracers.
         :param wsp: NaMaster workspace.
-        :param temps: list of contaminatn templates.
+        :param temps: list of contaminant templates.
         :params cl_dpj_all: list of deprojection biases for each bin pair combination.
         """
         if self.config['gaus_covar_type']=='analytic' :
             print("Computing analytical Gaussian covariance")
-            cov=self.get_covar_analytic(lth,clth,bpws,wsp)
+            cov=self.get_covar_analytic(lth,clth,bpws,tracers,wsp)
         elif self.config['gaus_covar_type']=='gaus_sim' :
             print("Computing simulated Gaussian covariance")
             cov=self.get_covar_gaussim(lth,clth,bpws,wsp,temps,cl_dpj_all)
@@ -348,28 +277,29 @@ class PowerSpecter(PipelineStage) :
         Get NmtWorkspaceFlat for our mask
         """
         wsp=nmt.NmtWorkspaceFlat()
-        if not os.path.isfile(self.get_output('mcm')) :
+        if not os.path.isfile(self.get_output_fname('mcm',ext='dat')) :
             print("Computing MCM")
             wsp.compute_coupling_matrix(tracers[0].field,tracers[0].field,bpws)
-            wsp.write_to(self.get_output('mcm'))
+            wsp.write_to(self.get_output_fname('mcm',ext='dat'))
         else :
             print("Reading MCM")
-            wsp.read_from(self.get_output('mcm'))
+            wsp.read_from(self.get_output_fname('mcm',ext='dat'))
         
         return wsp
 
-    def get_covar_mcm(self,wsp) :
+    def get_covar_mcm(self,tracers,bpws):
         """
         Get NmtCovarianceWorkspaceFlat for our mask
         """
         cwsp=nmt.NmtCovarianceWorkspaceFlat()
-        if not os.path.isfile(self.get_output('cov_mcm')) :
+        if not os.path.isfile(self.get_output_fname('cov_mcm',ext='dat')) :
             print("Computing covariance MCM")
-            cwsp.compute_coupling_coefficients(wsp,wsp)
-            cwsp.write_to(self.get_output('cov_mcm'))
+            cwsp.compute_coupling_coefficients(tracers[0].field,
+                                               tracers[0].field,bpws)
+            cwsp.write_to(self.get_output_fname('cov_mcm',ext='dat'))
         else :
             print("Reading covariance MCM")
-            cwsp.read_from(self.get_output('cov_mcm'))
+            cwsp.read_from(self.get_output_fname('cov_mcm',ext='dat'))
         
         return cwsp
 
@@ -384,7 +314,7 @@ class PowerSpecter(PipelineStage) :
         :params cl_dpj_all: list of deprojection biases for each bin pair combination.
         """
         #Create a dummy file for the covariance MCM
-        f=open(self.get_output('cov_mcm'),"w")
+        f=open(self.get_output_fname('cov_mcm',ext='dat'),"w")
         f.close()
 
         #Setup
@@ -422,26 +352,27 @@ class PowerSpecter(PipelineStage) :
             cells_sims.append(np.array(cells_this).flatten())
         cells_sims=np.array(cells_sims)
         #Save simulations for further 
-        np.savez(self.get_output('gaucov_sims')[:-4],cl_sims=cells_sims)
+        np.savez(self.get_output_fname('gaucov_sims'),cl_sims=cells_sims)
         
         #Compute covariance
         covar=np.cov(cells_sims.T)
         return covar
 
-    def get_covar_analytic(self,lth,clth,bpws,wsp) :
+    def get_covar_analytic(self,lth,clth,bpws,tracers,wsp) :
         """
         Estimate the power spectrum covariance analytically
         :param lth: list of multipoles.
         :param clth: list of guess power spectra sampled at the multipoles stored in `lth`.
         :param bpws: NaMaster bandpowers.
+        :param tracers: tracers.
         :param wsp: NaMaster workspace.
         """
         #Create a dummy file for the covariance MCM
-        f=open(self.get_output('gaucov_sims'),"w")
+        f=open(self.get_output_fname('gaucov_sims',ext='npz'),"w")
         f.close()
 
         covar=np.zeros([self.ncross*self.nell,self.ncross*self.nell])
-        cwsp=self.get_covar_mcm(wsp)
+        cwsp=self.get_covar_mcm(tracers,bpws)
 
         ix_1=0
         for i1 in range(self.nbins) :
@@ -453,7 +384,8 @@ class PowerSpecter(PipelineStage) :
                         ca1b2=clth[self.ordering[i1,j2]]
                         ca2b1=clth[self.ordering[j1,i2]]
                         ca2b2=clth[self.ordering[j1,j2]]
-                        cov_here=nmt.gaussian_covariance_flat(cwsp,lth,ca1b1,ca1b2,ca2b1,ca2b2)
+                        cov_here=nmt.gaussian_covariance_flat(cwsp,0,0,0,0,
+                                                              lth,[ca1b1],[ca1b2],[ca2b1],[ca2b2],wsp)
                         covar[ix_1*self.nell:(ix_1+1)*self.nell,:][:,ix_2*self.nell:(ix_2+1)*self.nell]=cov_here
                         ix_2+=1
                 ix_1+=1
@@ -484,9 +416,10 @@ class PowerSpecter(PipelineStage) :
                                     dtype=[('name','|U32'),('band','|U4'),('gl','|U4'),('thr','<f8')])
             for d in data_syst :
                 #Read systematic
-                if d['name'].startswith('oc_') :
-                    sysmap=self.read_map_bands(self.get_input(d['name'][3:]+'_maps'),False,d['band'])[0]
-                elif d['name']=='dust' :
+                if d['name'].startswith('oc_'):
+                    sysmap=self.read_map_bands(self.get_input(d['name'][3:]+'_maps'),False,d['band'],
+                                               offset=self.sys_map_offset)[0]
+                elif d['name']=='dust':
                     sysmap=self.read_map_bands(self.get_input('dust_map'),False,d['band'])[0]
                 else :
                     raise KeyError("Unknown systematic name "+d['name'])
@@ -506,6 +439,8 @@ class PowerSpecter(PipelineStage) :
                 print(' '+d['name']+d['gl']+'%.3lf'%(d['thr'])+
                       ' removes ~%.2lf per-cent of the available sky'%((1-fsky_post/fsky_pre)*100))
             print(' All systematics remove %.2lf per-cent of the sky'%((1-np.sum(msk_syst)/np.sum(msk_bi))*100))
+            self.fsk.write_flat_map(self.get_output_fname("mask_syst",ext="fits"),msk_syst)
+
             msk_bi*=msk_syst
 
         return msk_bi,mskfrac,mp_depth
@@ -543,7 +478,8 @@ class PowerSpecter(PipelineStage) :
         #Observing conditions
         for oc in self.config['oc_dpj_list'] :
             for t in self.read_map_bands(self.get_input(oc+'_maps'),
-                                         self.config['oc_all_bands'],self.config['band']) :
+                                         self.config['oc_all_bands'],
+                                         self.config['band'],offset=self.sys_map_offset) :
                 temps.append(t)
         temps=np.array(temps)
         #Remove mean
@@ -552,10 +488,23 @@ class PowerSpecter(PipelineStage) :
 
         return temps
 
+    def get_output_fname(self,name,ext=None):
+        fname=self.output_dir+name
+        if ext is not None:
+            fname+='.'+ext
+        return fname
+
     def parse_input(self) :
         """
         Check sanity of input parameters.
         """
+        # This is a hack to get the path of the root output directory.
+        # It should be easy to get this from ceci, but I don't know how to.
+        self.output_dir=self.get_output('dummy',final_name=True)[:-5]
+        if self.config['output_run_dir'] is not None:
+            self.output_dir+=self.config['output_run_dir']+'/'
+        if not os.path.isdir(self.output_dir):
+            os.mkdir(self.output_dir)
         if (self.config['noise_bias_type']!='analytic') and (self.config['noise_bias_type']!='pois_sim') :
             raise ValueError('Noise bias calculation must be either \'analytic\' or \'pois_sim\'')
         if (self.config['gaus_covar_type']!='analytic') and (self.config['gaus_covar_type']!='gaus_sim') :
@@ -563,6 +512,12 @@ class PowerSpecter(PipelineStage) :
         if self.config['guess_spectrum']!='NONE' :
             if not os.path.isfile(self.config['guess_spectrum']) :
                 raise ValueError('Guess spectrum must be either \'NONE\' or an existing ASCII file')
+        if self.config['sys_collapse_type']=='average':
+            self.sys_map_offset=0
+        elif self.config['sys_collapse_type']=='median':
+            self.sys_map_offset=2
+        else:
+            raise ValueError('Systematic map flattening mode %s unknown. Use \'average\' or \'median\''%(self.config['sys_collapse_type']))
 
         return
 
@@ -698,31 +653,24 @@ class PowerSpecter(PipelineStage) :
         cls_wdpj,cls_deproj=self.get_dpj_bias(tracers_wc,lth,clth,cls_wdpj_coupled,wsp,bpws)
 
         print("Computing covariance")
-        cov_wodpj=self.get_covar(lth,clth,bpws,wsp,None,None)
+        cov_wodpj=self.get_covar(lth,clth,bpws,tracers_wc,wsp,None,None)
         if self.config['gaus_covar_type']=='analytic' :
             cov_wdpj=cov_wodpj.copy()
         else :
-            cov_wdpj=self.get_covar(lth,clth,bpws,wsp,temps,cls_deproj)
-
-        if self.config['add_ssc'] :
-            print("Computing SSC")
-            ng_data,cov_ssc=self.get_covar_ssc(tracers_nc,ell_eff)
-            cov_wodpj+=cov_ssc
-            cov_wdpj+=cov_ssc
-            #np.savetxt(o.prefix_out+".ngals",ng_data,
-            #           header='[1]-Ngals [2]-Sigma_poisson [3]-Sigma_CV [4]-Sigma_T')
+            cov_wdpj=self.get_covar(lth,clth,bpws,tracers_wc,wsp,temps,cls_deproj)
 
         print("Computing noise bias")
         nls=self.get_noise(tracers_nc,wsp,bpws)
 
         print("Writing output")
-        self.write_vector_to_sacc(self.get_output('noi_bias'),tracers_sacc,
+        print(self.get_output_fname('noi_bias',ext='sacc'))
+        self.write_vector_to_sacc(self.get_output_fname('noi_bias',ext='sacc'),tracers_sacc,
                                   binning_nw,nls,verbose=False)
-        self.write_vector_to_sacc(self.get_output('dpj_bias'),tracers_sacc,
+        self.write_vector_to_sacc(self.get_output_fname('dpj_bias',ext='sacc'),tracers_sacc,
                                   binning_nw,cls_deproj,verbose=False)
-        self.write_vector_to_sacc(self.get_output('power_spectra_wodpj'),tracers_sacc,
+        self.write_vector_to_sacc(self.get_output_fname('power_spectra_wodpj',ext='sacc'),tracers_sacc,
                                   binning_ww,cls_wodpj,covar=cov_wodpj,verbose=False)
-        self.write_vector_to_sacc(self.get_output('power_spectra_wdpj'),tracers_sacc,
+        self.write_vector_to_sacc(self.get_output_fname('power_spectra_wdpj',ext='sacc'),tracers_sacc,
                                   binning_ww,cls_wdpj,covar=cov_wdpj,verbose=True)
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 *pyc
 *.py~
 *.png
+*.jpg
 *.sublime-workspace
 *.sublime-project
 .ipynb_checkpoints/
@@ -13,3 +14,4 @@ sql_utils/*.sql
 *synctex*
 *bbl
 data_query/*.sql
+core.*

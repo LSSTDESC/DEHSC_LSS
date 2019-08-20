@@ -1,5 +1,5 @@
 global:
-    depth_cut: 24.5
+    depth_cut: 22.5
     res: 0.01
     pad: 0.1
     res_bo: 0.003
@@ -12,7 +12,7 @@ ReduceCat:
     depth_method: fluxerr
 
 SystMapper:
-    hist_nbins: 40
+    ccd_drop: [9]
 
 COSMOSWeight:
     n_neighbors: 20
@@ -30,13 +30,14 @@ PowerSpecter:
 #    gaus_covar_type: gaus_sim
     noise_bias_type: analytic
 #    noise_bias_type: pois_sim
+#    guess_spectrum: /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/hsc_lss_params/cls_guess_i22p5.txt
     guess_spectrum: NONE
-#    guess_spectrum: /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/hsc_lss_params/cls_guess.txt
     mask_thr: 0.5
     mask_systematics: False
 #    mask_systematics: True
-    oc_dpj_list: [airmass,ccdtemp,ellipt,exptime,nvisit,seeing,sigma_sky,skylevel]
-#    oc_dpj_list: [airmass,seeing,sigma_sky]
+    oc_dpj_list: [airmass,seeing,sigma_sky]
+#    oc_dpj_list: [airmass,ccdtemp,ellipt,exptime,nvisit,seeing,sigma_sky,skylevel]
     oc_all_bands: True
 #    oc_all_bands: False
-    output_run_dir: CovAna_NoiAna_MskSirius_ClData_Dpj1_DpjBands1
+    output_run_dir: CovAna_NoiAna_MskSirius_ClData_Dpj0_DpjBands1
+    sys_collapse_type: average
