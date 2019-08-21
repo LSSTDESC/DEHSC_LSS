@@ -55,8 +55,15 @@ for t1,t2,typ,ells,ndx in s_all['data'].sortTracers():
         label_n=None
         label_d=None
     l_factor=1.0
-    ax.errorbar(ells,l_factor*(cl-nl),yerr=l_factor*el,fmt='r.',label=label_c)
-    eb=ax.errorbar(ells,-l_factor*(cl-nl),yerr=l_factor*el,fmt='r.')
+    msk_neg=cl-nl<0
+    ax.errorbar(ells[~msk_neg],
+                (l_factor*(cl-nl))[~msk_neg],
+                yerr=(l_factor*el)[~msk_neg],
+                fmt='ro',label=label_c,ms=3)
+    eb=ax.errorbar(ells[msk_neg],
+                   (-l_factor*(cl-nl))[msk_neg],
+                   yerr=(l_factor*el)[msk_neg],
+                   fmt='ro',mfc='white',ms=3)
     eb[-1][0].set_linestyle('--')
     ax.plot(ells,l_factor*nl,'-',c='#AAAAAA',label=label_n)
     ax.plot(ells,l_factor*dl,'-',lw=1,c='#0000CC',label=label_d)
