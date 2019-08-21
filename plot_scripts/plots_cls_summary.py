@@ -39,11 +39,8 @@ for b1 in range(nbins) :
         if b2<b1 :
             axes[b1,b2].axis('off')
 
-ndx_all=[]
 for t1,t2,typ,ells,ndx in s_all['data'].sortTracers():
     lmax=min(lmaxs[t1],lmaxs[t2])
-    mask=ells<lmax
-    ndx_all+=list(ndx[mask])
     ax=axes[t1,t2]
     cl=s_all['data'].mean.vector[ndx]
     nl=s_all['noise'].mean.vector[ndx]
