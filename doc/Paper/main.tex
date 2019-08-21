@@ -391,56 +391,117 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     where $J_1(x)$ is the cylindrical Bessel function of order 1.
     
 
-\subsection{Parameter constraints}\label{ssec:methods.constr}
-In order to derive constraints on HOD, cosmological and systematics parameters, we assume the joint likelihood of all auto- and cross-power spectra to be Gaussian 
-\begin{align}
-\mathscr{L}(D \vert \theta) = \frac{1}{[(2\pi)^{d}\det{C}]^{\sfrac{1}{2}}} e^{-\frac{1}{2}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})^{\mathrm{T}}C^{-1}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})}.
-\label{eq:likelihood}
-\end{align}
-The quantity $C$ denotes the joint covariance matrix, which we estimate analytically for a cosmological model \todo{bla} and keep constant during parameter estimation.
-We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. For all sampled parameters, we assume flat, uniform priors. We sample the parameter set \todo{bla}. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}.
+  \subsection{Parameter constraints}\label{ssec:methods.constr}
+    In order to derive constraints on HOD, cosmological and systematics parameters, we assume the joint likelihood of all auto- and cross-power spectra to be Gaussian 
+    \begin{align}
+      \mathscr{L}(D \vert \theta) = \frac{1}{[(2\pi)^{d}\det{C}]^{\sfrac{1}{2}}} e^{-\frac{1}{2}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})^{\mathrm{T}}C^{-1}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})}.
+      \label{eq:likelihood}
+    \end{align}
+    The quantity $C$ denotes the joint covariance matrix, which we estimate analytically for a cosmological model \todo{bla} and keep constant during parameter estimation.
+    We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. For all sampled parameters, we assume flat, uniform priors. We sample the parameter set \todo{bla}. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}.
 
-\begin{table*}
-\caption{Parameters varied in the MCMC with their respective priors and posterior means. The uncertainties denote the $68 \%$ c.l..} \label{tab:params}
-\begin{center}
-\begin{tabular}{ccc}
-\hline\hline 
-Parameter & Prior & Posterior mean\\ \hline \Tstrut                             
-$M_{\mathrm{min}}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
-$M_{\mathrm{min}, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
-$M_{0}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\
-$M_{0, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
-$M_{1}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
-$M_{1, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
-$\Delta z_{i}$ & flat $\in [-0.2., \,0.2]$ & $- \pm -$ \\
-\hline\hline 
-\end{tabular}
-\end{center}
-\end{table*} 
+    \begin{table*}
+      \caption{Parameters varied in the MCMC with their respective priors and posterior means. The uncertainties denote the $68 \%$ c.l..} \label{tab:params}
+      \begin{center}
+        \begin{tabular}{ccc}
+          \hline\hline 
+          Parameter & Prior & Posterior mean\\ \hline \Tstrut                             
+          $M_{\mathrm{min}}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
+          $M_{\mathrm{min}, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
+          $M_{0}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\
+          $M_{0, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
+          $M_{1}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
+          $M_{1, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
+          $\Delta z_{i}$ & flat $\in [-0.2., \,0.2]$ & $- \pm -$ \\
+          \hline\hline 
+        \end{tabular}
+      \end{center}
+    \end{table*} 
 
 \section{Results}\label{sec:results}
-\subsection{Power spectra}
-\subsection{Covariance matrix}
-\subsection{Constraints on HOD parameters}
-\subsubsection{Magnification bias}
-In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to the gravitational lensing effect of the intervening LSS. This effect is usually termed magnification bias. The statistical distribution of galaxies is mainly affected by magnification bias as it increases observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification bias can dominate over the intrinsic clustering signal for cross-correlations between widely separated redshift bins. As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification bias signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification bias in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from several deep patches, called DEEP and UDEEP. We repeat the above analysis on these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift in our fiducial WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen from the Figure, the three estimates agree well with each other.
+  \subsection{Power spectra}\label{ssec:results.spectra}
+    \subsubsection{Fiducial measurements}\label{sssec:results.spectra.fid}
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.99\textwidth]{figures/cls_summary.pdf}
+        \caption{Summary plot showing all measured auto- and cross-power spectra. The red data points with error bars show the coadded power spectra (see Section \ref{sssec:results.spectra.fid}). The noise and deprojection biases subtracted from the raw power spectra are shown as grey and blue lines respectively, with the negative parts of the deprojection bias shown as dashed lines. The pair of numbers in the upper right corner of each panel corresponds to the indices of the bins being cross-correlated. \todo{describe negative data points} \todo{should we include best-fit theory here too?} \todo{Note that these errorbars only include the Gaussian part of the covariance matrix.}}
+        \label{fig:cls_summary}
+      \end{figure}
+      We compute all auto- and cross-power spectra between the four different redshift bins (listed in Table \ref{tab:bins_summary}) in each of the 6 HSC DR1 fields (listed in Table \ref{tab:field_summary}) as described in Section \ref{ssec:methods.cell}, including the deprojection of 48 different contaminant templates (9 observing condition maps in each of the 5 HSC filters, a dust map, a star density map and a depth map). In order to use these measurements to constrain model parameters, we first coadd them into a single set of spectra. We perform this coaddition simply as a weighted average, weighting the spectra in each field by its area:
+      \begin{equation}
+        {\bf C}_{\rm coadd}=\frac{\sum_f A_f\,{\bf C}_f}{\sum_f A_f}, \hspace{12pt}{\sf Cov}_{\rm coadd}=\frac{\sum_f A_f^2\,{\sf Cov}_f}{\left(\sum_f A_f\right)^2}
+      \end{equation}
+      where ${\bf C}$ is a vector containing all power spectra, ${\sf Cov}$ is its covariance matrix, and $f$ runs through the 6 DR1 fields with area $A_f$. This procedure should be close to inverse-variance weighting assuming that the power spectrum covariance has a similar structure in all fields. The coadded spectra should therefore be close to optimally weighted, with the added advantage that the coaddition does not introduce additional scale dependence due to mode-coupling in the covariance matrix.
+      
+      The resulting power spectrum measurements are shown in Figure \ref{fig:cls_summary} as red circles with error bars. In all cases we have subtracted the shot noise bias as described in Section \ref{ssec:methods.cell}, which is also shown as a grey solid line in the auto-correlations. As described in Section \ref{ssec:methods.cell}, after deprojecting a set of contaminant templates, the power spectra estimated from the projected maps must be corrected for a bias caused by the loss of modes due to deprojection. This bias is also shown as a blue solid line in Figure \ref{fig:cls_summary}, where the dashed parts show the absolute value of the bias when it is negative. This bias is always at least a factor $\sim5$ smaller than the measured power spectra, and is most relevant on large scales. The semi-transparent grey bands in the figure cover the range of scales excluded from our analysis (described in Section \ref{ssec:methods.constr} \todo{check if this is correct}). Unless otherwise stated, in what follows all our results will not include any of these data.
+      
+      The rest of this sub-section describes the different tests we have carried out to quantify the robustness of these measurements.
 
-\begin{figure}
-\begin{center}
-\subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for lowest tomographic redshift bin.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
-\subfigure[Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
-\caption{Illustration of data-driven estimation of $s(z)$ for galaxy sample used in our analysis.} 
-\label{fig:s-func-estimation}
-\end{center}
-\end{figure}
+    \subsubsection{Consistency across fields}\label{sssec:results.spectra.consistent}
+      The fact that the HSC DR1 sample is distributed across 6 different disconnected fields allows us to carry out consistency test of the measurements in individual fields. For example, it is reasonable to expect that, if a given undetected systematic is biasing our measurements significantly, its impact would vary across different fields, and would therefore lead to inconsitent power spectrum measurements between them. We carry out two basic consistency tests, involving the number density of objects in each field (i.e. the one-point function) and the measured power spectra.
+      
+      \paragraph{Number densities.} The number density of galaxies estimated in a given field is simply given by the ratio of the number of galaxies by the field's footprint area:
+      \begin{equation}
+        \hat{\bar{n}}=\frac{\sum_p N_p}{\sum_p \Omega_p}= \bar{n} \frac{\int d\nv^2\,W(\nv)\left[1+\delta_g(\nv)\right]}{\int d\nv^2\,W(\nv)}.
+      \end{equation}
+      wher $p$ runs over all pixels in the map, and $N_p$ and $\Omega_p$ are the number of objects and area of pixel $p$. In the second equality we have taken the continuum limit, $\bar{n}$ is the true number density, $\delta_g$ is the galaxy overdensity and $W$ is the field's mask. Using the statistics of $\delta_g$ it is straightforward to calculate the variance of the estimated $\hat{\bar n}$:
+      \begin{equation}
+       {\rm Var}(\hat{\bar n})=\int \frac{d{\bf l}^2}{(2\pi)^2}\left|\frac{W_{\bf l}}{\int d\nv^2\,W(\nv)}\right|^2\,C_\ell.
+      \end{equation}
+      Here ${\bf l}$ is a 2D Fourier-space wave vector, $W_{\bf l}$ is the Fourier transform of the mask and $C_\ell$ is the power spectrum of $\delta_g$\footnote{We verified the validity of this calculation by replacing $C_\ell$ by its shot-noise contribution and recovering the Poisson limit (${\rm Var}_{\rm Poisson}(\hat{\bar n})=\bar{n}/A$, where $A$ is the footprint area). We find that the error on $\hat{\bar n}$ is dominated by cosmic variance (as opposed to shot noise) by more than a factor of $\sim5$ in all cases.}. Following this procedure we estimate the number density in each field and redshift bin as well as its uncertainty (where we use the mask described in Section \ref{ssec:methods.mask} and the best-fit theory power spectra to compute the latter). The results are shown in Figure \ref{fig:ndens_consistency}. In all cases we find no significant deviations in the number density found in each field with respect to the mean, with only one estimate out of the 24 (GAMA15H in bin 2) deviating by more than 2 $\sigma$. We therefore conclude that there is no evidence of inconsistency between fields on the basis of their number densities.
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.7\textwidth]{figures/ndens_consistency.pdf}
+        \caption{Source number densities estimated in the 6 different fields ($x$-axis) and in the 4 different redshift bins (in each panel, from top to bottom). We find no evidence of inconsistency between the number sources found in each field.}
+        \label{fig:ndens_consistency}
+      \end{figure}
 
-Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification bias. In order to determine the best-fit model parameters accounting for magnification bias we run two different MCMCs: in the first case, we fix the magnification bias amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification bias parameter that scales the amplitude of the magnification kernel and we fit it alongside the other parameters.
+      \paragraph{Power spectra.} Figure \ref{fig:cls_consistency} shows the difference between the power spectra estimated in each field and the coadded power spectra normalized by the power spectrum errors for all auto- and cross-correlations. We observe a reasonable scatter with respect to the coadded spectra of up to $\sim3\sigma$, which does not immediately indicate any evidence for inconsistency between fields. As a more quantitative check for inconsistencies we carry out a $\chi^2$ analysis of this scatter. Let  $\Delta {\bf C}_f={\bf C}_f-{\bf C}_{\rm coadd}$ be the difference between the power spectra measured in field $f$ and the coadded ones. Using the notation of Section \ref{sssec:results.spectra.fid}, the covariance of $\Delta {\bf C}_f$ is given by:
+      \begin{equation}
+        {\sf Cov}_{\Delta_f}=\left(1-2\frac{A_f}{\sum_{f'}A_{f'}}\right){\sf Cov}_f+{\sf Cov}_{\rm coadd}.
+      \end{equation}
+      We can therefore quantify the significance of the power spectrum differences by computing the $\chi^2$:
+      \begin{equation}
+        \chi^2\equiv\Delta{\bf C}_f^T\cdot{\sf Cov}_{\Delta_f}^{-1}\cdot\Delta{\bf C}_f,
+      \end{equation}
+      and its probability to exceed (PTE) under the assumption that $\chi^2$ follows a ``chi-squared'' distribution with a number of degrees of freedom given by the size of $\Delta{\bf C}_f$. Doing so for all the individual auto- and cross-correlations, as well as for the combined data vector containing all of them simultaneously, we find no quantitative evidence of inconsistency between fields. All PTEs are larger than 8\%, with the vast majority of them lying above 30\%. We conclude that there is no evidence for systematics from the power spectrum measurements in different fields, and therefore it is safe to coadd them and use the coadded spectra to obtain model constraints.
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.99\textwidth]{figures/cls_consistency.pdf}
+        \caption{Difference between the power spectra measured in each field and the mean coadded spectra normalized by the 1$\sigma$ errors. The pair of numbers in the upper right corner of each panel corresponds to the indices of the bins being cross-correlated. We find no inconsistency between the different measurements.}
+        \label{fig:cls_consistency}
+      \end{figure}
+      
+    \subsubsection{Robustness to contaminants} \label{sssec:results.spectra.syst}
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.99\textwidth]{figures/cls_systematics.pdf}
+        \caption{\todo{write caption} \todo{add data from arcturus mask}}
+        \label{fig:cls_systematics}
+      \end{figure}
+    
+    \subsubsection{Shot noise subtraction} \label{sssec:results.spectra.shotnoise}
+    
+  \subsection{Covariance matrix}
+  \subsection{Constraints on HOD parameters}
+    \subsubsection{Magnification bias}
+      In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to the gravitational lensing effect of the intervening LSS. This effect is usually termed magnification bias. The statistical distribution of galaxies is mainly affected by magnification bias as it increases observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification bias can dominate over the intrinsic clustering signal for cross-correlations between widely separated redshift bins. As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification bias signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification bias in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from several deep patches, called DEEP and UDEEP. We repeat the above analysis on these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift in our fiducial WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen from the Figure, the three estimates agree well with each other.
 
-\subsubsection{Interpretation of HOD results}
+      \begin{figure}
+        \begin{center}
+          \subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for lowest tomographic redshift bin.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
+          \subfigure[Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
+          \caption{Illustration of data-driven estimation of $s(z)$ for galaxy sample used in our analysis.} 
+          \label{fig:s-func-estimation}
+        \end{center}
+      \end{figure}
 
-In order to understand the observed trend of decreasing $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ with redshift, it would be ideal to look at the rest-frame properties of the galaxies considered in our analysis and how these change as a function of redshift. However, computing k-corrections and absolute magnitudes for broad-band photometric data can be challenging and we therefore choose and alternative approach. We cross-match galaxies passing our selection criteria within the HSC COSMOS field to galaxies also included in the COSMOS 30-band photometric catalog of \cite{2016ApJS..224...24L}. The COSMOS 30-band catalog contains, among others, absolute magnitudes in Subaru \texttt{B}-band, $M_{B}$, and Subaru \texttt{r+}-band, $M_{R}$. Using these quantities, we construct color-magnitude diagrams for all cross-matched galaxies. Fig.~\ref{fig:color-mag} shows the $M_{B}-M_{R}$ color as a function of $M_{R}$ magnitude for 10 equally spaced redshift bins in $z \in [0.15, 1.5]$\footnote{The galaxies are split into redshift bins according to COSMOS 30-band photometric redshifts. We note that we have repeated the analysis splitting the sample according to HSC \texttt{Ephor AB} photometric redshifts, finding consistent results.}. \an{We could also show the plot for the HSC splitting. What do you prefer?} In this diagram, red galaxies populate the high $M_{B}-M_{R}$ color, high $M_{R}$ magnitude plane, while blue galaxies tend to have lower $M_{B}-M_{R}$ and $M_{R}$. As can be seen from the figure, red galaxies increasingly drop-out of the high redshift samples. We can quantify this effect by computing the fraction of red galaxies in our sample as a function of redshift: we empirically determine the separation between the blue and red clouds (denoted by the solid lines in the figure) and compute the fraction of galaxies in the red cloud as $f_{R} = \sfrac{N_{R}}{(N_{R}+N_{B})}$, where $N_{R}$ denotes the number of galaxies above the separation line, while $N_{B}$ is the number of galaxies below the line. Consistent with the figure, we find decreasing $f_{R}$ as a function of redshift. 
+      Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification bias. In order to determine the best-fit model parameters accounting for magnification bias we run two different MCMCs: in the first case, we fix the magnification bias amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification bias parameter that scales the amplitude of the magnification kernel and we fit it alongside the other parameters.
 
-This suggests that red galaxies increasingly drop-out of our sample due to the applied magnitude limit of $m_{\mathrm{lim}, i} < 24.5$.
+    \subsubsection{Interpretation of HOD results}
+      In order to understand the observed trend of decreasing $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ with redshift, it would be ideal to look at the rest-frame properties of the galaxies considered in our analysis and how these change as a function of redshift. However, computing k-corrections and absolute magnitudes for broad-band photometric data can be challenging and we therefore choose and alternative approach. We cross-match galaxies passing our selection criteria within the HSC COSMOS field to galaxies also included in the COSMOS 30-band photometric catalog of \cite{2016ApJS..224...24L}. The COSMOS 30-band catalog contains, among others, absolute magnitudes in Subaru \texttt{B}-band, $M_{B}$, and Subaru \texttt{r+}-band, $M_{R}$. Using these quantities, we construct color-magnitude diagrams for all cross-matched galaxies. Fig.~\ref{fig:color-mag} shows the $M_{B}-M_{R}$ color as a function of $M_{R}$ magnitude for 10 equally spaced redshift bins in $z \in [0.15, 1.5]$\footnote{The galaxies are split into redshift bins according to COSMOS 30-band photometric redshifts. We note that we have repeated the analysis splitting the sample according to HSC \texttt{Ephor AB} photometric redshifts, finding consistent results.}. \an{We could also show the plot for the HSC splitting. What do you prefer?} In this diagram, red galaxies populate the high $M_{B}-M_{R}$ color, high $M_{R}$ magnitude plane, while blue galaxies tend to have lower $M_{B}-M_{R}$ and $M_{R}$. As can be seen from the figure, red galaxies increasingly drop-out of the high redshift samples. We can quantify this effect by computing the fraction of red galaxies in our sample as a function of redshift: we empirically determine the separation between the blue and red clouds (denoted by the solid lines in the figure) and compute the fraction of galaxies in the red cloud as $f_{R} = \sfrac{N_{R}}{(N_{R}+N_{B})}$, where $N_{R}$ denotes the number of galaxies above the separation line, while $N_{B}$ is the number of galaxies below the line. Consistent with the figure, we find decreasing $f_{R}$ as a function of redshift. 
+
+      This suggests that red galaxies increasingly drop-out of our sample due to the applied magnitude limit of $m_{\mathrm{lim}, i} < 24.5$.
 
 %\begin{figure}
 %\begin{center}
@@ -450,22 +511,22 @@ This suggests that red galaxies increasingly drop-out of our sample due to the a
 %\end{center}
 %\end{figure}
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.95\textwidth]{figures/color-magnitude_cut=COSMOS30_nbin=10_weights=True.pdf}
-\caption{Color-magnitude diagrams of COSMOS 30-band galaxies cross-matched to HSC galaxies passing our selection cuts for 10 tomographic redshift bins $z \in [0.15, 1.5]$.}
-\label{fig:color-mag}
-\end{center}
-\end{figure}
+      \begin{figure}
+        \begin{center}
+          \includegraphics[width=0.95\textwidth]{figures/color-magnitude_cut=COSMOS30_nbin=10_weights=True.pdf}
+          \caption{Color-magnitude diagrams of COSMOS 30-band galaxies cross-matched to HSC galaxies passing our selection cuts for 10 tomographic redshift bins $z \in [0.15, 1.5]$.}
+          \label{fig:color-mag}
+        \end{center}
+      \end{figure}
 
-  \todo{Things to discuss:}
-  \begin{enumerate}
-    \item Impact of systematics. Discuss star contamination in more detail (referenced above).
-    \item Checks we've done: consistency between fields ($C_\ell$ and $N_{\rm gal}$), different masks, different levels of contaminant deprojection, different covariances.
-    \item Effects of deprojection.
-    \item Final contours.
-    \item ...
-  \end{enumerate}
+      \todo{Things to discuss:}
+      \begin{enumerate}
+        \item Impact of systematics. Discuss star contamination in more detail (referenced above).
+        \item Checks we've done: consistency between fields ($C_\ell$ and $N_{\rm gal}$), different masks, different levels of contaminant deprojection, different covariances.
+        \item Effects of deprojection.
+        \item Final contours.
+        \item ...
+      \end{enumerate}
 
 \section{Discussion}\label{sec:discussion}
   \lipsum[9]
