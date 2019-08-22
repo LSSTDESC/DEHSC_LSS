@@ -495,13 +495,27 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
       One final possible source of systematic bias is the effect of bright sources, which cause a depletion in the number of observed galaxies around them as described in e.g. \cite{2018PASJ...70S...7C}. To mitigate this effect we make use of the bright object mask provided with the HSC DR1 (the so-called ``Sirius'' mask) as described in Section \ref{ssec:methods.mask}. One possible problem associated with this mask is the fact that it removes regions around both bright stars as well as a small fraction of bright extra-Galactic objects. Since the latter will be correlated at some level with some of the sources used in our clustering analysis, it is important to check for a possible bias associated with masking them. To do so, and to test our fiducial power spectra against the exact procedure used to produce the bright object mask, we have repeated our measurements making use of the bright star mask published by \cite{2018PASJ...70S...7C} (the so-called ``Arcturus mask). The top-right and bottom-right panels of Figure \ref{fig:ndens_syst} show both masks for the VVDS field. We can see that, while the masked regions are mostly centered around the same sources, the prescriptions used to define the masking radii are different \todo{we could give some details of what the differences are here}. The yellow datapoints in Figure \ref{fig:cls_summary} show the difference with respect to our fiducial power spectra of the spectra computed using the Arcturus mask, normalized by their 1$\sigma$ errors. \todo{Comment on this once the revised measurements are there}. We therefore conclude that bright sources do not impact our fiducial power spectra significantly. \todo{Make sure this is correct.}
       
     \subsubsection{Shot noise subtraction} \label{sssec:results.spectra.shotnoise}
+      We employ a method of estimating the shot noise by splitting the galaxy samples into two random subsamples.  We then construct number maps for each of the galaxy subsamples, which we call $S_1$ and $S_2$.  Each of these subsamples has a total power spectrum composed of the true underlying power spectrum $\delta$, which is common to both, and an independent shot noise such that $S_1 = \delta + n_1$ and $S_2 = \delta + n_2$.  We can estimate the shot noise by computing the power spectrum of the difference between the two split maps:
+      \begin{align}
+      S_1 - S_2 & = n_1 - n_2 \nonumber\\
+      \left\langle S_1 - S_2 \right\rangle & = n_1^2 + n_2^2 - 2n_1n_2 \nonumber
+      \end{align}
+      Because $n_1$ and $n_2$ are random, and therefore uncorrelated, this reduces to:
+      \begin{align}
+      \left\langle S_1 - S_2 \right\rangle & = n_1^2 + n_2^2
+      \end{align}
+      If the shot noise of the full galaxy sample is $n$, then the shot noise of each subsample will be $n_1 = \sqrt{2}n$ and $n_2 = \sqrt{2}n$.  We then find that
+      \begin{align}\label{eq:shotnoise}
+      \left\langle S_1 - S_2 \right\rangle & = 4n
+      \end{align}
+      We show the results of this calculation, averaged for all of the HSC fields in Figure \ref{fig:shotnoise_avg}.  The solid lines represent the results of calculating the shot noise using the method above, while the transparent lines represent the results found when calculating the shot noise analytically with {\tt NaMaster}.  The two methods of shot noise estimation agree well for high $\ell$.
+      
       \begin{figure}
         \centering
-        \includegraphics[width=0.6\textwidth]{figures/shotnoise_avg.png}
-        \caption{\todo{write caption.}}
+        \includegraphics[width=0.6\textwidth]{figures/shotnoise_avg.pdf}
+        \caption{A plot of the shot noise estimated using Equation \ref{eq:shotnoise} (solid lines), and {\tt NaMaster} (transparent lines).  Each color represents a different tomographic redshift bin, and the bins have been averaged across all of the HSC fields.  Both methods indicate similar estimates of the shot noise.}
         \label{fig:shotnoise_avg}
       \end{figure}
-      \todo{Adam to write}
     
   \subsection{Covariance matrix}
   \subsection{Constraints on HOD parameters}
