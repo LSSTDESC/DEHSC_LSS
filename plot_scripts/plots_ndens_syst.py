@@ -13,7 +13,7 @@ def plot_ndata(x,y,ey,ax,xcut=None):
     m = np.sum((x-1)*(y-1)/ey**2)/np.sum((x-1)**2/ey**2)
 
     # Plot data
-    ax.errorbar(x,y,yerr=ey,fmt='r.')
+    ax.errorbar(x,y,yerr=ey,fmt='ro',ms=4)
     # Plot linear fit
     x0=x[0]-(x[-1]-x[0])*0.05
     xf=x[-1]+(x[-1]-x[0])*0.05
