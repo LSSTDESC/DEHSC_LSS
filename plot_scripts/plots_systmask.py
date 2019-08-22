@@ -14,13 +14,15 @@ _,msk3=fm.read_flat_map(prefix+field+
                         "_arcturus_i24p5_out/masked_fraction.fits")
 msk3[msk3<0.5]=0; msk3[msk3>=0.5]=1.;
 
-fig=plt.figure()
+fig=plt.figure(figsize=(8,8))
 ax=fig.add_subplot(211,projection=fsk.wcs)
+ax.set_title("Sirius mask",fontsize=14)
 im=ax.imshow((msk1+msk2).reshape([fsk.ny,fsk.nx]),vmin=0,vmax=2,
              origin='lower', interpolation='nearest')
 ax.set_xlabel('R.A.', fontsize=14)
 ax.set_ylabel('Dec.', fontsize=14)
 ax=fig.add_subplot(212,projection=fsk.wcs)
+ax.set_title("Arcturus mask",fontsize=14)
 im=ax.imshow(msk3.reshape([fsk.ny,fsk.nx]),vmin=0,vmax=1,
              origin='lower', interpolation='nearest')
 ax.set_xlabel('R.A.', fontsize=14)
