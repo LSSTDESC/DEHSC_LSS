@@ -26,7 +26,11 @@ def plot_ndata(x,y,ey,ax,xcut=None):
         ax.plot([xcut,xcut],[y0-0.05*(yf-y0),yf+0.05*(yf-y0)],'--',c='#AAAAAA')
         ax.set_ylim([y0-0.05*(yf-y0),yf+0.05*(yf-y0)])
 
-    ax.tick_params(labelsize="large")
+    #for tick in ax.xaxis.get_major_ticks():
+    #    tick.label.set_fontsize(14)
+    #for tick in ax.yaxis.get_major_ticks():
+    #    tick.label.set_fontsize(14)
+    ax.tick_params(labelsize="x-large")
     ax.set_ylabel('$R(N_g)$',fontsize=15)
     
 fig,axes=plt.subplots(2,1,figsize=(10,10))
