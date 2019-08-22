@@ -33,7 +33,7 @@ def plot_ndata(x,y,ey,ax,xcut=None):
     ax.tick_params(labelsize="x-large")
     ax.set_ylabel('$R(N_g)$',fontsize=15)
     
-fig,axes=plt.subplots(2,1,figsize=(10,10))
+fig,axes=plt.subplots(2,1,figsize=(8,8))
 # Plot airmass
 plot_ndata(d_airmass['x_rescaled'][1],
            d_airmass['mean'][1],
