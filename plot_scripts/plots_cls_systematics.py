@@ -36,6 +36,7 @@ def read_cls_coadd(msk_name,directory,wdpj=True):
 s_fid=read_cls_coadd('sirius','CovAna_NoiAna_MskSirius_ClFit_Dpj1_DpjBands1',wdpj=True)
 s_ndp=read_cls_coadd('sirius','CovAna_NoiAna_MskSirius_ClFit_Dpj1_DpjBands1',wdpj=False)
 s_sys=read_cls_coadd('sirius','CovAna_NoiAna_MskSiriusSyst_ClFit_Dpj0_DpjBands1',wdpj=True)
+s_msk=read_cls_coadd('arcturus','CovAna_NoiAna_MskArcturus_ClFit_Dpj0_DpjBands1',wdpj=True)
 
 lmaxs=np.array([2170,2515,3185,4017])
 
@@ -57,23 +58,30 @@ for t1,t2,typ,ells,ndx in s_fid['data'].sortTracers():
     c_fid=s_fid['data'].mean.vector[ndxs]
     c_ndp=s_ndp['data'].mean.vector[ndxs]
     c_sys=s_sys['data'].mean.vector[ndxs]
+    c_msk=s_msk['data'].mean.vector[ndxs]
     e_fid=np.sqrt(np.fabs(np.diag(s_fid['data'].precision.getCovarianceMatrix()[ndxs,:][:,ndxs])))
     e_ndp=np.sqrt(np.fabs(np.diag(s_ndp['data'].precision.getCovarianceMatrix()[ndxs,:][:,ndxs])))
     e_sys=np.sqrt(np.fabs(np.diag(s_sys['data'].precision.getCovarianceMatrix()[ndxs,:][:,ndxs])))
+    e_msk=np.sqrt(np.fabs(np.diag(s_msk['data'].precision.getCovarianceMatrix()[ndxs,:][:,ndxs])))
     print("%d-%d"%(t1+1,t2+1))
     ax.plot([2,20000],[0,0],'k--')
     if t1==0 and t2==0:
         label_ndp='No deprojection'
         label_sys='Contaminant mask'
+        label_msk='Arcturus mask'
     else:
         label_ndp=None
         label_sys=None
-    ax.errorbar(ls*(0.95+0.1*(0+0.5)/2.),(c_ndp-c_fid)/e_ndp,
-                    yerr=e_ndp/e_ndp,
-                    fmt='.',c='r',label=label_ndp)
-    ax.errorbar(ls*(0.95+0.1*(1+0.5)/2.),(c_sys-c_fid)/e_sys,
-                    yerr=e_sys/e_sys,
-                    fmt='.',c='b',label=label_sys)
+        label_msk=None
+    ax.errorbar(ls*(0.95+0.1*(0+0.5)/3.),(c_ndp-c_fid)/e_ndp,
+                yerr=e_ndp/e_ndp,
+                fmt='.',c='r',label=label_ndp)
+    ax.errorbar(ls*(0.95+0.1*(1+0.5)/3.),(c_sys-c_fid)/e_sys,
+                yerr=e_sys/e_sys,
+                fmt='.',c='b',label=label_sys)
+    ax.errorbar(ls*(0.95+0.1*(2+0.5)/3.),(c_msk-c_fid)/e_sys,
+                yerr=e_sys/e_sys,
+                fmt='.',c='y',label=label_msk)
     ax.set_xscale('log')
     ax.set_ylim([-3.9,3.9])
     ax.set_xlim([90,4000])
