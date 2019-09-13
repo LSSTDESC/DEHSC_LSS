@@ -346,11 +346,13 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{equation}
     Where $M_{\ell\ell'}$ are the mode-coupling matrices described in the previous section, except now they are computed from the products of two masks. This approach has been shown by \cite{2019arXiv190611765G} to yield a very good approximation for the power spectrum covariance, fully accounting for the effects of mode coupling due to survey geometry. \todo{we did check this against gaussian simulations for this paper too. Do we want to show this? We'd need to regenerate those simulations and the corresponding plots.}
     
-    The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we estimate this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as \todo{I think there must be something missing here, since this should depend on $f_{\rm sky}$ at least (e.g. see Eq. 9 of \url{https://arxiv.org/pdf/0810.4170.pdf}). Also, you need to define $\theta$ or write this in terms of integrals over ${\bf l}$ and ${\bf l}'$.} \todo{Also, you need to define the $q$s.}
-    \begin{equation}
-      \mathrm{Cov}_{\mathrm{NG}}(C^{ab}_{\ell}, C^{cd}_{\ell'}) = \int \int \mathrm{d}\theta \;\mathrm{d}\chi \; \frac{q^{a}(\chi)q^{b}(\chi)q^{c}(\chi)q^{d}(\chi)}{\chi^{6}} \; T^{abcd}(\sfrac{\ell}{\chi}, \sfrac{\ell'}{\chi}, \theta).
-    \end{equation}
-    Using the halo model, the connected part of the trispectrum $T^{ABCD}$ is given by (e.g. \cite{Takada:2013}):
+    The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we estimate this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as \todo{Also, you need to define the $q$s.}
+    \begin{align}
+      \mathrm{Cov}_{\mathrm{NG}}(C^{ab}_{\ell}, C^{cd}_{\ell'}) = \frac{1}{4 \pi f_{\mathrm{sky}}} \int_{\vert \boldsymbol{\ell} \vert \in \ell_{1}} \int_{\vert \boldsymbol{\ell}' \vert \in \ell_{2}} \int \frac{\mathrm{d}^{2}\boldsymbol{\ell}}{A(\ell_{1})} \; \frac{\mathrm{d}^{2}\boldsymbol{\ell}'}{A(\ell_{2})} \; \mathrm{d}\chi \; \frac{q^{a}(\chi)q^{b}(\chi)q^{c}(\chi)q^{d}(\chi)}{\chi^{6}} \times \\ T^{abcd}(\sfrac{\boldsymbol{\ell}}{\chi}, \sfrac{-\boldsymbol{\ell}}{\chi}, \sfrac{\boldsymbol{\ell}'}{\chi}, \sfrac{-\boldsymbol{\ell}'}{\chi}).
+    \end{align}
+    The quantity $A(\ell_{i})$ denotes the area of an annulus of width $\Delta \ell_{i}$ around $\ell_{i}$, i.e. $A(\ell_{i}) = \int_{\vert \boldsymbol{\ell} \vert \in \ell_{i}} \mathrm{d}^{2}\boldsymbol{\ell}$, which is approximately given by $A(\ell_{i}) \approx 2 \pi \Delta \ell_{i} \ell_{i}$ for $\ell_{i} \gg \Delta \ell_{i}$.
+    
+    Using the halo model, the connected part of the trispectrum $T^{abcd}$ is given by (e.g. \cite{Takada:2013}):
     \begin{equation}
       T^{abcd} = T^{abcd, 1h} + (T^{abcd, 2h}_{22} + T^{abcd, 2h}_{13}) + T^{abcd, 3h} + T^{abcd, 4h},
     \end{equation}
@@ -361,12 +363,17 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
       &T^{abcd, 2h}_{13}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = P_{\mathrm{lin}}(k_{a})I^{1}_{a}(k_{a})I^{1}_{bcd}(k_{b}, k_{b}, k_{c}) + 3 \; \mathrm{perm.}, \\
       &T^{abcd, 3h}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = B^{\mathrm{PT}}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{cd})I^{1}_{a}(k_{a})I^{1}_{b}(k_{b})I^{1}_{cd}(k_{c}, k_{d}) + 5 \; \mathrm{perm.}, \\
       &T^{abcd, 4h}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d}) = T^{\mathrm{PT}}(\mathbf{k}_{a}, \mathbf{k}_{b}, \mathbf{k}_{c}, \mathbf{k}_{d})I^{1}_{a}(k_{a})I^{1}_{b}(k_{b})I^{1}_{c}(k_{c})I^{1}_{d}(k_{d}).
+    \label{eq:halo-mod-trisp}
     \end{align}
     Here, ${\bf k}_{ab}\equiv {\bf k}_a+{\bf k}_b$, and the quantities $B^{\mathrm{PT}}$ and $T^{\mathrm{PT}}$ denote the matter bi- and trispectrum respectively, as estimated using tree-level perturbation theory. The full expressions for these terms can be found in \cite{Takada:2013}. Finally, $I^{n}_{a_1...b_m}$ denotes the generic halo model integral, defined as (e.g. \cite{Krause:2017}):
     \begin{align}
       I^{n}_{a_1...a_m}(k_1,...,k_m) &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M}b_{h, n}(M)  \left\langle\prod_{i=1}^m \left[\tilde{u}_{a_i}(k_i, M) \right]\right\rangle, \\
     \end{align}
-    where $b_{h,1}(M)\equiv b_h(M)$ is the halo bias, $b_{h,0}\equiv1$, and $\tilde{u}_{a_i}$ is the halo profile for the $i$-th field being correlated (e.g. the HOD profile described in Section \ref{ssec:theory.hod} in the case of galaxy clustering). For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution. \todo{if we don't really use the halo model expressions above, we should provide the actual expression we use and omit the above.} \todo{Also, do you want to say anything about shot noise terms?}
+    where $b_{h,1}(M)\equiv b_h(M)$ is the halo bias, $b_{h,0}\equiv1$, and $\tilde{u}_{a_i}$ is the halo profile for the $i$-th field being correlated (e.g. the HOD profile described in Section \ref{ssec:theory.hod} in the case of galaxy clustering). For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution. Specifically, we set 
+    \begin{equation}
+      T^{abcd} = T^{abcd, 1h} + b_{a}b_{b}b_{c}b_{d}T^{m, 2h+3h+4h},
+    \end{equation}
+where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:halo-mod-trisp} and $b_{i}$ denotes the linear bias predicted using halo occupation distribution modeling. \todo{Also, do you want to say anything about shot noise terms?}
 
     Finally, we compute the super-sample covariance contribution following the treatment of \todo{cite}:
     \begin{align}
@@ -406,13 +413,15 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
         \begin{tabular}{ccc}
           \hline\hline 
           Parameter & Prior & Posterior mean\\ \hline \Tstrut                             
-          $M_{\mathrm{min}}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
+          $M_{\mathrm{min}}$ & flat $\in [0., \,17.]$ & $- \pm -$ \\ 
           $M_{\mathrm{min}, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
           $M_{0}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\
           $M_{0, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
           $M_{1}$ & flat $\in [0., \,15.]$ & $- \pm -$ \\ 
           $M_{1, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ \\
-          $\Delta z_{i}$ & flat $\in [-0.2., \,0.2]$ & $- \pm -$ \\
+          $\Delta z_{i}$ & flat $\in [-0.2, \,0.2]$ & $- \pm -$ \\ \\
+          $A_{M}$ & flat $\in [-2., \,2.]$ & $- \pm -$ \\
+          $z_{w, i}$ & flat $\in [-0.2, \,0.2]$ & $- \pm -$ \\
           \hline\hline 
         \end{tabular}
       \end{center}
