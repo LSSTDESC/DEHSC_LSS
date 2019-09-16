@@ -567,7 +567,7 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minima
   
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
 \caption{Fiducial constraints on HOD parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
 \label{fig:constraints-fid}
 \end{center}
@@ -591,6 +591,36 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minima
 \end{figure}
 
 \subsubsection{Robustness to modeling and data choices}
+
+\begin{table*}
+\caption{Summary of the cosmological models considered in this work.} \label{tab:models}
+\begin{center}
+\begin{tabular}{cccccccc}
+\hline\hline 
+Analysis variant & $M_{\mathrm{min}, p}$ & $M_{\mathrm{min}}$ & $M_{1, p}$ & $M_{1}$ & $A_{\mu}$ & $\Omega_{c}$ & $\sigma_{8}$ \\ \hline      
+fiducial & - & - & - & - & - & - & - \\
+auto & - & - & - & - & - & - & - \\
+G cov & - & - & - & - & - & - & - \\
+G+SSC cov & - & - & - & - & - & - & - \\
+no $z_{w, i}$ & - & - & - & - & - & - & - \\
+no $z_{w, i}, \Delta z_{i}$ & - & - & - & - & - & - & - \\
+no $z_{w, i}$, HSC $\Delta z_{i}$ prior & - & - & - & - & - & - & - \\
+pz=\texttt{DEmP}, no $z_{w, i}$ & - & - & - & - & - & -& -  \\
+pz=\texttt{Ephor}, no $z_{w, i}$ & - & - & - & - & - & - & - \\
+pz=\texttt{Ephor\_AB}, no $z_{w, i}$ & - & - & - & - & - & - & - \\
+pz=\texttt{FRANKEN-Z}, no $z_{w, i}$ & - & - & - & - & - & - & - \\
+pz=\texttt{DEmP} & - & - & - & - & - & -& -  \\
+pz=\texttt{Ephor} & - & - & - & - & - & - & - \\
+pz=\texttt{Ephor\_AB} & - & - & - & - & - & - & - \\
+pz=\texttt{FRANKEN-Z} & - & - & - & - & - & - & - \\
+fiducial magn. & - & - & - & - & - & - & - \\
+fit magn., auto+cross & - & - & - & - & - & - & - \\
+fit magn., auto & - & - & - & - & - & - & - \\
+fit cosmo & - & - & - & - & - & - & - \\
+ \hline \hline
+\end{tabular}
+\end{center}
+\end{table*}
 
 \begin{enumerate}
 \item auto vs. auto+cross
@@ -656,6 +686,7 @@ We test the robustness of our results to photometric redshift uncertainties in t
 \end{center}
 \end{figure}
 
+\subsubsection{Joint cosmology and HOD constraints}
 Finally we investigate how well our data allows us to jointly constrain the HOD distribution of galaxies and cosmological parameters. To this end we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.83 \pm 0.20$ and $\Omega_{c} = 0.230 \pm 0.025$. This shows that the data is able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, probably owing to the degeneracy with galaxy bias. The constraints on HOD and cosmological parameters are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}.
  
  \begin{figure}
@@ -666,7 +697,7 @@ Finally we investigate how well our data allows us to jointly constrain the HOD 
 \end{center}
 \end{figure} 
  
- \subsubsection{Magnification bias}
+ \subsubsection{Magnification}
 In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to gravitational lensing by the intervening LSS. This effect is usually termed magnification bias. The main effect of magnification on the statistical distribution of galaxies is to increase observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification bias can dominate over the intrinsic clustering signal for cross-correlations between widely separated redshift bins. As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification bias signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification bias in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from several deep patches, called DEEP and UDEEP. We repeat the above analysis on these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift in our fiducial WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen from the Figure, the three estimates agree well with each other.
 
       \begin{figure}
@@ -680,7 +711,7 @@ In addition to intrinsic correlations between galaxy positions, there exist seve
 
 Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification bias. In order to determine the best-fit model parameters accounting for magnification bias we run two different MCMCs: in the first case, we fix the magnification bias amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification bias parameter $A_{\mu}$ that scales the amplitude of the magnification kernel $W_{\mu}$ and we fit it alongside the other parameters.
 
-From a joint fit to all auto- and cross power spectra we obtain $A_{\mu} = 0.99\substack{+0.37 \\ -0.35}$ and the constraints are shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl}. This is consistent with our model for $s(z)$, which corresponds to $A_{\mu} = 1$ and constitutes a $\sim 2.8 \sigma$ detection of magnification bias from our HSC sample. The best-fit $\chi^{2}$ including magnification is $\chi^{2} = 83.2$\footnote{This is consistent with the case in which we set $A_{\mu}=1$, where we obtain consistent constraints with best-fit $\chi^{2} = 84.1$.}, which corresponds to an improvement compared to the fiducial analysis of $\Delta \chi^{2} = 95.4 - 83.2 = 12.2$, consistent with the $\sim 3 \sigma$ detection. The constraints obtained when including magnification agree very well with our fiducial constraints, as can be seen from Fig.~\ref{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}. In addition, we find the significance of the magnification detection to be insensitive to photometric redshift systematics, as it is unchanged when we account for changes in the width of the photometric redshift distributions in addition to shifts in the mean. In order to investigate what part of the data vector is driving the constraints on $A_{\mu}$ we repeat this analysis only including the auto power spectra. The comparison between the constraints from auto- and cross power spectra to those from auto power spectra only in shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=auto}. As can be seen, the auto power spectra alone are not able to constrain $A_{\mu}$, which means that the constraints on the magnification amplitude are solely driven by the cross power spectra.
+From a joint fit to all auto- and cross power spectra we obtain $A_{\mu} = 0.99\substack{+0.37 \\ -0.35}$ and the constraints are shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl}. This is consistent with our model for $s(z)$, which corresponds to $A_{\mu} = 1$ and constitutes a $\sim 2.8 \sigma$ detection of magnification bias from our HSC sample. The best-fit $\chi^{2}$ including magnification is $\chi^{2} = 83.2$\footnote{This is consistent with the case in which we set $A_{\mu}=1$, where we obtain consistent constraints with best-fit $\chi^{2} = 84.1$.}, which, computing the degrees of freedom as $\nu = N_{\mathrm{data}} - N_{\mathrm{param}} = 94 - 15 = 79$, corresponds to $\chi^{2}_{\mathrm{red}} = \sfrac{\chi^{2}}{\nu} = 1.06$ ($p$-value $= 0.35$). This corresponds to an improvement in $\chi^{2}$ compared to the fiducial analysis of $\Delta \chi^{2} = 95.4 - 83.2 = 12.2$, consistent with the $\sim 3 \sigma$ detection. The constraints obtained when including magnification agree very well with our fiducial constraints, as can be seen from Fig.~\ref{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}. In addition, we find the significance of the magnification detection to be insensitive to photometric redshift systematics, as it is unchanged when we account for changes in the width of the photometric redshift distributions in addition to shifts in the mean. In order to investigate what part of the data vector is driving the constraints on $A_{\mu}$ we repeat this analysis only including the auto power spectra. The comparison between the constraints from auto- and cross power spectra to those from auto power spectra only in shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=auto}. As can be seen, the auto power spectra alone are not able to constrain $A_{\mu}$, which means that the constraints on the magnification amplitude are solely driven by the cross power spectra.
 
  \begin{figure}
 \begin{center}
