@@ -151,6 +151,14 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
     \end{equation}
     where $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters. 
 
+\subsection{Photometric redshift systematics modeling}\label{ssec:theory.photoz_syst}
+
+Uncertainties in photometric redshifts (photo-$z$) represent one of the major systematics in photometric galaxy clustering analyses. To lowest order, errors in photo-$z$'s cause shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies. In this work, we therefore choose to parametrize the impact of photo-$z$ errors on the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by
+\begin{equation}
+p_{i}(z) = \hat{p}_{i}(z_{c} + (1 + z_{w, i})(z-z_{c}) + \Delta z_{i}),
+\end{equation} 
+where the index $i$ runs over the number of redshift bins considered in our analysis.
+In the above equation, $\hat{p}(z)$ denotes the estimated redshift distribution while $p(z)$ is the underlying true distribution. The parameters $\Delta z_{i}$ account for shifts in the means of the distributions and changes to their widths are parameterized through $z_{w, i}$. The quantity $z_{c}$ is kept constant in our analysis and is set to the redshift at which $\hat{p}(z)$ attains its maximal value.
 
 \section{Data}\label{sec:data}
   \begin{table}
@@ -420,10 +428,10 @@ where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:ha
       \label{eq:likelihood}
     \end{align}
     The quantity $C$ denotes the joint covariance matrix, which we estimate analytically as described in Sec.~\ref{ssec:methods.covar} and keep constant during parameter estimation \todo{somewhere say: for a cosmological model bla}.
-    We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. For all sampled parameters, we assume flat, uniform priors. We sample the parameter set \todo{bla}. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}.
+    We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}. In our fiducial analysis we sample the parameter set $\boldsymbol{\theta} = \{M_{\mathrm{min}}, \, M_{\mathrm{min}, p}, \, M_{0}, \, M_{0, p}, \, M_{1}, \, M_{1, p}, \, \Delta z_{i}, \, z_{w, i}\}$, $i = 0, \dots ,3$, where the first six parameters describe the HOD of galaxies as outlined in Sec.~\ref{ssec:theory.hod}. The remaining parameters account for photometric redshift uncertainties as described in Sec.~\ref{ssec:theory.photoz_syst}. We perform additional analyses in which we separately allow for variations in the amplitude $A_{\mu}$ of the magnification bias kernel $W_{\mu}$ and the cosmological parameters $\Omega_{c}$ and $\sigma_{8}$, where $\Omega_{c}$ is the the fractional cold matter density today and $\sigma_{8}$ denotes the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc. For all sampled parameters, we assume flat, uniform priors. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}.
 
     \begin{table*}
-      \caption{Parameters varied in the MCMC with their respective priors and posterior means. The uncertainties denote the $68 \%$ c.l..} \label{tab:params}
+      \caption{Summary of parameters varied in the MCMC with their respective priors. The posterior means and best-fits denote the values derived for our fiducial analysis. The uncertainties denote the $68 \%$ c.l..} \label{tab:params}
       \begin{center}
         \begin{tabular}{cccc}
           \hline\hline 
@@ -433,10 +441,12 @@ where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:ha
           $M_{0}$ & flat $\in [0., \,15.]$ & $- \pm -$ & $-$ \\
           $M_{0, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ & $-$ \\
           $M_{1}$ & flat $\in [0., \,15.]$ & $- \pm -$ & $-$ \\ 
-          $M_{1, p}$ & flat $\in [-5., \,10.]$ & $- \pm -$ & $-$ \\
-          $\Delta z_{i}$ & flat $\in [-0.2, \,0.2]$ & $- \pm -$ & $-$ \\ \\
-          $A_{\mu}$ & flat $\in [-2., \,2.]$ & $- \pm -$ & $-$ \\
-          $z_{w, i}$ & flat $\in [-0.2, \,0.2]$ & $- \pm -$ & $-$ \\
+          $M_{1, p}$ & flat $\in [-5., \,15.]$ & $- \pm -$ & $-$ \\
+          $\Delta z_{i}$ & flat $\in [-0.2, \,0.2]$ & $- \pm -$ & $-$ \\
+          $z_{w, i}$ & flat $\in [-0.2, \,0.2]$ & $- \pm -$ & $-$ \\ \\
+          $A_{\mu}$ & flat $\in [-2., \,2.]$ & $ - $ & $ - $ \\
+          $\Omega_{c}$ & flat $\in [0.1, \,0.9]$ & $ - $ & $ - $ \\
+          $\sigma_{8}$ & flat $\in [0.4, \,1.5]$ & $ - $ & $ - $ \\
           \hline\hline 
         \end{tabular}
       \end{center}
@@ -534,7 +544,7 @@ where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:ha
       where we have assumed that $n_1$ and $n_2$ are uncorrelated (since our two sub-catalogs are disjoint). Since the number density in each of the subsamples is half of the full sample, we can recover an estimate of the latter's shot-noise spectrum by simply dividing the power spectrum of the difference map by $4$. Figure \ref{fig:shotnoise_avg} shows the comparison between the analytic estimate in Eq. \ref{eq:nell} (transparent lines) and the estimate from the difference map power spectra (solid lines) for the four different redshift bins \todo{what order?}. Within the statistical noise of the split-map estimate, both methods agree well, particularly at high $\ell$, validating our procedure to subtract the shot-noise contribution.
       
     
-\subsection{Covariance matrix}
+\subsection{Covariance matrix}\label{ssec:results.covariance}
 
 We estimate the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{ssec:methods.covar} and the resulting correlation matrix is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
 
@@ -557,11 +567,13 @@ We estimate the covariance matrix of all measured power spectra analytically as 
 \end{center}
 \end{figure}
 
-\subsection{Constraints on HOD parameters}
+\subsection{Constraints on HOD parameters}\label{ssec:results.hod-constraints}
 
 \subsubsection{Fiducial constraints}
 
-Fig.~\ref{fig:constraints-fid} shows the HOD parameter constraints obtained from a joint fit to both auto- and cross power spectra. The corresponding best-fit values and means are shown alongside their $68 \%$ confidence limits in Tab.~\ref{tab:params}. Fig.~\ref{fig:cls-best-fit} shows the theoretical predictions derived from the parameter values at the lowest likelihood value alongside the measured power spectra. The corresponding $\chi^{2}$ is $\chi^{2} = 95.4$. Computing the degrees of freedom as $\nu = N_{\mathrm{data}} - N_{\mathrm{param}} = 94 - 14 = 80$, we obtain $\chi^{2}_{\mathrm{red}} = \sfrac{\chi^{2}}{\nu} = 1.17$ ($p$-value $= 0.11$), which shows that the data is rather well-fit by our best-fit model.
+Both the auto- and cross power spectra shown in Fig.~\ref{fig:cls_summary} carry information on astrophysical, systematics and cosmological parameters. We especially expect the cross correlations to help constrain photo-$z$ systematics parameters, as they probe the relative clustering strength in different redshift bins and thus help break degeneracies between the clustering amplitude and shifts in the means of the bins. In this work, we therefore compute fiducial constraints from a joint fit to both auto- and cross power spectra.
+
+Fig.~\ref{fig:constraints-fid-hod} shows the constraints on the HOD parameters $M_{\mathrm{min}}, \, M_{\mathrm{min}, p}, \, M_{1}, \, M_{1, p}$ for our fiducial model described in Sec.~\ref{ssec:methods.constr}. The constraints on all fitted parameters are shown in Fig.~\ref{fig:constraints-fid-full} and the corresponding best-fit values and means are shown alongside their $68 \%$ confidence limits in Tab.~\ref{tab:params}. As can be seen from Figures \ref{fig:constraints-fid-hod} and \ref{fig:constraints-fid-full}, the data allow us to constrain $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ whereas $M_{0}(z)$ is unconstrained. Fig.~\ref{fig:cls-best-fit} shows the theoretical predictions derived from the parameter values at the lowest likelihood value alongside the measured power spectra. The corresponding $\chi^{2}$ is $\chi^{2} = 95.4$. Computing the degrees of freedom as $\nu = N_{\mathrm{data}} - N_{\mathrm{param}} = 94 - 14 = 80$, we obtain $\chi^{2}_{\mathrm{red}} = \sfrac{\chi^{2}}{\nu} = 1.17$ ($p$-value $= 0.11$), which shows that the data is consistent with the best-fit theoretical model.
 
 In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minimal mass to host a central galaxy $M_{\mathrm{min}}$ and the mass scale for satellites $M_{1}$ obtained in our analysis. To illustrate the uncertainty on this relation, we also show a sample of curves derived from 1000 random realizations from the MCMCs. As can be seen, we find that the data prefers both a decreasing $M_{\mathrm{min}}$ and $M_{1}$. This is somewhat counterintuitive, as we would naively expect at least the minimal mass to host a central galaxy to increase with redshift since galaxies will only form in the most massive halos at early times. We will discuss these findings in detail in Sec.~\ref{sssec:results.constraints.interpretation}.
   
@@ -569,7 +581,7 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minima
 \begin{center}
 \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
 \caption{Fiducial constraints on HOD parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-\label{fig:constraints-fid}
+\label{fig:constraints-fid-hod}
 \end{center}
 \end{figure}
 
@@ -592,45 +604,39 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minima
 
 \subsubsection{Robustness to modeling and data choices}
 
+In order to test the robustness of our fiducial HOD constraints to implementation and data choices, we compare the constraints from several analysis variants, as described in the following.
+
 \begin{table*}
-\caption{Summary of the cosmological models considered in this work.} \label{tab:models}
+\caption{Parameter constraints and best-fit $\chi^{2}$ values obtained for all considered analysis variants.} \label{tab:constraints_robustness}
 \begin{center}
-\begin{tabular}{cccccccc}
+\begin{tabular}{ccccccccc}
 \hline\hline 
-Analysis variant & $M_{\mathrm{min}, p}$ & $M_{\mathrm{min}}$ & $M_{1, p}$ & $M_{1}$ & $A_{\mu}$ & $\Omega_{c}$ & $\sigma_{8}$ \\ \hline      
-fiducial & - & - & - & - & - & - & - \\
-auto & - & - & - & - & - & - & - \\
-G cov & - & - & - & - & - & - & - \\
-G+SSC cov & - & - & - & - & - & - & - \\
-no $z_{w, i}$ & - & - & - & - & - & - & - \\
-no $z_{w, i}, \Delta z_{i}$ & - & - & - & - & - & - & - \\
-no $z_{w, i}$, HSC $\Delta z_{i}$ prior & - & - & - & - & - & - & - \\
-pz=\texttt{DEmP}, no $z_{w, i}$ & - & - & - & - & - & -& -  \\
-pz=\texttt{Ephor}, no $z_{w, i}$ & - & - & - & - & - & - & - \\
-pz=\texttt{Ephor\_AB}, no $z_{w, i}$ & - & - & - & - & - & - & - \\
-pz=\texttt{FRANKEN-Z}, no $z_{w, i}$ & - & - & - & - & - & - & - \\
-pz=\texttt{DEmP} & - & - & - & - & - & -& -  \\
-pz=\texttt{Ephor} & - & - & - & - & - & - & - \\
-pz=\texttt{Ephor\_AB} & - & - & - & - & - & - & - \\
-pz=\texttt{FRANKEN-Z} & - & - & - & - & - & - & - \\
-fiducial magn. & - & - & - & - & - & - & - \\
-fit magn., auto+cross & - & - & - & - & - & - & - \\
-fit magn., auto & - & - & - & - & - & - & - \\
-fit cosmo & - & - & - & - & - & - & - \\
+Analysis variant & $\sfrac{\chi^{2}}{\nu}$ & $M_{\mathrm{min}, p}$ & $M_{\mathrm{min}}$ & $M_{1, p}$ & $M_{1}$ & $A_{\mu}$ & $\Omega_{c}$ & $\sigma_{8}$ \\ \hline      
+fiducial & - & - & - & - & - & - & - & - \\
+auto & - & - & - & - & - & - & - & - \\
+G cov & - & - & - & - & - & - & - & - \\
+G+SSC cov & - & - & - & - & - & - & - & - \\
+no $z_{w, i}$ & - & - & - & - & - & - & - & - \\
+no $z_{w, i}, \Delta z_{i}$ & - & - & - & - & - & - & - & - \\
+no $z_{w, i}$, HSC $\Delta z_{i}$ prior & - & - & - & - & - & - & - & - \\
+pz=\texttt{DEmP}, no $z_{w, i}$ & - & - & - & - & - & -& -  & - \\
+pz=\texttt{Ephor}, no $z_{w, i}$ & - & - & - & - & - & - & - & - \\
+pz=\texttt{Ephor\_AB}, no $z_{w, i}$ & - & - & - & - & - & - & - & - \\
+pz=\texttt{FRANKEN-Z}, no $z_{w, i}$ & - & - & - & - & - & - & - & - \\
+pz=\texttt{DEmP} & - & - & - & - & - & -& -  & - \\
+pz=\texttt{Ephor} & - & - & - & - & - & - & - & - \\
+pz=\texttt{Ephor\_AB} & - & - & - & - & - & - & - & - \\
+pz=\texttt{FRANKEN-Z} & - & - & - & - & - & - & - & - \\
+fiducial magn. & - & - & - & - & - & - & - & - \\
+fit magn., auto+cross & - & - & - & - & - & - & - & - \\
+fit magn., auto & - & - & - & - & - & - & - & - \\
+fit cosmo & - & - & - & - & - & - & - & - \\
  \hline \hline
 \end{tabular}
 \end{center}
 \end{table*}
 
-\begin{enumerate}
-\item auto vs. auto+cross
-\item covariance matrix modeling
-\item no low-z/high-z bins
-\item photo-z
-\item fit cosmo
-\end{enumerate}
-
-In order to test the consistency of the auto- and cross power spectra, we compute constraints on both HOD and systematics parameters using only the auto power spectra. Fig.~\ref{fig:constraints-auto-vs-auto+cross} shows the comparison between the constraints obtained from auto power spectra alone to those obtained from auto- and cross power spectra. As expected, we find that the auto power spectra alone yield generally weaker constraints than the combination of auto- and cross power spectra. As can be seen, the auto power spectra alone cannot constrain the photometric redshift systematics parameters $\Delta z_{i}$, suggesting that a significant part of the constraining power in our analysis stems from the cross correlations. Apart from these differences in constraining power, the constraints from auto power spectra and from auto- and cross power spectra agree very well with each other. This suggests that uncertainties in photometric redshifts do not significantly affect the cross power spectra measured in our analysis.
+As discussed above, our fiducial constraints are derived from a joint fit to both auto- and cross power spectra. However, cross correlations between redshift bins are susceptible to photometric redshift errors, such as outliers. In order to test for systematics affecting the cross-correlations, we therefore test the consistency of the auto- and cross power spectra by comparing the constraints obtained using only auto power spectra to those obtained when jointly fitting auto- and cross power spectra. Fig.~\ref{fig:constraints-auto-vs-auto+cross} shows the comparison between the HOD constraints obtained from auto power spectra to those obtained from auto- and cross power spectra. As can be seen, the constraints from auto power spectra and auto- and cross power spectra agree very well with each other, suggesting that uncertainties in photometric redshifts do not significantly affect the cross correlations measured in our analysis. In addition we see that the constraining power on HOD parameters is unaffected by including the cross power spectra. \todo{chi2 from auto theory to auto+cross theory}
 
  \begin{figure}
 \begin{center}
@@ -640,7 +646,7 @@ In order to test the consistency of the auto- and cross power spectra, we comput
 \end{center}
 \end{figure}
 
-We test the impact of the different contributions to the full covariance matrix by comparing the constraints obtained accounting for Gaussian (G), Gaussian and SSC (G+SSC) and Gaussian, SSC and non-Gaussian (G+NG+SSC) contributions and the results are shown in Fig.~\ref{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC}. These constraints agree very well with each other, with the G and the G+SSC case yielding almost identical constraints. Accounting for all non-Gaussian contributions to the covariance results in slightly broadened constraints. Comparing to Fig.~\ref{fig:covariance-contributions}, this is probably due to the fact that these corrections only affect the lowest redshift bins at small angular scales and therefore do not have a significant impact when computing constraints from all power spectra.
+An important part of our data model is the analytical covariance matrix described in Sec.~\ref{ssec:methods.covar}. In order to test the impact of non-Gaussian contributions to the covariance on our results, we compare the HOD constraints obtained accounting for Gaussian (G), Gaussian and SSC (G+SSC) and Gaussian, SSC and non-Gaussian (G+NG+SSC) contributions. As can be seen from Fig.~\ref{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC}, these constraints agree very well with each other. The constraints from the G and the G+SSC case yield almost identical constraints, which is expected due to the suppression of the SSC contribution by the number density correction (c.f. Sec.~\ref{ssec:results.covariance}). Accounting for all non-Gaussian contributions to the covariance results in slightly broadened but consistent constraints. Comparing to Fig.~\ref{fig:covariance-contributions}, this is probably due to the fact that these corrections only affect the lowest redshift bins at small angular scales and therefore do not have a significant impact when computing constraints from all power spectra.
 
  \begin{figure}
 \begin{center}
@@ -649,6 +655,12 @@ We test the impact of the different contributions to the full covariance matrix 
 \label{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC}
 \end{center}
 \end{figure}
+
+\subsubsection{Robustness to photometric redshift uncertainties}
+
+One of the most important potential systematics in photometric galaxy clustering analyses are photometric redshift uncertainties and we therefore test the stability of our results to photo-$z$ in several different ways. In Fig.~\todo{bla} we show the constraints on photometric redshift systematics parameters derived in our fiducial analysis. We find that the data cannot separately constrain the mean shift parameters $\Delta z_{i}$ as opposed to pairwise differences between those. We therefore show the constraints in terms of the reparametrized parameters $\Sigma \Delta z_{i}, \Delta z_{1} - \Delta z_{0}, \Delta z_{2} - \Delta z_{1}, \Delta z_{3} - \Delta z_{2}$, which denote the sum of the $\delta z_{i}$ and their pairwise differences respectively. 
+
+\todo{move this to photo-z section} As expected, we find that the auto power spectra alone yield generally weaker constraints than the combination of auto- and cross power spectra. As can be seen, the auto power spectra alone cannot constrain the photometric redshift systematics parameters $\Delta z_{i}$, suggesting that a significant part of the constraining power in our analysis stems from the cross correlations.
 
 We test the robustness of our results to photometric redshift uncertainties in two different ways. First, we perform internal consistency checks on the fiducial COSMOS photometric redshifts and in a second step, we compare our fiducial constraints to those obtained using redshift distributions estimated with alternative methods. The accuracy of COSMOS30 photometric redshifts decreases for $z > 1.25$ \cite{Ilbert:2009} and we therefore expect our high redshift bin to be mostly affected by photo-$z$ errors. We thus compute parameter constraints neglecting the high redshift bin and all its cross- correlations. Additionally, we also compute constraints neglecting the lowest redshift bin and its cross correlations. The results of these two analyses are shown in Figures \ref{fig:constraints-fit-bins=0+1+2+3-vs-fit-bins=0+1+2} and \ref{fig:constraints-fit-bins=0+1+2+3-vs-fit-bins=1+2+3}. As can be seen, we find all constraints to agree well with each other, with only small differences in the photometric redshift parameters $\Delta z_{i}$. This suggests that neither the highest nor the lowest redshift bin are significantly affected by photometric redshift uncertainties in the COSMOS30 catalog.
 
@@ -783,6 +795,16 @@ This suggests that red galaxies increasingly drop-out of our sample due to the a
 \acknowledgments
 
 We thank the Backstreet Boys for useful comments and discussions.
+
+\appendix
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+\caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\label{fig:constraints-fid-full}
+\end{center}
+\end{figure}
 
 \bibliography{bibliography}
 
