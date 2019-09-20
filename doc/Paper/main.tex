@@ -620,7 +620,7 @@ In order to test the robustness of our fiducial HOD constraints to implementatio
 \hline\hline 
 Analysis variant & $\sfrac{\chi^{2}}{\nu}$ & $M_{\mathrm{min}, p}$ & $M_{\mathrm{min}}$ & $M_{1, p}$ & $M_{1}$ & $A_{\mu}$ & $\Omega_{c}$ & $\sigma_{8}$ \\ \hline \Tstrut       
 fiducial & $\sfrac{95.8}{80}$ & $2.93\substack{+1.56 \\ -1.47}$ & $12.29 \pm 0.15$ & $6.00\substack{+2.14 \\ -2.05}$ & $13.69 \pm 0.21$ & - & - & - \\
-auto & - & - & - & - & - & - & - & - \\
+auto & $\sfrac{26.8}{25}$ & $3.32\substack{+2.03 \\ -1.79}$ & $12.32 \pm 0.14$ & $6.49\substack{+2.80 \\ -2.47}$ & $13.72\substack{+0.20 \\ -0.19}$  & - & - & - \\
 G cov & - & - & - & - & - & - & - & - \\
 G+SSC cov & - & - & - & - & - & - & - & - \\
 no $z_{w, i}$ & - & - & - & - & - & - & - & - \\
@@ -634,7 +634,7 @@ pz=\texttt{DEmP} & - & - & - & - & - & -& -  & - \\
 pz=\texttt{Ephor} & - & - & - & - & - & - & - & - \\
 pz=\texttt{Ephor\_AB} & - & - & - & - & - & - & - & - \\
 pz=\texttt{FRANKEN-Z} & - & - & - & - & - & - & - & - \\
-fiducial magn. & - & - & - & - & - & - & - & - \\
+fiducial magn. & $\sfrac{83.4}{79}$ & $3.53\substack{+1.88 \\ -1.71}$ & $12.33 \pm 0.15$ & $6.63\substack{+2.50 \\ -2.23}$ & $13.72\substack{+0.20 \\ -0.21}$  & - & - & - \\
 fit magn., auto+cross & - & - & - & - & - & - & - & - \\
 fit magn., auto & - & - & - & - & - & - & - & - \\
 fit cosmo & - & - & - & - & - & - & - & - \\
@@ -659,19 +659,27 @@ An important part of our data model is the analytical covariance matrix describe
 
 One of the most important potential systematics in photometric galaxy clustering analyses are photometric redshift uncertainties and we therefore test the stability of our results to photo-$z$s in several different ways, as described in detail below. 
 
-In Fig.~\todo{bla}, we show the constraints on photometric redshift systematics parameters derived in our fiducial analysis. We find that the data cannot separately constrain the mean shift parameters $\Delta z_{i}$ as opposed to pairwise differences between those. We therefore show the constraints in terms of the reparametrized parameters $\Sigma_{i} \Delta z_{i}, \Delta z_{1} - \Delta z_{0}, \Delta z_{2} - \Delta z_{1}, \Delta z_{3} - \Delta z_{2}$, which denote the sum of the $\Delta z_{i}$ and their pairwise differences respectively. While $\Sigma_{i} \Delta z_{i}$ and $z_{w, i}$ are largely unconstrained, we find that we can constrain the three pairwise differences $\Delta z_{i} - \Delta z_{j}$ to within $\sigma_{\Delta z_{i} - \Delta z_{j}} \approx 0.021$ ($68 \%$ c.l.). This means that the data do not allow constraining the absolute position of each redshift bin, but are quite sensitive to their relative positions.
+In Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we show the constraints on photometric redshift systematics parameters derived in our fiducial analysis. We find that the data cannot separately constrain the mean shift parameters $\Delta z_{i}$ as opposed to pairwise differences between those. We therefore show the constraints in terms of the reparametrized parameters $\Sigma_{i} \Delta z_{i}, \Delta z_{1} - \Delta z_{0}, \Delta z_{2} - \Delta z_{1}, \Delta z_{3} - \Delta z_{2}$, which denote the sum of the $\Delta z_{i}$ and their pairwise differences respectively. While $\Sigma_{i} \Delta z_{i}$ and $z_{w, i}$ are largely unconstrained, we find that we can constrain the three pairwise differences $\Delta z_{i} - \Delta z_{j}$ to within $\sigma_{\Delta z_{i} - \Delta z_{j}} \approx 0.021$ ($68 \%$ c.l.). This means that the data do not allow constraining the absolute position of each redshift bin, but are quite sensitive to their relative positions.
 
 It is instructive to investigate which part of the data drives the constraints on photometric redshift systematics. To this end we compare the constraints obtained using auto power spectra only to those obtained from auto- and cross power spectra. As can be seen from Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we find that the auto power spectra do not constrain the photometric redshift systematics parameters $\Delta z_{i} - \Delta z_{j}$, as opposed to the combination of auto- and cross power spectra. This shows that the cross correlations drive the constraints on photometric redshift systematics and are thus essential for jointly constraining redshift systematics and astrophysical/cosmological parameters from LSS.
 
-In order to test the impact of photometric redshift uncertainties on our fiducial HOD constraints, we compare them to those obtained when separately fixing $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$. The results are shown in Fig.~\todo{bla}. 
+In order to test the impact of photometric redshift uncertainties on our fiducial HOD constraints, we compare them to those obtained when separately fixing $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$. The results are shown in Fig.~\ref{fig:constraints-hod-pz-shifts-pz-widths-vs-pz-shifts-vs-no-pz-shifts}. 
 
 As described in Sec.~\ref{ssec:methods.nz}, our fiducial constraints are derived with the redshift distributions derived using COSMOS 30-band data \cite{2016ApJS..224...24L}. There are several potential caveats associated with this approach. First, the   photometric redshift accuracy decreases significantly for objects in the COSMOS 30 band catalog with $z > 1.4$ and secondly, the fraction of catastrophic outliers at faint magnitudes is estimated to be around $6-10 \%$ \cite{2016ApJS..224...24L}. We expect the highest redshift bin to be mostly affected by decreasing photometric redshift accuracy. However, as noted in \cite{Joudaki:2019}, catastrophic outliers that are erroneously assigned to too low redshifts are more likely to fall into our sample than outliers assigned to too high redshifts. Therefore, the lowest redshift bin in particular might also be affected by photometric redshift errors \an{not sure this is the reason for which Jeff asked us to remove the low-z bin...}. In order to test the robustness of our results to photometric redshift uncertainties at low and high redshifts, we compute parameter constraints separately neglecting the high and low redshift bin and all its cross- correlations. The results of these two analyses are shown in Fig.~\ref{fig:constraints-fit-bins=0+1+2+3-vs-fit-bins=0+1+2-vs-fit-bins=1+2+3}. As can be seen, we find all constraints to agree well with each other, with only small differences in the photometric redshift parameters $\Delta z_{i}$. This suggests that our analysis is robust against photometric redshift uncertainties in the COSMOS 30 band catalog affecting the lowest or highest of our redshift bins.
 
  \begin{figure}
 \begin{center}
 \includegraphics[width=0.95\textwidth]{figures/contours-pz-syst_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_fit=auto+cross-vs-fit=auto.pdf}
-\caption{Comparison of the constraints on photo-$z$ systematics parameters obtained from auto power spectra alone to those obtained from auto and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\caption{Comparison of our fiducial constraints on photo-$z$ systematics parameters to those obtained from auto power spectra alone. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
 \label{fig:constraints-pz-syst-auto+cross-vs-auto}
+\end{center}
+\end{figure}
+
+ \begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_M1p-pr_fit=pz-shifts+widths-vs-fit=pz-shifts-vs-no-pz-shifts.pdf}
+\caption{Comparison of our fiducial HOD constraints to those obtained setting $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\label{fig:constraints-hod-pz-shifts-pz-widths-vs-pz-shifts-vs-no-pz-shifts}
 \end{center}
 \end{figure}
 
@@ -685,15 +693,7 @@ As described in Sec.~\ref{ssec:methods.nz}, our fiducial constraints are derived
 
 As a last test of robustness against photometric redshift errors, we compare the constraints obtained using the COSMOS redshift distributions to those obtained with the photo-$z$ codes \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z}, as provided by the HSC Collaboration \cite{2018PASJ...70S...9T}. In analogy to our fiducial analysis, we use the photometric redshift error model given in Eq.~\ref{eq:photo-z-model} for each photo-$z$ code. The comparison of the constraints on HOD and photo-$z$ systematics parameters obtained for the five different methods are shown in Figures \ref{fig:constraints-HOD-fit-pz-shifts+pz-widths-pz-methods} and \ref{fig:constraints-pz-syst-fit-pz-shifts+pz-widths-pz-methods}. As can be seen, the constraints on HOD parameters from all codes are in very good agreement, while we see some discrepancies between the constraints on photometric redshift systematics parameters, especially between $z_{w, 3}$ and $\Delta z_{3} - \Delta z_{2}$. However, these differences are not unexpected as the different redshift distributions have different means and shapes and are therefore not required to give consistent constraints on photo-$z$ systematics parameters. To better understand the source for these discrepancies, we compare the auto power spectra obtained when forcing the five redshift distributions to have approximately the same means and widths. We find that the resulting power spectra exhibit significant differences, which suggests that features in the redshift distribution beyond mean and width can significantly impact observed galaxy clustering power spectra. In our case, accounting for uncertainties in means and widths gives consistent constraints on HOD parameters and we therefore conclude that this error model is accurate enough to characterize photo-$z$ uncertainties in the present case. However, this will probably cease to be true for future photometric clustering analyses (e.g. using LSST data) and suggests that these data sets will have to be analyzed accounting for the full uncertainty on the shape of the photometric redshift distributions.
 
-In order to further illustrate this last point, we perform two additional analyses in which we compare the constraints obtained from the five photo-$z$ methods setting $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$ respectively. The results are shown in Figures \ref{fig:constraints-fit-pz-shifts-pz-methods} and \todo{bla}. As can be seen, the values for the photo-$z$ systematics parameters $\Sigma_{i} \Delta z_{i}, \Delta z_{i} - \Delta z_{j}$ required by the different codes are significantly different, which leads to differences in both constraining power and constraints on HOD parameters. Investigating this further, we find that the observed differences in $\Delta z_{i}$ cannot be explained with the differences in mean redshift between the distributions derived using the five separate methods. In addition, we find that shifts in the mean of the redshift distributions mainly affect low redshift auto power spectra but have a significantly smaller impact on our high redshift bins. As noted above, this suggests that the power spectra are affected by features beyond the mean of the photo-$z$ distribution and our analysis is sensitive to those, as borne out by the differences in HOD constraints seen in Fig.~\ref{fig:constraints-fit-pz-shifts-pz-methods}. \todo{Repeat analysis without pz shifts}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
-\caption{Comparison of the constraints on HOD and systematics parameters obtained using the redshift distributions derived from COSMOS30, \texttt{DEmP}, \texttt{Ephor}, \texttt{Ephor\_AB} and \texttt{FRANKEN-Z} accounting for only shifts in the means of the distributions. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-\label{fig:constraints-fit-pz-shifts-pz-methods}
-\end{center}
-\end{figure}
+In order to further illustrate this last point, we perform two additional analyses in which we compare the constraints obtained from the five photo-$z$ methods setting $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$ respectively. The results of the former analysis are shown in Figures \ref{fig:constraints-HOD-fit-pz-shifts-pz-methods}, \ref{fig:constraints-pz-syst-fit-pz-shifts-pz-methods}. As can be seen, the values for the photo-$z$ systematics parameters $\Sigma_{i} \Delta z_{i}, \Delta z_{i} - \Delta z_{j}$ required by the different codes are significantly different, which leads to differences in both constraining power and constraints on HOD parameters. Investigating this further, we find that the observed differences in $\Delta z_{i}$ cannot be explained with the differences in mean redshift between the distributions derived using the five separate methods. In addition, we find that shifts in the mean of the redshift distributions mainly affect low redshift auto power spectra but have a significantly smaller impact on our high redshift bins. As noted above, this suggests that the power spectra are affected by features beyond the mean of the photo-$z$ distribution and our analysis is sensitive to those, as borne out by the differences in HOD constraints seen in Fig.~\ref{fig:constraints-HOD-fit-pz-shifts-pz-methods}. \todo{Repeat analysis without pz shifts}
 
 \begin{figure}
 \begin{center}
@@ -809,11 +809,43 @@ We thank the Backstreet Boys for useful comments and discussions.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
-\caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-\label{fig:constraints-fid-full}
+\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
+\caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} marginalizing over shifts in the means and setting $z_{w, i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\label{fig:constraints-HOD-fit-pz-shifts-pz-methods}
 \end{center}
 \end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/contours-pz-syst_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
+\caption{Comparison of the constraints on photo-$z$ systematics parameters obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} marginalizing over shifts in the means and setting $z_{w, i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\label{fig:constraints-pz-syst-fit-pz-shifts-pz-methods}
+\end{center}
+\end{figure}
+
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
+%\caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} setting $z_{w, i} = 0, \Delta z_{i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+%\label{fig:constraints-HOD-no-pz-shifts-pz-methods}
+%\end{center}
+%\end{figure}
+%
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
+%\caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} setting $z_{w, i} = 0, \Delta z_{i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+%\label{fig:constraints-HOD-no-pz-shifts-pz-methods}
+%\end{center}
+%\end{figure}
+
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+%\caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+%\label{fig:constraints-fid-full}
+%\end{center}
+%\end{figure}
 
 \bibliography{bibliography}
 
