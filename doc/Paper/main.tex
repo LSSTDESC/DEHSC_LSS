@@ -583,7 +583,7 @@ Both the auto- and cross power spectra shown in Fig.~\ref{fig:cls_summary} carry
 
 Fig.~\ref{fig:constraints-fid-hod} shows the constraints on the HOD parameters $M_{\mathrm{min}}, \, M_{\mathrm{min}, p}, \, M_{1}, \, M_{1, p}$ for our fiducial model described in Sec.~\ref{ssec:methods.constr}. The constraints on all fitted parameters are shown in Fig.~\ref{fig:constraints-fid-full} and the corresponding best-fit values and means are shown alongside their $68 \%$ confidence limits in Tab.~\ref{tab:params}. As can be seen from Figures \ref{fig:constraints-fid-hod} and \ref{fig:constraints-fid-full}, the data allow us to constrain $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ whereas $M_{0}(z)$ is unconstrained. Fig.~\ref{fig:cls-best-fit} shows the theoretical predictions derived from the parameter values at the lowest likelihood value alongside the measured power spectra. The corresponding $\chi^{2}$ is $\chi^{2} = 95.8$. Computing the degrees of freedom as $\nu = N_{\mathrm{data}} - N_{\mathrm{param}} = 94 - 14 = 80$, we obtain $\chi^{2}_{\mathrm{red}} = \sfrac{\chi^{2}}{\nu} = 1.20$ ($p$-value $= 0.11$), which shows that the data are consistent with the best-fit theoretical model.
 
-In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minimal mass to host a central galaxy $M_{\mathrm{min}}$ and the mass scale for satellites $M_{1}$ obtained in our analysis. To illustrate the uncertainty on this relation, we also show a sample of curves derived from 1000 random realizations from the MCMCs. As can be seen, we find that the data prefer both a decreasing $M_{\mathrm{min}}$ and $M_{1}$. This is somewhat counterintuitive, as we would naively expect at least the minimal mass to host a central galaxy to increase with redshift since galaxies will only form in the most massive halos at early times. We will discuss these findings in detail in Sec.~\ref{sssec:results.constraints.interpretation}.
+In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minimal mass to host a central galaxy $M_{\mathrm{min}}$ and the mass scale for satellites $M_{1}$ obtained in our analysis. To illustrate the uncertainty on this relation, we also show a sample of curves derived from 1000 random realizations from the MCMCs. As can be seen, we find that the data prefer both a decreasing $M_{\mathrm{min}}$ and $M_{1}$. This is somewhat counterintuitive, as we would naively expect at least the minimal mass to host a central galaxy to increase with redshift since galaxies will only form in the most massive halos at early times. We will discuss these findings in detail in Sec.~\ref{sssec:results.constraints-interpretation}.
   
 \begin{figure}
 \begin{center}
@@ -612,10 +612,10 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minima
 
 \subsubsection{Robustness to modeling and data choices}
 
-In order to test the robustness of our fiducial HOD constraints to implementation and data choices, we compare the constraints from several analysis variants, as described in the following.
+In order to test the robustness of our fiducial HOD constraints to implementation and data choices, we compare the constraints from several analysis variants, as described in the following. A summary of all performed robustness tests and the respective constraints on HOD parameters can be found in Tab.~\ref{tab:constraints_robustness}.
 
 \begin{sidewaystable}
-\caption{Parameter constraints and best-fit $\chi^{2}$ values obtained for all considered analysis variants.} \label{tab:constraints_robustness}
+\caption{Parameter constraints and best-fit $\chi^{2}$ values obtained for all considered analysis variants. The number of degrees of freedom $\nu$ is estimated according to $\nu = N_{\mathrm{data}}-N_{\mathrm{param}}$. The uncertainties denote the $68 \%$ c.l..} \label{tab:constraints_robustness}
 \begin{center}
 \begin{tabular}{ccccccccc}
 \hline\hline 
@@ -627,8 +627,8 @@ G+SSC cov & $\sfrac{97.8}{80}$ & $3.28\substack{+1.57 \\ -1.51}$ & $12.31\substa
 no $z_{w, i}$ & $\sfrac{97.8}{84}$ & $2.69\substack{+1.17 \\ -1.08}$ & $12.24 \pm 0.09$ & $5.74\substack{+1.95 \\ -1.66}$ & $13.62\substack{+0.14 \\ -0.13}$ & - & - & - \\
 no $z_{w, i}, \Delta z_{i}$ & $\sfrac{102.2}{88}$ & $3.23 \pm 0.76$ & $12.27 \pm 0.06$ & $6.43\substack{+1.17 \\ -1.18}$ & $13.65 \pm 0.10$ & - & - & - \\
 no $z_{w, i}$, HSC $\Delta z_{i}$ prior & - & - & - & - & - & - & - & - \\
-bins=0, 1, 2 & - & - & - & - & - & -& -  & - \\
-bins=1, 2, 3 & - & - & - & - & - & - & - & - \\
+bins=0, 1, 2 & $\sfrac{56.2}{43}$ & $2.83\substack{+2.25 \\ -2.11}$ & $12.26\substack{+0.18 \\ -0.19}$ & $5.44\substack{+3.07 \\ -2.93}$ & $13.64\substack{+0.25 \\ -0.26}$ & - & - & - \\
+bins=1, 2, 3 & $\sfrac{45.8}{46}$ & $2.38\substack{+2.32 \\ -2.26}$ & $12.16\substack{+0.25 \\ -0.13}$ & $5.31\substack{+3.17 \\ -3.09}$ & $13.53\substack{+0.32 \\ -0.19}$ & - & - & - \\
 pz=\texttt{Ephor\_AB} & $\sfrac{99.8}{80}$ & $2.96\substack{+1.22 \\ -1.12}$ & $12.45 \pm 0.11$ & $6.07\substack{+1.66 \\ -1.54}$ & $13.90 \pm 0.16$ & - & - & - \\
 pz=\texttt{Ephor} & $\sfrac{107.6}{80}$ & $3.18\substack{+1.24 \\ -1.27}$ & $12.43 \pm 0.12$ & $6.34\substack{+1.75 \\ -1.77}$ & $13.87 \pm 0.17$ & - & - & - \\
 pz=\texttt{DEmP} & $\sfrac{106.4}{80}$ & $2.90\substack{+1.35 \\ -1.33}$ & $12.37 \pm 0.12$ & $5.95\substack{+1.87 \\ -1.83}$ & $13.78 \pm 0.17$ & - & - & - \\
@@ -666,7 +666,7 @@ In Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we show the constraint
 
 It is instructive to investigate which part of the data drives the constraints on photometric redshift systematics. To this end we compare the constraints obtained using auto power spectra only to those obtained from auto- and cross power spectra. As can be seen from Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we find that the auto power spectra do not constrain the photometric redshift systematics parameters $\Delta z_{i} - \Delta z_{j}$, as opposed to the combination of auto- and cross power spectra. This shows that the cross correlations drive the constraints on photometric redshift systematics and are thus essential for jointly constraining redshift systematics and astrophysical/cosmological parameters from LSS.
 
-In order to test the impact of photometric redshift uncertainties on our fiducial HOD constraints, we compare them to those obtained when separately fixing $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$. The results are shown in Fig.~\ref{fig:constraints-hod-pz-shifts-pz-widths-vs-pz-shifts-vs-no-pz-shifts}. 
+In order to test the impact of photometric redshift uncertainties on our fiducial HOD constraints, we compare them to those obtained when separately fixing $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$. The results are shown in Fig.~\ref{fig:constraints-hod-pz-shifts-pz-widths-vs-pz-shifts-vs-no-pz-shifts}. As expected, we find that the constraints on HOD parameters successively weaken as we include more freedom in the photo-$z$ error model. However, as can be seen both from Fig.~\ref{fig:constraints-hod-pz-shifts-pz-widths-vs-pz-shifts-vs-no-pz-shifts} and Tab.~\ref{tab:constraints_robustness}, the constraints obtained in the three cases agree very well. This suggests that our fiducial HOD constraints are robust to photo-$z$ uncertainties in the COSMOS 30-band catalog, as parametrized through Eq.~\ref{eq:photo-z-model}. 
 
 As described in Sec.~\ref{ssec:methods.nz}, our fiducial constraints are derived with the redshift distributions derived using COSMOS 30-band data \cite{2016ApJS..224...24L}. There are several potential caveats associated with this approach. First, the   photometric redshift accuracy decreases significantly for objects in the COSMOS 30 band catalog with $z > 1.4$ and secondly, the fraction of catastrophic outliers at faint magnitudes is estimated to be around $6-10 \%$ \cite{2016ApJS..224...24L}. We expect the highest redshift bin to be mostly affected by decreasing photometric redshift accuracy. However, as noted in \cite{Joudaki:2019}, catastrophic outliers that are erroneously assigned to too low redshifts are more likely to fall into our sample than outliers assigned to too high redshifts. Therefore, the lowest redshift bin in particular might also be affected by photometric redshift errors \an{not sure this is the reason for which Jeff asked us to remove the low-z bin...}. In order to test the robustness of our results to photometric redshift uncertainties at low and high redshifts, we compute parameter constraints separately neglecting the high and low redshift bin and all its cross- correlations. The results of these two analyses are shown in Fig.~\ref{fig:constraints-fit-bins=0+1+2+3-vs-fit-bins=0+1+2-vs-fit-bins=1+2+3}. As can be seen, we find all constraints to agree well with each other, with only small differences in the photometric redshift parameters $\Delta z_{i}$. This suggests that our analysis is robust against photometric redshift uncertainties in the COSMOS 30 band catalog affecting the lowest or highest of our redshift bins.
 
@@ -714,7 +714,7 @@ In order to further illustrate this last point, we perform two additional analys
 \end{center}
 \end{figure}
  
- \subsubsection{Magnification}
+ \subsubsection{Magnification}\label{sssec:results.magnification}
 In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to gravitational lensing by the intervening LSS. This effect is usually termed magnification bias. The main effect of magnification on the statistical distribution of galaxies is to increase observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification bias can dominate over the intrinsic clustering signal for cross-correlations between widely separated redshift bins. As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification bias signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification bias in our particular sample, we therefore estimate $s(z)$ from the observed number counts in our sample. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ at the effective redshift of each bin\footnote{We define the effective redshift for each tomographic bin as the mean redshift of the galaxy distribution.} by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from two deep patches, called DEEP and UDEEP. We repeat the above analysis with these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift bin in our fiducial WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen, the three estimates agree well with each other.
 
       \begin{figure}
@@ -741,12 +741,12 @@ From a joint fit to all auto- and cross power spectra we obtain $A_{\mu} = 0.99\
  \begin{figure}
 \begin{center}
 \includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
-\caption{Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra.}
+\caption{Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model described in Sec.~\ref{sssec:results.magnification}.}
 \label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
 \end{center}
 \end{figure}
 
-\subsubsection{Interpretation of HOD results}\label{sssec:results.constraints.interpretation}
+\subsubsection{Interpretation of HOD results}\label{sssec:results.constraints-interpretation}
 As described in Sec.~\ref{ssec:results.hod-constraints}
 In order to understand the observed trend of decreasing $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ with redshift, it would be ideal to look at the rest-frame properties of the galaxies considered in our analysis and how these change as a function of redshift. However, computing k-corrections and absolute magnitudes for broad-band photometric data can be challenging and we therefore choose an alternative approach. We cross-match galaxies passing our selection criteria within the HSC COSMOS field to galaxies also included in the COSMOS 30-band photometric catalog of \cite{2016ApJS..224...24L}. The COSMOS 30-band catalog contains, among others, absolute magnitudes in Subaru \texttt{B}-band, $M_{B}$, and Subaru \texttt{r+}-band, $M_{R}$. Using these quantities, we construct color-magnitude diagrams for all cross-matched galaxies. Fig.~\ref{fig:color-mag} shows the $M_{B}-M_{R}$ color as a function of $M_{R}$ magnitude for 10 equally spaced redshift bins in $z \in [0.15, 1.5]$\footnote{The galaxies are split into redshift bins according to COSMOS 30-band photometric redshifts. We note that we have repeated the analysis splitting the sample according to HSC \texttt{Ephor AB} photometric redshifts, finding consistent results.}. \an{We could also show the plot for the HSC splitting. What do you prefer?} In this diagram, red galaxies populate the high $M_{B}-M_{R}$ color, high $M_{R}$ magnitude plane, while blue galaxies tend to have lower $M_{B}-M_{R}$ and $M_{R}$. As can be seen from the figure, red galaxies increasingly drop-out of the high redshift samples. We can quantify this effect by computing the fraction of red galaxies in our sample as a function of redshift: we empirically determine the separation between the blue and red clouds (denoted by the solid lines in the figure) and compute the fraction of galaxies in the red cloud as $f_{R} = \sfrac{N_{R}}{(N_{R}+N_{B})}$, where $N_{R}$ denotes the number of galaxies above the separation line, while $N_{B}$ is the number of galaxies below the line. Consistent with the figure, we find decreasing $f_{R}$ as a function of redshift. 
 
@@ -812,6 +812,14 @@ We thank the Backstreet Boys for useful comments and discussions.
 
 \begin{figure}
 \begin{center}
+\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+\caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\label{fig:constraints-fid-full}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
 \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
 \caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} marginalizing over shifts in the means and setting $z_{w, i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
 \label{fig:constraints-HOD-fit-pz-shifts-pz-methods}
@@ -839,14 +847,6 @@ We thank the Backstreet Boys for useful comments and discussions.
 %\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
 %\caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} setting $z_{w, i} = 0, \Delta z_{i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
 %\label{fig:constraints-HOD-no-pz-shifts-pz-methods}
-%\end{center}
-%\end{figure}
-
-%\begin{figure}
-%\begin{center}
-%\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
-%\caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-%\label{fig:constraints-fid-full}
 %\end{center}
 %\end{figure}
 
