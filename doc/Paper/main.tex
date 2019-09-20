@@ -661,7 +661,7 @@ One of the most important potential systematics in photometric galaxy clustering
 
 In Fig.~\todo{bla}, we show the constraints on photometric redshift systematics parameters derived in our fiducial analysis. We find that the data cannot separately constrain the mean shift parameters $\Delta z_{i}$ as opposed to pairwise differences between those. We therefore show the constraints in terms of the reparametrized parameters $\Sigma_{i} \Delta z_{i}, \Delta z_{1} - \Delta z_{0}, \Delta z_{2} - \Delta z_{1}, \Delta z_{3} - \Delta z_{2}$, which denote the sum of the $\Delta z_{i}$ and their pairwise differences respectively. While $\Sigma_{i} \Delta z_{i}$ and $z_{w, i}$ are largely unconstrained, we find that we can constrain the three pairwise differences $\Delta z_{i} - \Delta z_{j}$ to within $\sigma_{\Delta z_{i} - \Delta z_{j}} \approx 0.021$ ($68 \%$ c.l.). This means that the data do not allow constraining the absolute position of each redshift bin, but are quite sensitive to their relative positions.
 
-It is instructive to investigate which part of the data are driving the constraints on photometric redshift systematics. To this end we compare the constraints obtained using auto power spectra only to those obtained from auto- and cross power spectra. As can be seen from Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we find that the auto power spectra do not constrain the photometric redshift systematics parameters $\Delta z_{i} - \Delta z_{j}$, as opposed to the combination of auto- and cross power spectra. This shows that the cross correlations drive the constraints on photometric redshift systematics and are thus essential for jointly constraining redshift systematics and astrophysical/cosmological parameters from LSS.
+It is instructive to investigate which part of the data drives the constraints on photometric redshift systematics. To this end we compare the constraints obtained using auto power spectra only to those obtained from auto- and cross power spectra. As can be seen from Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we find that the auto power spectra do not constrain the photometric redshift systematics parameters $\Delta z_{i} - \Delta z_{j}$, as opposed to the combination of auto- and cross power spectra. This shows that the cross correlations drive the constraints on photometric redshift systematics and are thus essential for jointly constraining redshift systematics and astrophysical/cosmological parameters from LSS.
 
 In order to test the impact of photometric redshift uncertainties on our fiducial HOD constraints, we compare them to those obtained when separately fixing $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$. The results are shown in Fig.~\todo{bla}. 
 
@@ -737,8 +737,8 @@ From a joint fit to all auto- and cross power spectra we obtain $A_{\mu} = 0.99\
 
  \begin{figure}
 \begin{center}
-\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_fit=mag-bias-ampl_fit=auto+cross-vs-fit=auto.pdf}
-\caption{Comparison of the constraints on magnification obtained from auto power spectra alone to those obtained from auto and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
+\caption{Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra.}
 \label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
 \end{center}
 \end{figure}
@@ -782,8 +782,8 @@ To illustrate the cosmological constraining power of the data considered in our 
  
  \begin{figure}
 \begin{center}
-\includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=Oc+s8_fit=auto+cross_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
-\caption{Constraints on HOD and cosmological parameters obtained from a joint fit to all auto- and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\includegraphics[width=0.49\textwidth]{figures/contours-Oc-s8_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_fit=Oc+s8.pdf}
+\caption{Constraints on cosmological parameters obtained from a joint fit to all auto- and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
 \label{fig:constraints-fit=Oc+s8}
 \end{center}
 \end{figure} 
