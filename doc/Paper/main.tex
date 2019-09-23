@@ -438,20 +438,20 @@ where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:ha
         \begin{tabular}{cccc}
           \hline\hline 
           Parameter & Prior & Posterior mean & Best-fit \\ \hline \Tstrut                             
-          $M_{\mathrm{min}}$ & flat $\in [0., \,17.]$ & $12.29 \pm 0.15$ & $-$ \\ 
-          $M_{\mathrm{min}, p}$ & flat $\in [-5., \,10.]$ & $2.93\substack{+1.56 \\ -1.47}$ & $-$ \\
-          $M_{0}$ & flat $\in [0., \,15.]$ & $5.97 \pm 4.00$ & $-$ \\
-          $M_{0, p}$ & flat $\in [-5., \,10.]$ & $2.65 \pm 5.00$ & $-$ \\
-          $M_{1}$ & flat $\in [0., \,15.]$ & $13.69 \pm 0.21$ & $-$ \\ 
-          $M_{1, p}$ & flat $\in [-5., \,15.]$ & $6.00\substack{+2.14 \\ -2.05}$ & $-$ \\
-          $\Delta z_{0}$ & flat $\in [-0.2, \,0.2]$ & $0.0170\substack{+0.091 \\ -0.090}$ & $-$ \\
-          $\Delta z_{1}$ & flat $\in [-0.2, \,0.2]$ & $0.00470\substack{+0.095 \\ -0.093}$ & $-$ \\
-          $\Delta z_{2}$ & flat $\in [-0.2, \,0.2]$ & $0.0198\substack{+0.101 \\ -0.099}$ & $-$ \\
-          $\Delta z_{3}$ & flat $\in [-0.2, \,0.2]$ & $0.0337\substack{+0.106 \\ -0.105}$ & $-$ \\
-          $z_{w, 0}$ & flat $\in [-0.2, \,0.2]$ & $-0.0361\substack{+0.1376 \\ -0.1234}$ & $-$ \\
-          $z_{w, 1}$ & flat $\in [-0.2, \,0.2]$ & $0.0252 \pm 0.0799$ & $-$ \\
-          $z_{w, 2}$ & flat $\in [-0.2, \,0.2]$ & $0.0569\substack{+0.0856 \\ -0.0897}$ & $-$ \\
-          $z_{w, 3}$ & flat $\in [-0.2, \,0.2]$ & $0.0153\substack{+0.1190 \\ -0.1217}$ & $-$ \\ \\
+          $M_{\mathrm{min}}$ & flat $\in [0., \,17.]$ & $12.29 \pm 0.15$ & $12.25$ \\ 
+          $M_{\mathrm{min}, p}$ & flat $\in [-5., \,10.]$ & $2.93\substack{+1.56 \\ -1.47}$ & $1.83$ \\
+          $M_{0}$ & flat $\in [0., \,15.]$ & $5.97 \pm 4.00$ & $8.36$ \\
+          $M_{0, p}$ & flat $\in [-5., \,10.]$ & $2.65 \pm 5.00$ & $7.58$ \\
+          $M_{1}$ & flat $\in [0., \,15.]$ & $13.69 \pm 0.21$ & $13.63$ \\ 
+          $M_{1, p}$ & flat $\in [-5., \,15.]$ & $6.00\substack{+2.14 \\ -2.05}$ & $4.49$ \\
+          $\Delta z_{0}$ & flat $\in [-0.2, \,0.2]$ & $0.0170\substack{+0.091 \\ -0.090}$ & $-0.0525$ \\
+          $\Delta z_{1}$ & flat $\in [-0.2, \,0.2]$ & $0.00470\substack{+0.095 \\ -0.093}$ & $-0.0321$ \\
+          $\Delta z_{2}$ & flat $\in [-0.2, \,0.2]$ & $0.0198\substack{+0.101 \\ -0.099}$ & $0.0136$ \\
+          $\Delta z_{3}$ & flat $\in [-0.2, \,0.2]$ & $0.0337\substack{+0.106 \\ -0.105}$ & $0.0174$ \\
+          $z_{w, 0}$ & flat $\in [-0.2, \,0.2]$ & $-0.0361\substack{+0.1376 \\ -0.1234}$ & $-0.159$ \\
+          $z_{w, 1}$ & flat $\in [-0.2, \,0.2]$ & $0.0252 \pm 0.0799$ & $-0.00141$ \\
+          $z_{w, 2}$ & flat $\in [-0.2, \,0.2]$ & $0.0569\substack{+0.0856 \\ -0.0897}$ & $0.0576$ \\
+          $z_{w, 3}$ & flat $\in [-0.2, \,0.2]$ & $0.0153\substack{+0.1190 \\ -0.1217}$ & $0.0467$ \\ \\
           $A_{\mu}$ & flat $\in [-2., \,2.]$ & $ - $ & $ - $ \\
           $\Omega_{c}$ & flat $\in [0.1, \,0.9]$ & $ - $ & $ - $ \\
           $\sigma_{8}$ & flat $\in [0.4, \,1.5]$ & $ - $ & $ - $ \\
@@ -717,7 +717,7 @@ In order to further illustrate the effects of an incomplete photo-$z$ error mode
 \end{figure}
  
  \subsubsection{Magnification}\label{sssec:results.hod-constraints.magnification}
-In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to gravitational lensing by the intervening LSS. This effect is usually termed magnification bias. The main effect of magnification on the statistical distribution of galaxies is to increase observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification can dominate over the intrinsic clustering signal for cross-correlations between widely separated redshift bins \todo{reference}. As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ at the effective redshift of each bin\footnote{We define the effective redshift for each tomographic bin as the mean redshift of the galaxy distribution.} by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from two deep patches, called DEEP and UDEEP. We repeat the above analysis with these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift bin in the WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen, the three estimates agree well with each other and we use the $s(z)$ function derived from our fiducial WIDE sample in the following.
+In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to gravitational lensing by the intervening LSS. This effect is usually termed magnification bias. The main effect of magnification on the statistical distribution of galaxies is to increase observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification can be comparable to the intrinsic clustering signal for cross-correlations between widely separated redshift bins (see e.g. \cite{Challinor:2011}). As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ at the effective redshift of each bin\footnote{We define the effective redshift for each tomographic bin as the mean redshift of the galaxy distribution.} by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from two deep patches, called DEEP and UDEEP. We repeat the above analysis with these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift bin in the WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen, the three estimates agree well with each other and we use the $s(z)$ function derived from our fiducial WIDE sample in the following.
 
       \begin{figure}
         \begin{center}
