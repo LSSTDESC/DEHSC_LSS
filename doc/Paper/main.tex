@@ -36,17 +36,17 @@
 
 \author[a,1]{Nicola A.}
 \author[b]{Alonso D.}
+\author[c]{Slosar A.}
 \author[x]{Awan H.}
 \author[x]{Broussard A.}
 \author[x]{Gomes Z.}
 \author[x]{Gawiser E.}
 \author[x]{Mandelbaum R.}
 \author[x]{Miyatake H.}
-\author[x]{Newman J.(?)}
+\author[x]{Newman J.}
 \author[x]{S\'anchez J.}
 \author[x]{Sevilla I.}
 \author[x]{Skinner S.}
-\author[c]{Slosar A.}
 \author[x]{Wagoner E.}
 
 \affiliation[a]{Department of Astrophysical Sciences, Princeton University, Peyton Hall, Princeton NJ 08544-0010, USA}
@@ -65,102 +65,6 @@ We test for magnification bias effect and constrain the lensing amplitude $A_L=3
 
 \section{Introduction}\label{sec:intro}
 \lipsum[1]
-
-\section{Theory}\label{sec:theory}
-  \subsection{Projected quantities and power spectra}\label{ssec:theory.cellpk}
-    \todo{cites everywhere}
-    Our main observable is the projected overdensity of galaxies $\delta^i_g(\nv)$ as a function of sky position $\nv$ in a given redshift bin labelled by $i$. This is related to the 3D galaxy overdensity $\Delta_g$ through
-    \begin{equation}
-      \delta^i_g(\nv)=\int dz\,p^i(z)\,\Delta_g\left(t(z),\chi(z)\nv\right).
-    \end{equation}
-    Here $t(z)$ and $\chi(z)$ are the cosmic time and radial comoving distance as a function of redshift, and $p^i(z)$ is the redshift bin window function, given by the true redshift distribution of objects in the bin normalized to unit area.
-  
-    Given the small size of the sky patches covered by the HSC DR1, we will adopt the flat sky approximation for simplicity, in which case $\nv$ is a 2D vector. It is common to decompose $\delta^i_g(\nv)$ into its Fourier coefficients
-    \begin{equation}
-      a^i_{\bf l}\equiv \int\frac{d\theta^2}{2\pi}e^{-i{\bf l}\cdot\nv}\delta^i_g(\nv).
-    \end{equation}
-    The variance of the Fourier coefficients is the so-called angular power spectrum $\langle a^i_{\bf l}a^{j*}_{{\bf l}'}\rangle = C^{ij}_\ell\,\delta^{\cal D}({\bf l}-{\bf l}')$, where $\delta^{\cal D}$ is the 2D Dirac delta function. The 3D power spectrum $P_{gg}(z,{\bf k})$ is defined analogously for the 3D Fourier coefficients of $\Delta_g$. Both quantities are related to each other through:
-    \begin{equation}\label{eq:cell_gg_limber}
-      C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)} p^i(z)p^j(z)\,P_{gg}\left(z,k=\frac{\ell+1/2}{\chi(z)}\right),
-    \end{equation}
-    where $H(z)$ is the expansion rate at redshift $z$, and we have used the so-called Limber approximation.
-  
-  \subsection{Magnification bias}\label{ssec:theory.mag}
-    \todo{cites everywhere}
-    Gravitational lensing alters the observed galaxy fluxes and distorts their observed positions. The combined effect, is a position-dependent modulation of the number density that distorts the clustering pattern.
-    In the presence of this effect, the equations in the previous section get slightly modified. The projected galaxy overdensity becomes:
-    \begin{equation}
-      \delta^i_g(\nv)=\int dz\,\left[p^i(z)\,\Delta_g+\frac{W_\mu^i(z)}{H(z)}\nabla_\theta^2\nabla^{-2}\Delta_m\right],
-    \end{equation}
-    where $\Delta_m$ is the 3D matter overdensity (we have omitted the dependence on $t$ and $\chi\nv$ for brevity) and $W_\mu$ is the magnification kernel
-    \begin{equation}
-      W_\mu(z)=\frac{3H_0^2\Omega_M(1+z)}{2}\int_z^\infty dz'\,p^i(z)\,\left(5s(z')-2\right)\,\frac{\chi(z')-\chi(z)}{\chi(z)\chi(z')}.
-    \end{equation}
-    Here, $H_0\equiv H(z=0)$, $\Omega_M$ is the cosmological matter fraction, and $s$ is the logarithmic slope of the cumulative apparent magnitude distribution:
-    \begin{equation}
-      s(z) \equiv \frac{\partial \log_{10}N(<m, z)}{\partial m}.
-      \label{eq:s-func}
-    \end{equation}
-    The angular power spectrum is then given by:
-    \begin{equation}\label{eq:cell_gg_wmag}
-      C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)}\left[p^ip^j\,P_{gg}+\left(p^iW_\mu^j+p^jW_\mu^i\right)\frac{\ell(\ell+1)}{Hk^2}P_{gm}+W_\mu^iW_\mu^j\left(\frac{\ell(\ell+1)}{Hk^2}\right)^2P_{mm}\right],
-    \end{equation}
-    where $P_{mm}$ is the 3D power spectrum of matter fluctuations, $P_{gm}$ is the galaxy-matter cross-spectrum and we have omitted the dependence of all quantities on $z$ or $k=(\ell+1/2)/\chi$ for brevity.
-
-  \subsection{Halo Occupation Distribution}\label{ssec:theory.hod}
-    In order to model $P_{gg}(z,k)$ we use a halo occupation distribution (HOD) model \todo{cites everywhere}. In this halo model-based presciption we model the galaxy content of dark matter haloes as a function of halo mass. Details about HOD parametrizations can be found in \todo{cite}. In short, the galaxy power spectrum receives contributions from the so-called 1-halo and 2-halo terms:
-    \begin{equation}
-      P_{gg}(z,k) = P_{gg,{\rm 1h}}(z,k) + P_{gg,{\rm 2h}}(z,k),
-    \end{equation}
-    where
-    \begin{align}
-      & P_{gg,{\rm 1h}}(k)=\frac{1}{\bar{n}_g^2} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[\bar{N}_s^2u_s^2(k)+2\bar{N}_su_s^2(k)\right],\\
-      & P_{gg,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM}\,b_h(M)\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)^2\,P_{\rm lin}(k).
-    \end{align}
-    Here, $M$ represents halo mass, $dn/dM$ is the halo mass function, $b_h(M)$ is the halo bias, $\bar{N}_c(M)$ and $\bar{N}_s(M)$ are the mean number of central and satellite galaxies respectively, $u_s(k)$ is the Fourier transform of the normalized density profile of satellite galaxies, $P_{\rm lin}(k)$ is the linear matter power spectrum and $\bar{n}_g$ is the total mean galaxy density, given by
-    \begin{equation}
-      \bar{n}_g=\int dM\,\frac{dn}{dM}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
-    \end{equation}
-    A central assumption in standard HOD parametrizations is that centrals/satellites follow a binomial/Poisson distribution.
-
-    Following \todo{cite}, we parametrise the number of centrals and satellites as a function of mass as:
-    \begin{align}
-      &\bar{N}_c(M)=\frac{1}{2}\left[1+{\rm erf}\left(\frac{\log(M/M_{\rm min})}{\sigma_{{\rm ln}M}}\right)\right],\\
-      &\bar{N}_s(M)=\Theta(M-M_0)\left(\frac{M-M_0}{M_1'}\right)^\alpha,
-    \end{align}
-    where $\Theta(x)$ is the Heavyside step function. Furthermore, we assume that $N_c$ follows a Bernoulli distribution with probability $p=\bar{N}_c$, and that the number of satellites is Poisson-distributed with mean $\bar{N}_s$. Finally, we model the distribution of satellites to follow that of the dark matter, and therefore $u_s$ is a Navarro-Frenk-White profile, given by:
-    \begin{equation}
-      u_s(k|M)=\frac{\sin x\left[{\rm Si}\left((1+c)\,x\right)-{\rm Si}(x)\right]+\cos x\left[{\rm Ci}\left((1+c)x\right)-{\rm Ci}(x)\right]-\frac{\sin(cx)}{(1+c)x}}{{\rm ln}(1+c)-\frac{c}{1+c}},
-    \end{equation}
-    where $x=k R_\Delta/c$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. The concentration-mass relation $c(M)$ also depends on the choice of $\Delta$, and we follow the parametrization of Duffy et al. \todo{cite}.
-
-    In order to include lensing magnification in the theory prediction, we also need to model the galaxy-matter and matter-matter power spectra (see Eq. \ref{eq:cell_gg_wmag}). Following the HOD parametrization, the 1-halo and 2-halo contributions to $P_{gm}(k)$ are given by:
-    \begin{align}
-      & P_{gm,{\rm 1h}}(k)=\frac{1}{\bar{n}_g\bar{\rho}_M} \int dM\,\frac{dn}{dM} M\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right],\\
-      & P_{gm,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM}\,b_h(M)\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)\,P_{\rm lin}(k),
-    \end{align}
-    where $\bar{\rho}_M$ is the comoving matter density. $P_{mm}(k)$ is simply given by the {\tt Halofit} parametrization of \todo{cite}.
-
-    It is a well-known fact that the simple halo model implementation described here is not able to accurately describe the ``quasi-linear'' scales in the transition between the 1-halo and 2-halo-dominated regimes, corresponding to $k\sim0.1\,{\rm Mpc}^{-1}$ at $z\sim0$ \todo{cite}. To correct for this inaccuracy, we simply multiply $P_{gg}$ and $P_{gm}$ by a universal scale-dependent factor, given by the ratio between the {\tt Halofit} and the pure halo model predictions for $P_{mm}$:
-    \begin{equation}
-      R(z,k)=\frac{P^{\rm Halofit}_{mm}(z,k)}{P^{\rm halo\,model}_{mm}(z,k)}.
-    \end{equation}
-    
-    We expect mean galaxy properties to evolve as a function of redshift for the magnitude-limited sample considered in this analysis. Instead of fitting a separate HOD model to each redshift bin, we fit redshift-dependent functions to $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$ and choose a functional form given by:
-    \begin{equation}
-      M_{i}(z) = M_{i} + M_{i, p} \left(\frac{1}{1+z} - \frac{1}{1+z_{p}}\right),
-    \end{equation}
-    where $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters. 
-
-\subsection{Photometric redshift systematics modeling}\label{ssec:theory.photoz_syst}
-
-Uncertainties in photometric redshifts (photo-$z$) represent one of the major systematics in photometric galaxy clustering analyses. To lowest order, errors in photo-$z$'s cause shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies. In this work, we therefore choose to parametrize the impact of photo-$z$ errors on the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by
-\begin{equation}
-p_{i}(z) = \hat{p}_{i}(z_{c} + (1 + z_{w, i})(z-z_{c}) + \Delta z_{i}),
-\label{eq:photo-z-model}
-\end{equation} 
-where the index $i$ runs over the number of redshift bins considered in our analysis.
-In the above equation, $\hat{p}(z)$ denotes the estimated redshift distribution while $p(z)$ is the underlying true distribution. The parameters $\Delta z_{i}$ account for shifts in the means of the distributions and changes to their widths are parameterized through $z_{w, i}$. The quantity $z_{c}$ is kept constant in our analysis and is set to the redshift at which $\hat{p}(z)$ attains its maximal value.
 
 \section{Data}\label{sec:data}
   \begin{table}
@@ -353,7 +257,81 @@ In the above equation, $\hat{p}(z)$ denotes the estimated redshift distribution 
     \end{equation}
     where $\bar{w}$ is the mean value of the survey mask across the map, $\bar{N}$ is the mean number density of sources per pixel, and $\Omega_{\rm pix}$ is the pixel area in units of steradians.
 
-  \subsection{Covariance matrices}\label{ssec:methods.covar}
+  \subsection{Modelling the signal}\label{ssec:methods.theory}
+  \subsubsection{Projected quantities and power spectra}\label{sssec:methods.theory.cellpk}
+    \todo{cites everywhere}
+    Our main observable is the projected overdensity of galaxies $\delta^i_g(\nv)$ as a function of sky position $\nv$ in a given redshift bin labelled by $i$. This is related to the 3D galaxy overdensity $\Delta_g$ through
+    \begin{equation}
+      \delta^i_g(\nv)=\int dz\,p^i(z)\,\Delta_g\left(t(z),\chi(z)\nv\right).
+    \end{equation}
+    Here $t(z)$ and $\chi(z)$ are the cosmic time and radial comoving distance as a function of redshift, and $p^i(z)$ is the redshift bin window function, given by the true redshift distribution of objects in the bin normalized to unit area.
+  
+    Given the small size of the sky patches covered by the HSC DR1, we will adopt the flat sky approximation for simplicity, in which case $\nv$ is a 2D vector. It is common to decompose $\delta^i_g(\nv)$ into its Fourier coefficients
+    \begin{equation}
+      a^i_{\bf l}\equiv \int\frac{d\theta^2}{2\pi}e^{-i{\bf l}\cdot\nv}\delta^i_g(\nv).
+    \end{equation}
+    The variance of the Fourier coefficients is the so-called angular power spectrum $\langle a^i_{\bf l}a^{j*}_{{\bf l}'}\rangle = C^{ij}_\ell\,\delta^{\cal D}({\bf l}-{\bf l}')$, where $\delta^{\cal D}$ is the 2D Dirac delta function. The 3D power spectrum $P_{gg}(z,{\bf k})$ is defined analogously for the 3D Fourier coefficients of $\Delta_g$. Both quantities are related to each other through:
+    \begin{equation}\label{eq:cell_gg_limber}
+      C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)} p^i(z)p^j(z)\,P_{gg}\left(z,k=\frac{\ell+1/2}{\chi(z)}\right),
+    \end{equation}
+    where $H(z)$ is the expansion rate at redshift $z$, and we have used the so-called Limber approximation.
+
+  \subsubsection{Halo Occupation Distribution}\label{sssec:methods.theory.hod}
+    In order to model $P_{gg}(z,k)$ we use a halo occupation distribution (HOD) model \todo{cites everywhere}. In this halo model-based presciption we model the galaxy content of dark matter haloes as a function of halo mass. Details about HOD parametrizations can be found in \todo{cite}. In short, the galaxy power spectrum receives contributions from the so-called 1-halo and 2-halo terms:
+    \begin{equation}
+      P_{gg}(z,k) = P_{gg,{\rm 1h}}(z,k) + P_{gg,{\rm 2h}}(z,k),
+    \end{equation}
+    where
+    \begin{align}
+      & P_{gg,{\rm 1h}}(k)=\frac{1}{\bar{n}_g^2} \int dM\,\frac{dn}{dM} \bar{N}_c\,\left[\bar{N}_s^2u_s^2(k)+2\bar{N}_su_s^2(k)\right],\\
+      & P_{gg,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM}\,b_h(M)\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)^2\,P_{\rm lin}(k).
+    \end{align}
+    Here, $M$ represents halo mass, $dn/dM$ is the halo mass function, $b_h(M)$ is the halo bias, $\bar{N}_c(M)$ and $\bar{N}_s(M)$ are the mean number of central and satellite galaxies respectively, $u_s(k)$ is the Fourier transform of the normalized density profile of satellite galaxies, $P_{\rm lin}(k)$ is the linear matter power spectrum and $\bar{n}_g$ is the total mean galaxy density, given by
+    \begin{equation}
+      \bar{n}_g=\int dM\,\frac{dn}{dM}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
+    \end{equation}
+    A central assumption in standard HOD parametrizations is that centrals/satellites follow a binomial/Poisson distribution.
+
+    Following \todo{cite}, we parametrise the number of centrals and satellites as a function of mass as:
+    \begin{align}
+      &\bar{N}_c(M)=\frac{1}{2}\left[1+{\rm erf}\left(\frac{\log(M/M_{\rm min})}{\sigma_{{\rm ln}M}}\right)\right],\\
+      &\bar{N}_s(M)=\Theta(M-M_0)\left(\frac{M-M_0}{M_1'}\right)^\alpha,
+    \end{align}
+    where $\Theta(x)$ is the Heavyside step function. Furthermore, we assume that $N_c$ follows a Bernoulli distribution with probability $p=\bar{N}_c$, and that the number of satellites is Poisson-distributed with mean $\bar{N}_s$. Finally, we model the distribution of satellites to follow that of the dark matter, and therefore $u_s$ is a Navarro-Frenk-White profile, given by:
+    \begin{equation}
+      u_s(k|M)=\frac{\sin x\left[{\rm Si}\left((1+c)\,x\right)-{\rm Si}(x)\right]+\cos x\left[{\rm Ci}\left((1+c)x\right)-{\rm Ci}(x)\right]-\frac{\sin(cx)}{(1+c)x}}{{\rm ln}(1+c)-\frac{c}{1+c}},
+    \end{equation}
+    where $x=k R_\Delta/c$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. The concentration-mass relation $c(M)$ also depends on the choice of $\Delta$, and we follow the parametrization of Duffy et al. \todo{cite}.
+
+    In order to include lensing magnification in the theory prediction (see Section \ref{ssec:results.magnification}), we also need to model the galaxy-matter and matter-matter power spectra (see Eq. \ref{eq:cell_gg_wmag}). Following the HOD parametrization, the 1-halo and 2-halo contributions to $P_{gm}(k)$ are given by:
+    \begin{align}
+      & P_{gm,{\rm 1h}}(k)=\frac{1}{\bar{n}_g\bar{\rho}_M} \int dM\,\frac{dn}{dM} M\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right],\\
+      & P_{gm,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int dM\,\frac{dn}{dM}\,b_h(M)\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)\,P_{\rm lin}(k),
+    \end{align}
+    where $\bar{\rho}_M$ is the comoving matter density. $P_{mm}(k)$ is simply given by the {\tt Halofit} parametrization of \todo{cite}.
+
+    It is a well-known fact that the simple halo model implementation described here is not able to accurately describe the ``quasi-linear'' scales in the transition between the 1-halo and 2-halo-dominated regimes, corresponding to $k\sim0.1\,{\rm Mpc}^{-1}$ at $z\sim0$ \todo{cite}. To correct for this inaccuracy, we simply multiply $P_{gg}$ and $P_{gm}$ by a universal scale-dependent factor, given by the ratio between the {\tt Halofit} and the pure halo model predictions for $P_{mm}$:
+    \begin{equation}
+      R(z,k)=\frac{P^{\rm Halofit}_{mm}(z,k)}{P^{\rm halo\,model}_{mm}(z,k)}.
+    \end{equation}
+    
+    We expect mean galaxy properties to evolve as a function of redshift for the magnitude-limited sample considered in this analysis. Instead of fitting a separate HOD model to each redshift bin, we fit redshift-dependent functions to $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$ and choose a functional form given by:
+    \begin{equation}
+      M_{i}(z) = M_{i} + M_{i, p} \left(\frac{1}{1+z} - \frac{1}{1+z_{p}}\right),
+    \end{equation}
+    where $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}$, $M_{0}$ and $M_{1}$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters.
+
+\subsubsection{Photometric redshift systematics modeling}\label{sssec:methods.theory.photoz_syst}
+
+Uncertainties in photometric redshifts (photo-$z$) represent one of the major systematics in photometric galaxy clustering analyses. To lowest order, errors in photo-$z$'s cause shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies. In this work, we therefore choose to parametrize the impact of photo-$z$ errors on the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by
+\begin{equation}
+p_{i}(z) = \hat{p}_{i}(z_{c} + (1 + z_{w, i})(z-z_{c}) + \Delta z_{i}),
+\label{eq:photo-z-model}
+\end{equation} 
+where the index $i$ runs over the number of redshift bins considered in our analysis.
+In the above equation, $\hat{p}(z)$ denotes the estimated redshift distribution while $p(z)$ is the underlying true distribution. The parameters $\Delta z_{i}$ account for shifts in the means of the distributions and changes to their widths are parameterized through $z_{w, i}$. The quantity $z_{c}$ is kept constant in our analysis and is set to the redshift at which $\hat{p}(z)$ attains its maximal value.
+    
+  \subsection{Covariance matrices}\label{sssec:methods.theory.covar}
     We use an analytical procedure to estimate the uncertainties of our measured power spectra, inspired in the methods used by \todo{cites}. As shown in \todo{cite}, the covariance matrix for large-scale structure data can be decomposed into a disconnected trispectrum part, essentially equivalent to the covariance of a Gaussian random field with the same power spectrum as the data, a connected part, caused by the non-Gaussian nature of the density field, and a super-sample covariance term (labelled SSC here), caused by the coherent shift in the amplitude of density fluctuations within the surveyed volume caused by long wavelength modes larger than the survey. 
     
     We estimate the Gaussian covariance of the pseudo-$C_\ell$ estimator as described in \cite{2004MNRAS.349..603E,2019arXiv190611765G}. In the absence of any approximations, the covariance of the observed power spectra is given by
@@ -393,7 +371,7 @@ In the above equation, $\hat{p}(z)$ denotes the estimated redshift distribution 
     \begin{align}
       I^{n}_{a_1...a_m}(k_1,...,k_m) &= \int \mathrm{d}M \frac{\mathrm{d}n}{\mathrm{d}M}b_{h, n}(M)  \left\langle\prod_{i=1}^m \left[\tilde{u}_{a_i}(k_i, M) \right]\right\rangle, \\
     \end{align}
-    where $b_{h,1}(M)\equiv b_h(M)$ is the halo bias, $b_{h,0}\equiv1$, and $\tilde{u}_{a_i}$ is the halo profile for the $i$-th field being correlated (e.g. the HOD profile described in Section \ref{ssec:theory.hod} in the case of galaxy clustering). For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution. Specifically, we set 
+    where $b_{h,1}(M)\equiv b_h(M)$ is the halo bias, $b_{h,0}\equiv1$, and $\tilde{u}_{a_i}$ is the halo profile for the $i$-th field being correlated (e.g. the HOD profile described in Section \ref{sssec:methods.theory.hod} in the case of galaxy clustering). For simplicity, we follow \cite{Krause:2017} and approximate the 2- to 4-halo trispectrum as the linearily biased matter trispectrum and only include a probe-specific 1-halo trispectrum contribution. Specifically, we set 
     \begin{equation}
       T^{abcd} = T^{abcd, 1h} + b_{a}b_{b}b_{c}b_{d}T^{m, 2h+3h+4h},
     \end{equation}
@@ -429,8 +407,10 @@ where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:ha
       \mathscr{L}(D \vert \theta) = \frac{1}{[(2\pi)^{d}\det{\mathsf{C}}]^{\sfrac{1}{2}}} e^{-\frac{1}{2}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})^{\mathrm{T}}\mathsf{C}^{-1}(\mathbf{C}^{\mathrm{obs}}_{\ell}-\mathbf{C}^{\mathrm{theor}}_{\ell})}.
       \label{eq:likelihood}
     \end{align}
-    The quantity $\mathsf{C}$ denotes the joint covariance matrix, which we estimate analytically as described in Sec.~\ref{ssec:methods.covar} and keep constant during parameter estimation \citep{2019OJAp....2E...3K}.
-    We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}, which is based on \texttt{emcee} \cite{Foreman-Mackey2013}\footnote{We note that we have compared the MCMC results obtained using \texttt{CosmoHammer} to those obtained using a Metropolis-Hastings algorithm as implemented in \texttt{april} (https://github.com/slosar/april), finding consistent results for our test case.}. In our fiducial analysis we sample the parameter set $\boldsymbol{\theta} = \{M_{\mathrm{min}}, \allowbreak \, M_{\mathrm{min}, p}, \allowbreak \, M_{0}, \allowbreak \, M_{0, p}, \allowbreak \, M_{1}, \allowbreak \, M_{1, p}, \allowbreak \, \Delta z_{i}, \allowbreak \, z_{w, i}\}$, $i = 0, \dots ,3$, where the first six parameters describe the HOD of galaxies as outlined in Sec.~\ref{ssec:theory.hod}. The remaining parameters account for photometric redshift uncertainties as described in Sec.~\ref{ssec:theory.photoz_syst}. We perform additional analyses in which we separately allow for variations in the amplitude $A_{\mu}$ of the magnification bias kernel $W_{\mu}$ and the cosmological parameters $\Omega_{c}$ and $\sigma_{8}$, where $\Omega_{c}$ is the the fractional cold matter density today and $\sigma_{8}$ denotes the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc. For all sampled parameters, we assume flat, uniform priors. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}. Unless stated otherwise, we fix all cosmological parameters to the best-fit values derived by the Planck Collaboration in 2018 using temperature, polarization and CMB lensing data, i.e. $\Omega_{b}=0.0493$, $\Omega_{c}=0.264$, $h=0.6736$, $n_{s}=0.9649$ and $\sigma_{8}=0.8111$ (see the fourth column in Tab.~2 in \cite{Planck:2018}). \todo{I think we do not mention our scale cuts anywhere. This would be a good point.}
+    The quantity $\mathsf{C}$ denotes the joint covariance matrix, which we estimate analytically as described in Sec.~\ref{sssec:methods.theory.covar} and keep constant during parameter estimation \citep{2019OJAp....2E...3K}.
+    We sample the likelihood in a Monte Carlo Markov Chain (MCMC) using the publicly available code \texttt{CosmoHammer} \cite{Akeret:2013}, which is based on \texttt{emcee} \cite{Foreman-Mackey2013}\footnote{We note that we have compared the MCMC results obtained using \texttt{CosmoHammer} to those obtained using a Metropolis-Hastings algorithm as implemented in \texttt{april} (https://github.com/slosar/april), finding consistent results for our test case.}. In our fiducial analysis we sample the parameter set $\boldsymbol{\theta} = \{M_{\mathrm{min}}, \allowbreak \, M_{\mathrm{min}, p}, \allowbreak \, M_{0}, \allowbreak \, M_{0, p}, \allowbreak \, M_{1}, \allowbreak \, M_{1, p}, \allowbreak \, \Delta z_{i}, \allowbreak \, z_{w, i}\}$, $i = 0, \dots ,3$, where the first six parameters describe the HOD of galaxies as outlined in Sec.~\ref{sssec:methods.theory.hod}. The remaining parameters account for photometric redshift uncertainties as described in Sec.~\ref{sssec:methods.theory.photoz_syst}. We perform additional analyses in which we separately allow for variations in the amplitude $A_{\mu}$ of the magnification bias kernel $W_{\mu}$ and the cosmological parameters $\Omega_{c}$ and $\sigma_{8}$, where $\Omega_{c}$ is the the fractional cold matter density today and $\sigma_{8}$ denotes the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc. For all sampled parameters, we assume flat, uniform priors. The sampled parameters are shown alongside their priors in Tab.~\ref{tab:params}. Unless stated otherwise, we fix all cosmological parameters to the best-fit values derived by the Planck Collaboration in 2018 using temperature, polarization and CMB lensing data, i.e. $\Omega_{b}=0.0493$, $\Omega_{c}=0.264$, $h=0.6736$, $n_{s}=0.9649$ and $\sigma_{8}=0.8111$ (see the fourth column in Tab.~2 in \cite{Planck:2018}). \todo{I think we do not mention our scale cuts anywhere. This would be a good point to do that.}
+    
+    It is worth noting that the priors assumed on the photo-$z$ parameters (shifts and widths), are significantly larger than those used by the HSC cosmic shear analysis \cite{2019PASJ...71...43H}, where the prior on the shift parameters is of the order of $0.01-0.04$. This prior was estimated as the scatter between the best-fit shift parameters that recover the same shear power spectrum for different estimates of the redshift distribution and different photo-$z$ codes. We carried out an additional analysis where we quantified the shift and width parameters allowed by the sample variance uncertainties in our fiducial estimate of the redshift distribution from COSMOS. To do so, we estimated the covariance matrix of the redshift distribution amplitudes in each narrow histogram bin shown in Fig. \ref{fig:nzs} using a simplified linear bias model. From this covariance matrix, we then draw Gaussian realizations of the redshift distributions (with our fiducial estimate as the mean), and compute, the mean redshift of each realization. Estimating the standard deviation in the mean redshift of all realizations, we find that shifts of the order of $\Delta z\sim0.02$ are allowed by the statistical uncertainties in COSMOS. We therefore conclude that the priors used here are conservative, and encompass the range of shift and width values allowed by our uncertainties. It is interesting to note that, having access to the covariance matrix of the redshift distribution would allow us to perform a more general characterization of the $N(z)$ uncertainties, beyond shift-width parametrizations (e.g. through principal component analysis). We leave this type of study for future work.
 
     \begin{table*}
       \caption{Summary of parameters varied in the MCMC with their respective priors. The posterior means and best-fits denote the values derived for our fiducial analysis. The uncertainties denote the $68 \%$ c.l..} \label{tab:params}
@@ -554,12 +534,12 @@ where $T^{abcd, 1h}$ and $T^{m, 2h+3h+4h}$ are computed following Eq.~\ref{eq:ha
     
 \subsection{Covariance matrix}\label{ssec:results.covariance}
 
-We estimate the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{ssec:methods.covar} and the resulting correlation matrix is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
+We estimate the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{sssec:methods.theory.covar} and the resulting correlation matrix is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.5\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=PT-resp_mode=LINBIAS_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_G+NG+SSC.pdf}
-\caption{Correlation matrix for all auto- and cross power spectra considered in our analysis, estimated as described in Sec.~\ref{ssec:methods.covar}.}
+\caption{Correlation matrix for all auto- and cross power spectra considered in our analysis, estimated as described in Sec.~\ref{sssec:methods.theory.covar}.}
 \label{fig:covmat}
 \end{center}
 \end{figure}
@@ -648,7 +628,7 @@ fit cosmo & $\sfrac{93.0}{78}$ $(0.12)$ & $3.37\substack{+1.73 \\ -1.66}$ & $12.
 
 As discussed above, our fiducial constraints are derived from a joint fit to both auto- and cross power spectra. However, cross correlations between redshift bins are susceptible to photometric redshift errors, such as outliers. In order to test for systematics affecting the cross-correlations, we therefore test the consistency of the auto- and cross power spectra by comparing the constraints obtained using only auto power spectra to those obtained when jointly fitting auto- and cross power spectra. Fig.~\ref{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC-vs-fit=auto} shows the comparison between our fiducial HOD constraints and those obtained from auto power spectra alone. As can be seen, the constraints from auto power spectra and auto- and cross power spectra agree very well with each other, suggesting that uncertainties in photometric redshifts do not significantly affect the cross-correlations measured in our analysis. Furthermore, we see that the constraining power on HOD parameters is unaffected by including the cross power spectra. As a final consistency check between auto- and cross power spectra we test how well the auto power spectra predict the cross power spectra. To this end we compute the $\chi^{2}$ between the observed auto- and cross power spectra and the theoretical predictions derived from auto power spectra only. As we will discuss below, the auto power spectra cannot constrain the photo-$z$ systematics parameters and we therefore fix $z_{w, i} = 0, \Delta z_{i} = 0$ for this test. We find $\chi^{2} = 102.3$, which is practically equivalent to the best-fit $\chi^{2}$ obtained when fitting both auto- and cross power spectra (see Tab.~\ref{tab:constraints_robustness}). This shows that the auto power spectra are able to predict the cross power spectra and provides further confirmation of their consistency. 
 
-An important part of our data model is the analytical covariance matrix described in Sec.~\ref{ssec:methods.covar}. In order to test the impact of the non-Gaussianity of the covariance on our results, we compare the HOD constraints obtained accounting for Gaussian (G) and Gaussian and SSC contributions (G+SSC) to our fiducial constraints, which include Gaussian, SSC and non-Gaussian contributions. As can be seen from Fig.~\ref{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC-vs-fit=auto}, these constraints agree very well with each other. The constraints from the G and the G+SSC case yield almost identical constraints, which is expected due to the suppression of the SSC contribution by the number density correction (c.f. Sec.~\ref{ssec:results.covariance}). Accounting for all non-Gaussian contributions to the covariance results in slightly broadened but consistent constraints. Comparing to Fig.~\ref{fig:covariance-contributions}, this is probably due to the fact that these corrections only affect the lowest redshift bins at small angular scales and therefore do not have a significant impact when computing constraints from all power spectra. \todo{May be worth stating whether they are important in order to get a good $\chi^2$. E.g. what $\chi^2$ do you get if you only use the Gaussian covariance?}
+An important part of our data model is the analytical covariance matrix described in Sec.~\ref{sssec:methods.theory.covar}. In order to test the impact of the non-Gaussianity of the covariance on our results, we compare the HOD constraints obtained accounting for Gaussian (G) and Gaussian and SSC contributions (G+SSC) to our fiducial constraints, which include Gaussian, SSC and non-Gaussian contributions. As can be seen from Fig.~\ref{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC-vs-fit=auto}, these constraints agree very well with each other. The constraints from the G and the G+SSC case yield almost identical constraints, which is expected due to the suppression of the SSC contribution by the number density correction (c.f. Sec.~\ref{ssec:results.covariance}). Accounting for all non-Gaussian contributions to the covariance results in slightly broadened but consistent constraints. Comparing to Fig.~\ref{fig:covariance-contributions}, this is probably due to the fact that these corrections only affect the lowest redshift bins at small angular scales and therefore do not have a significant impact when computing constraints from all power spectra. \todo{May be worth stating whether they are important in order to get a good $\chi^2$. E.g. what $\chi^2$ do you get if you only use the Gaussian covariance?}
 
 \begin{figure}
 \begin{center}
@@ -716,41 +696,6 @@ In order to further illustrate the effects of an incomplete photo-$z$ error mode
 \end{center}
 \end{figure}
  
- \subsubsection{Magnification}\label{sssec:results.hod-constraints.magnification}
- \todo{This intro is great, but I'd add most of it to Section \ref{ssec:theory.mag} and just present results here.}
-In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to gravitational lensing by the intervening LSS. This effect is usually termed magnification bias. The main effect of magnification on the statistical distribution of galaxies is to increase observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds. It has been shown that the clustering signal due to magnification can be comparable to the intrinsic clustering signal for cross-correlations between widely separated redshift bins (see e.g. \cite{Challinor:2011}). As shown in Sec.~\ref{ssec:theory.mag}, the magnitude of the magnification signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis \todo{say what $m$ is and which band we use.}. We then determine $s(z)$ at the effective redshift of each bin\footnote{We define the effective redshift for each tomographic bin as the mean redshift of the galaxy distribution.} by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from two deep patches, called DEEP and UDEEP. We repeat the above analysis with these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift bin in the WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen, the three estimates agree well with each other and we use the $s(z)$ function derived from our fiducial WIDE sample in the following.
-
-      \begin{figure}
-        \begin{center}
-          \subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for lowest tomographic redshift bin.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
-          \subfigure[Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
-          \caption{Illustration of data-driven estimation of $s(z)$ for galaxy sample used in our analysis.} 
-          \label{fig:s-func-estimation}
-        \end{center}
-      \end{figure}
-
-Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification. In order to investigate the sensitivity of the data to magnification we run two different MCMC analyses: in the first case, we fix the magnification amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification parameter $A_{\mu}$ that scales the amplitude of the magnification kernel $W_{\mu}$ and we fit it alongside our fiducial parameter set.
-
-From a joint fit to all auto- and cross power spectra we obtain $A_{\mu} = 0.99\substack{+0.37 \\ -0.36}$ and the constraint is shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}. This is consistent with our fiducial model for $s(z)$, which corresponds to $A_{\mu} = 1$ and constitutes a $\sim 2.8 \sigma$ detection of magnification from our HSC sample. The best-fit $\chi^{2}$ including magnification is $\chi^{2} = 83.8$\footnote{This is consistent with the case in which we set $A_{\mu}=1$, where we obtain consistent constraints with best-fit $\chi^{2} = 83.4$.}, which, computing the degrees of freedom as $\nu = N_{\mathrm{data}} - N_{\mathrm{param}} = 94 - 15 = 79$, leads to $\chi^{2}_{\mathrm{red}} = \sfrac{\chi^{2}}{\nu} = 1.06$ ($p$-value $= 0.33$). This corresponds to an improvement in $\chi^{2}$ compared to the fiducial analysis of $\Delta \chi^{2} = 95.8 - 83.8 = 12.0$, consistent with the $\sim 3 \sigma$ detection. The constraints on HOD parameters obtained when including magnification agree very well with our fiducial constraints, as can be seen from Fig.~\ref{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}. In addition, we find the significance of the magnification detection to be largely insensitive to photo-$z$ systematics modeling choices, as it is not significantly affected by relaxing our photo-$z$ systematics model by fixing $z_{w, i} = 0$. 
-
-In order to identify the part of the data vector driving the constraints on $A_{\mu}$, we repeat this analysis only including the auto power spectra. The comparison between the constraints on $A_{\mu}$ from auto- and cross power spectra to those obtained from auto power spectra alone in shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}. As can be seen, the auto power spectra alone do not constrain $A_{\mu}$, which implies that the constraints on the magnification amplitude are solely driven by the cross power spectra. \todo{Add a sentence saying why this makes sense: any correlation between far bins can only be due to magnification.} In analogy to the results for the photo-$z$ systematics parameters, we thus find that cross power spectra carry important information and it will thus be beneficial to include these cross correlations in current and future photometric clustering analyses. 
-
- \begin{figure}
-\begin{center}
-\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-bias-vs-mag-bias-free.pdf}
-\caption{Comparison of our fiducial HOD constraints to those obtained when varying the magnification amplitude. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-\label{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}
-\end{center}
-\end{figure}
-
- \begin{figure}
-\begin{center}
-\includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
-\caption{Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model described in Sec.~\ref{sssec:results.hod-constraints.magnification}.}
-\label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
-\end{center}
-\end{figure}
-
 \subsubsection{Interpretation of HOD results}\label{sssec:results.hod-constraints.constraints-interpretation}
 As described in Sec.~\ref{sssec:results.hod-constraints.fiducial}, our best-fit HOD constraints predict both the minimal mass to host a central $M_{\mathrm{min}}(z)$ and the mass scale for satellites $M_{1}(z)$ to decrease with redshift.
 In order to understand this trend, it would be ideal to look at the rest-frame properties of the galaxies considered in our analysis and how these change with redshift. However, computing k-corrections and absolute magnitudes for broad-band photometric data can be challenging and we therefore choose an alternative approach. We cross-match galaxies passing our selection criteria within the HSC COSMOS field to galaxies also included in the COSMOS 30-band photometric catalog of \cite{2016ApJS..224...24L}. The COSMOS 30-band catalog contains, among others, absolute magnitudes in Subaru \texttt{B}-band, $M_{B}$, and Subaru \texttt{r+}-band, $M_{R}$. Using these quantities, we construct color-magnitude diagrams for all cross-matched galaxies. Fig.~\ref{fig:color-mag} shows the $M_{B}-M_{R}$ color as a function of $M_{R}$ magnitude for 10 equally spaced redshift bins in $z \in [0.15, 1.5]$\footnote{The galaxies are split into redshift bins according to COSMOS 30-band photometric redshifts. We note that we have repeated the analysis splitting the sample according to HSC \texttt{Ephor\_AB} photometric redshifts, finding consistent results.}. \an{We could also show the plot for the HSC splitting. What do you prefer?} \todo{I think this one looks good!} In this diagram, red galaxies populate the high $M_{B}-M_{R}$ color, high $M_{R}$ magnitude plane, while blue galaxies tend to have lower $M_{B}-M_{R}$ and $M_{R}$. As can be seen from the figure, red galaxies increasingly drop-out of the high redshift samples \todo{Say that this makes sense, since at sufficiently high redshifts you mostly see them after  the 4000 angstrom break and they're a lot less bright.}. We can quantify this effect by computing the fraction of red galaxies in our sample as a function of redshift: we empirically determine the separation between the blue and red clouds (denoted by the solid lines in the figure) and compute the fraction of galaxies in the red cloud as $f_{R} = \sfrac{N_{R}}{(N_{R}+N_{B})}$, where $N_{R}$ denotes the number of galaxies above the separation line, while $N_{B}$ is the number of galaxies below the line. Consistent with the figure, we find decreasing $f_{R}$ as a function of redshift. 
@@ -785,7 +730,63 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
         \end{center}
       \end{figure}
       
-\subsubsection{Joint cosmology and HOD constraints}
+ \subsection{Magnification}\label{ssec:results.magnification}
+    \todo{cites everywhere}
+In addition to intrinsic correlations between galaxy positions, there exist several additional effects affecting the observed clustering of galaxies. One of these is the magnification of distant sources due to gravitational lensing by the intervening LSS, an effect is usually termed magnification bias. The main effects of magnification on the statistical distribution of galaxies is to increase observed galaxy fluxes, thus allowing dim galaxies to pass survey selection thresholds, and to alter their observed angular positions. The combined effect, is a position-dependent modulation of the number density that distorts the clustering pattern. It has been shown that the clustering signal due to magnification can be comparable to the intrinsic clustering signal for cross-correlations between widely separated redshift bins (see e.g. \cite{Challinor:2011}).
+
+    In the presence of magnification, the equations in Section \ref{ssec:methods.theory} get slightly modified. The projected galaxy overdensity becomes:
+    \begin{equation}
+      \delta^i_g(\nv)=\int dz\,\left[p^i(z)\,\Delta_g+\frac{W_\mu^i(z)}{H(z)}\nabla_\theta^2\nabla^{-2}\Delta_m\right],
+    \end{equation}
+    where $\Delta_m$ is the 3D matter overdensity (we have omitted the dependence on $t$ and $\chi\nv$ for brevity) and $W_\mu$ is the magnification kernel
+    \begin{equation}
+      W_\mu(z)=\frac{3H_0^2\Omega_M(1+z)}{2}\int_z^\infty dz'\,p^i(z)\,\left(5s(z')-2\right)\,\frac{\chi(z')-\chi(z)}{\chi(z)\chi(z')}.
+    \end{equation}
+    Here, $H_0\equiv H(z=0)$, $\Omega_M$ is the cosmological matter fraction, and $s$ is the logarithmic slope of the cumulative apparent magnitude distribution:
+    \begin{equation}
+      s(z) \equiv \frac{\partial \log_{10}N(<m, z)}{\partial m}.
+      \label{eq:s-func}
+    \end{equation}
+    The angular power spectrum is then given by:
+    \begin{equation}\label{eq:cell_gg_wmag}
+      C^{ij}_\ell = \int dz\,\frac{H(z)}{\chi^2(z)}\left[p^ip^j\,P_{gg}+\left(p^iW_\mu^j+p^jW_\mu^i\right)\frac{\ell(\ell+1)}{Hk^2}P_{gm}+W_\mu^iW_\mu^j\left(\frac{\ell(\ell+1)}{Hk^2}\right)^2P_{mm}\right],
+    \end{equation}
+    where $P_{mm}$ is the 3D power spectrum of matter fluctuations, $P_{gm}$ is the galaxy-matter cross-spectrum and we have omitted the dependence of all quantities on $z$ or $k=(\ell+1/2)/\chi$ for brevity.
+
+The magnitude of the magnification signal crucially depends on the derivative of the galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed galaxy number counts $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis \todo{say what $m$ is and which band we use.}. We then determine $s(z)$ at the effective redshift of each bin\footnote{We define the effective redshift for each tomographic bin as the mean redshift of the galaxy distribution.} by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, PDR1 also contains data from two deep patches, called DEEP and UDEEP. We repeat the above analysis with these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift bin in the WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen, the three estimates agree well with each other and we use the $s(z)$ function derived from our fiducial WIDE sample in the following.
+
+      \begin{figure}
+        \begin{center}
+          \subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for lowest tomographic redshift bin.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
+          \subfigure[Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
+          \caption{Illustration of data-driven estimation of $s(z)$ for galaxy sample used in our analysis.} 
+          \label{fig:s-func-estimation}
+        \end{center}
+      \end{figure}
+
+Using the estimated $s(z)$, we can derive theoretical predictions for the angular galaxy power spectra in presence of magnification. In order to investigate the sensitivity of the data to magnification we run two different MCMC analyses: in the first case, we fix the magnification amplitude to the predictions from the empirically determined $s(z)$ function. In the second case we include an additional magnification parameter $A_{\mu}$ that scales the amplitude of the magnification kernel $W_{\mu}$ and we fit it alongside our fiducial parameter set.
+
+From a joint fit to all auto- and cross power spectra we obtain $A_{\mu} = 0.99\substack{+0.37 \\ -0.36}$ and the constraint is shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}. This is consistent with our fiducial model for $s(z)$, which corresponds to $A_{\mu} = 1$ and constitutes a $\sim 2.8 \sigma$ detection of magnification from our HSC sample. The best-fit $\chi^{2}$ including magnification is $\chi^{2} = 83.8$\footnote{This is consistent with the case in which we set $A_{\mu}=1$, where we obtain consistent constraints with best-fit $\chi^{2} = 83.4$.}, which, computing the degrees of freedom as $\nu = N_{\mathrm{data}} - N_{\mathrm{param}} = 94 - 15 = 79$, leads to $\chi^{2}_{\mathrm{red}} = \sfrac{\chi^{2}}{\nu} = 1.06$ ($p$-value $= 0.33$). This corresponds to an improvement in $\chi^{2}$ compared to the fiducial analysis of $\Delta \chi^{2} = 95.8 - 83.8 = 12.0$, consistent with the $\sim 3 \sigma$ detection. The constraints on HOD parameters obtained when including magnification agree very well with our fiducial constraints, as can be seen from Fig.~\ref{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}. In addition, we find the significance of the magnification detection to be largely insensitive to photo-$z$ systematics modeling choices, as it is not significantly affected by relaxing our photo-$z$ systematics model by fixing $z_{w, i} = 0$. 
+
+In order to identify the part of the data vector driving the constraints on $A_{\mu}$, we repeat this analysis only including the auto power spectra. The comparison between the constraints on $A_{\mu}$ from auto- and cross power spectra to those obtained from auto power spectra alone in shown in Fig.~\ref{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}. As can be seen, the auto power spectra alone do not constrain $A_{\mu}$, which implies that the constraints on the magnification amplitude are solely driven by the cross power spectra. \todo{Add a sentence saying why this makes sense: any correlation between far bins can only be due to magnification.} In analogy to the results for the photo-$z$ systematics parameters, we thus find that cross power spectra carry important information and it will thus be beneficial to include these cross correlations in current and future photometric clustering analyses. 
+
+ \begin{figure}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-bias-vs-mag-bias-free.pdf}
+\caption{Comparison of our fiducial HOD constraints to those obtained when varying the magnification amplitude. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+\label{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}
+\end{center}
+\end{figure}
+
+ \begin{figure}
+\begin{center}
+\includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
+\caption{Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model described in Sec.~\ref{ssec:results.magnification}.}
+\label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
+\end{center}
+\end{figure}
+
+\subsection{Joint cosmology and HOD constraints}\label{ssec:results.cosmo}
 Finally we also consider jointly fitting cosmological, HOD and photo-$z$ systematics parameters. This analysis should be regarded as exploratory and only provide a means to illustrate the potential of photometric galaxy clustering analyses to jointly constrain these parameters. An in-depth cosmological analysis would require validation of the analysis and HOD modeling framework on simulations, which is beyond the scope of this work.
 
 To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.837\substack{+0.193 \\ -0.211}$ and $\Omega_{c} = 0.228\substack{+0.022 \\ -0.023}$, consistent with our assumed fiducial cosmology. The corresponding constraints are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}. As can be seen from Tab.~\ref{tab:constraints_robustness}, the derived constraints on HOD parameters agree well with our fiducial results, which shows that our HOD constraints are robust to variations in $\Omega_{c}$ and $\sigma_{8}$ as allowed by the data. This exploratory cosmological analysis further shows that the data are able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, probably owing to the degeneracy with galaxy bias. Therefore, photometric current and future galaxy clustering analyses constitute a promising way to jointly constrain HOD and cosmological parameters, which we leave to future work. 
@@ -797,7 +798,6 @@ To illustrate the cosmological constraining power of the data considered in our 
 \label{fig:constraints-fit=Oc+s8}
 \end{center}
 \end{figure} 
-
 
 \section{Discussion}\label{sec:discussion}
   \lipsum[9]
