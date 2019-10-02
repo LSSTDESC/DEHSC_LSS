@@ -820,7 +820,7 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
   \subsection{Joint cosmology and HOD constraints}\label{ssec:results.cosmo}
     Finally we also consider jointly fitting cosmological, HOD and photo-$z$ systematics parameters. This analysis should be regarded as exploratory and only provide a means to illustrate the potential of photometric galaxy clustering analyses to jointly constrain these parameters. An in-depth cosmological analysis would require validation of the analysis and HOD modeling framework on simulations, which is beyond the scope of this work.
 
-    To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.837\substack{+0.193 \\ -0.211}$ and $\Omega_{c} = 0.228\substack{+0.022 \\ -0.023}$, consistent with our assumed fiducial cosmology. The corresponding constraints are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}. As can be seen from Tab.~\ref{tab:constraints_robustness}, the derived constraints on HOD parameters agree well with our fiducial results, which shows that our HOD constraints are robust to variations in $\Omega_{c}$ and $\sigma_{8}$ as allowed by the data. This exploratory cosmological analysis further shows that the data are able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, probably owing to the degeneracy with galaxy bias. Therefore, photometric current and future galaxy clustering analyses constitute a promising way to jointly constrain HOD and cosmological parameters, which we leave to future work. 
+    To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.837\substack{+0.193 \\ -0.211}$ and $\Omega_{c} = 0.228\substack{+0.022 \\ -0.023}$, consistent with our assumed fiducial cosmology. The corresponding constraints are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}. As can be seen from Tab.~\ref{tab:constraints_robustness}, the derived constraints on HOD parameters agree well with our fiducial results, which shows that our HOD constraints are robust to variations in $\Omega_{c}$ and $\sigma_{8}$ as allowed by the data. This exploratory cosmological analysis further shows that the data are able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, showing that halo model is sufficiently flexible to allow effective marginalization over linear galaxy bias. Therefore, photometric current and future galaxy clustering analyses constitute a promising way to jointly constrain HOD and cosmological parameters, which we leave to future work. 
  
     \begin{figure}
       \begin{center}
@@ -830,12 +830,38 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
       \end{center}
     \end{figure} 
 
-\section{Discussion}\label{sec:discussion}
-  \lipsum[9]
+\section{Discussion and Conclusions}\label{sec:discussion}
+
+This paper has presented a comprehensive analysis of clustering of galaxies from the HSC-SSP DR1 dataset. It has demonstrated that despite relatively small area, the quality of the data allow serious scientific analysis leading to new insights both into physics of galaxy formation as well as methodology of clustering analysis.
+
+In terms of physics we show that a simple flux magnitude cut can be used to create useful samples for galaxy clustering analysis. This contrasts with other approaches that focus on red central galaxies to create smaller samples with more reliable redshift (see e.g. \cite{1507.05460,1807.10163}). Using magnitude cuts yield more galaxies that decrease the shot noise and thus improve the total statistical sensitivity of the survey despite somewhat lower bias leading to less pronounced clustering. In particular, the halo model results in observed galaxies occupying smaller halos toward higher redhifts, but these trends can be well understood by looking at how faint red galaxies drop out from our selection. These results confirm the phenomenological observation that galaxy bias scales approximately inversely with growth function, leading to redshift independent clustering at large redshifts. Our measured evolution of bias is thus consistent with previous measurements, such as those from DEEP2 survey \cite{Coil:2004} and also the LSST forecasting exercises, which assumed $b(z) = 0.95/D(z)$ \cite{1809.01669}. \as{should we comment on number density compared to SRD?}
+
+
+Encouragingly, we find no barriers to estimating clustering using our samples both in auto and cross-correlation. The deprojection technique has a small but statistically significant effect, especially on large scales.  This bodes well for \ldots
 
 \acknowledgments
 
-We thank the Backstreet Boys for useful comments and discussions.
+DA acknowledges support from the Beecroft trust and from STFC through
+an Ernest Rutherford Fellowship, grant reference ST/P004474/1.  HA, BA
+and EG have been supported by the Rutgers Discovery Informatics
+Institute Fellowship of Excellence in Computational and Data Science
+(AY 2017-2020) and Rutgers University \& Bevier Dissertation
+Completion Fellowship (AY 2019-2020). HA, AB, and EG were supported by
+the Department of Energy (grants DE-SC0011636 and DE-SC0010008). HA
+also thanks the LSSTC Data Science Fellowship Program, which is funded
+by LSSTC, NSF Cybertraining Grant \#1829740, the Brinson Foundation,
+and the Moore Foundation, as participation in the program has
+benefited this work. ZG is supported by a Rhodes Scholarship granted
+by the Rhodes Trust. JAN us supported by grant DOE DE-SC0007914 from
+the U.S. Department of Energy Office of Science (Office of High Energy
+Physics). This manuscript has been authored by Fermi Research
+Alliance, LLC under Contract No. DE-AC02-07CH11359 with the
+U.S. Department of Energy, Office of Science, Office of High Energy
+Physics. The work by JS was supported by the U.S. Department of Energy
+award DE-SC0009920. This project was supported in part by the
+U.S. Department of Energy, Office of Science, Office of Workforce
+Development for Teachers and Scientists (WDTS) under the Science
+Undergraduate Laboratory Internships Program (SULI).
 
 \appendix
 
