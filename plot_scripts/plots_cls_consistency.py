@@ -7,7 +7,7 @@ prefix="/global/cscratch1/sd/damonge/HSC_ceci/"
 
 def read_cls(field,
              msk_name='sirius',
-             directory='CovAna_NoiAna_MskSirius_ClFit_Dpj1_DpjBands1'):
+             directory='CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1_newDepth'):
     file_prefix=prefix+"WIDE_"+field+"_"+msk_name+'_i24p5_out/'+directory+'/'
 
     s=sacc.SACC.loadFromHDF(file_prefix+"power_spectra_wdpj.sacc")
