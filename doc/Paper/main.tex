@@ -610,8 +610,8 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the minima
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.95\textwidth]{figures/Cls-data-vs-best-fit_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-vs-mag_M1p-pr.pdf}
-\caption{\todo{UPDATE} Measured auto- and cross power spectra considered in our analysis. The solid lines show the theoretical predictions obtained from the best-fit model parameters obtained in a joint fit to both auto- and cross power spectra not allowing for magnification while the dashed lines show the theoretical predictions obtained allowing for a free magnification amplitude $A_{\mu}$.}
+\includegraphics[width=0.95\textwidth]{figures/Cls-data-vs-best-fit_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-vs-mag.pdf}
+\caption{\todo{UPDATE WITH FULLY CONVERGED RESULTS} Measured auto- and cross power spectra considered in our analysis. The solid lines show the theoretical predictions obtained from the best-fit model parameters obtained in a joint fit to both auto- and cross power spectra not allowing for magnification while the dashed lines show the theoretical predictions obtained allowing for a free magnification amplitude $A_{\mu}$.}
 \label{fig:cls-best-fit}
 \end{center}
 \end{figure}
@@ -712,7 +712,7 @@ Even though the photo-$z$ error model given in Eq.~\ref{eq:photo-z-model} leads 
 
 In order to further illustrate the effects of an incomplete photo-$z$ error model, we perform two additional analyses in which we compare the constraints obtained from the five photo-$z$ methods setting $z_{w, i} = 0$ and $z_{w, i} = 0, \Delta z_{i} = 0$ respectively. In the former case we find that the values for the photo-$z$ systematics parameters $\Sigma_{i} \Delta z_{i}, \Delta z_{i} - \Delta z_{j}$ required by the different codes differ significantly, which leads to differences in both constraining power and constraints on HOD parameters. We especially find significant shifts in $M_{\mathrm{min}}$ and $M_{1}$ along their degeneracy direction. Investigating this further, we find that the observed differences in $\Delta z_{i}$ cannot be explained with the differences in mean redshift between the distributions derived using the five separate methods. In addition, we find that for the redshift distributions considered in this analysis, mean shifts mainly affect low redshift auto power spectra but have a significantly smaller impact on high redshift bins. Variations in the widths of the photo-$z$ distributions on the other hand, have a similar impact at low and high redshifts. This suggests that a photo-$z$ error model accounting only for mean shifts is too simplistic to account for the redshift distribution differences observed in this analysis. As borne out by the observed discrepancies in HOD constraints, our analysis is sensitive to these differences and we therefore need to extend the photo-$z$ error model. From the discussion above it follows that additionally accounting for variations in the widths of the distributions is sufficient, as this error model yields HOD constraints that are robust to changes in the photo-$z$ estimation method.
 
-The discrepancies between HOD parameters derived from the five different methods become even stronger when we do not account for photo-$z$ uncertainties, as can be seen from Fig.~\ref{fig:constraints-HOD-no-pz-shifts-pz-methods}. In contrast to the results obtained using our fiducial COSMOS30 photo-$z$ distributions, we find that we cannot obtain an acceptable fit to the data for the alternative four methods when not accounting for photometric redshift uncertainties. The corresponding reduced $\chi^{2}$s range between $\chi^{2}_{\mathrm{red}} = 1.88$ and $\chi^{2}_{\mathrm{red}} = 4.88$. This suggests that the data are able to detect the presence of significant photometric redshift errors in the distributions derived using the photo-$z$ codes \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} as opposed to those derived using COSMOS 30-band data.
+The discrepancies between HOD parameters derived from the five different methods become even stronger when we do not account for photo-$z$ uncertainties, as can be seen from Fig.~\ref{fig:constraints-HOD-no-pz-shifts-pz-methods}. In contrast to the results obtained using our fiducial COSMOS30 photo-$z$ distributions, we find that we cannot obtain an acceptable fit to the data for the alternative four methods when not accounting for photometric redshift uncertainties. The corresponding reduced $\chi^{2}$s range between $\chi^{2}_{\mathrm{red}} = 1.97$ and $\chi^{2}_{\mathrm{red}} = 5.13$. This suggests that the data are able to detect the presence of significant photometric redshift errors in the distributions derived using the photo-$z$ codes \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} as opposed to those derived using COSMOS 30-band data.
 
 \begin{figure}
 \begin{center}
@@ -807,7 +807,7 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
     \begin{figure}
       \begin{center}
         \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-bias-vs-mag-bias-free.pdf}
-        \caption{\todo{UPDATE} Comparison of our fiducial HOD constraints to those obtained when varying the magnification amplitude. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+        \caption{\todo{UPDATE WITH FULLY CONVERGED RESULTS} Comparison of our fiducial HOD constraints to those obtained when varying the magnification amplitude. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
         \label{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}
       \end{center}
     \end{figure}
@@ -815,7 +815,7 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
     \begin{figure}
       \begin{center}
         \includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
-        \caption{\todo{UPDATE} Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model described in Sec.~\ref{ssec:results.magnification}.}
+        \caption{\todo{UPDATE WITH FULLY CONVERGED RESULTS} Comparison of the constraints on magnification amplitude obtained from auto power spectra alone to those obtained from auto and cross power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model described in Sec.~\ref{ssec:results.magnification}.}
         \label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
       \end{center}
     \end{figure}
@@ -828,7 +828,7 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
     \begin{figure}
       \begin{center}
         \includegraphics[width=0.49\textwidth]{figures/contours-Oc-s8_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_fit=Oc+s8.pdf}
-        \caption{\todo{UPDATE} Constraints on cosmological parameters obtained from a joint fit to all auto- and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+        \caption{\todo{UPDATE WITH FULLY CONVERGED RESULTS} Constraints on cosmological parameters obtained from a joint fit to all auto- and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
         \label{fig:constraints-fit=Oc+s8}
       \end{center}
     \end{figure} 
