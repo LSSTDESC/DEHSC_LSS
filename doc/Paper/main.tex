@@ -821,9 +821,9 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
     \end{figure}
 
   \subsection{Joint cosmology and HOD constraints}\label{ssec:results.cosmo}
-    Finally we also consider jointly fitting cosmological, HOD and photo-$z$ systematics parameters. This analysis should be regarded as exploratory and only provide a means to illustrate the potential of photometric galaxy clustering analyses to jointly constrain these parameters. An in-depth cosmological analysis would require validation of the analysis and HOD modeling framework on simulations, which is beyond the scope of this work.
+    Additionally we also consider jointly fitting cosmological, HOD and photo-$z$ systematics parameters. This analysis should be regarded as exploratory and only provide a means to illustrate the potential of photometric galaxy clustering analyses to jointly constrain these parameters. An in-depth cosmological analysis would require validation of the analysis and HOD modeling framework on simulations, which is beyond the scope of this work.
 
-    To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.807\substack{+0.149 \\ -0.143}$ and $\Omega_{c} = 0.237 \pm 0.025$, consistent with our assumed fiducial cosmology. The corresponding constraints are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}. As can be seen from Tab.~\ref{tab:constraints_robustness}, the derived constraints on HOD parameters agree well with our fiducial results, which shows that our HOD constraints are robust to variations in $\Omega_{c}$ and $\sigma_{8}$ as allowed by the data. This exploratory cosmological analysis further shows that the data are able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, showing that halo model is sufficiently flexible to allow effective marginalization over linear galaxy bias. Therefore, photometric current and future galaxy clustering analyses constitute a promising way to jointly constrain HOD and cosmological parameters, which we leave to future work. 
+    To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.807\substack{+0.149 \\ -0.143}$ and $\Omega_{c} = 0.237 \pm 0.025$, consistent with our assumed fiducial cosmology. The corresponding constraints are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}. As can be seen from Tab.~\ref{tab:constraints_robustness}, the derived constraints on HOD parameters agree well with our fiducial results, which shows that our HOD constraints are robust to variations in $\Omega_{c}$ and $\sigma_{8}$ as allowed by the data. This exploratory cosmological analysis further shows that the data are able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, showing that the halo model is sufficiently flexible to allow effective marginalization over linear galaxy bias. Therefore, photometric current and future galaxy clustering analyses constitute a promising way to jointly constrain HOD and cosmological parameters, which we leave to future work. 
  
     \begin{figure}
       \begin{center}
@@ -832,6 +832,35 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
         \label{fig:constraints-fit=Oc+s8}
       \end{center}
     \end{figure} 
+    
+\subsection{Constraints on linear galaxy bias for different magnitude-limited samples}\label{ssec:results.mag_cuts}
+
+Finally we use our analysis pipeline described in Sec.~\ref{sec:methods} to investigate the dependence of galaxy clustering on limiting magnitude $m_{\mathrm{lim}}$ of the sample and derive an approximate fitting function for the linear galaxy bias as a function of redshift and $m_{\mathrm{lim}}$. 
+
+To this end we split our fiducial galaxy sample into four brighter subsamples with limiting magnitudes $i_{\mathrm{corr}} < 20.5$, $i_{\mathrm{corr}} < 21.5$, $i_{\mathrm{corr}} < 22.5$ and $i_{\mathrm{corr}} < 23.5$, respectively. We then subdivide each of these samples into four redshift bins of approximately equal galaxy number and use our pipeline to compute constraints on HOD parameters for our fiducial analysis variant. This allows us to derive constraints on the large-scale galaxy bias as a function of redshift for each sample. We determine the bias from the mean of the posterior distribution as we find it to yield more stable constraints than the best-fit value. The results for the bias evaluated at the effective redshift of each tomographic bin are shown in Fig.~\ref{fig:magnitude-cuts-bias}, alongside the results for our fiducial sample. As can be seen, we find the linear bias to increase for decreasing limiting magnitude, as expected. Furthermore, the redshift-dependence of the bias can be roughly approximated as inversely proportional to the growth factor, $b(z) \sim \sfrac{1}{D(z)}$, for all samples. In order to obtain a fitting function for the large-scale galaxy bias as a function of redshift and limiting magnitude, we assume it to be separable in $z$ and $m_{\mathrm{lim}}$ and make the following Ansatz:
+\begin{equation}
+b(z, m_{\mathrm{lim}}) = \bar{b}(m_{\mathrm{lim}}) D(z)^{\alpha}.
+\label{eq:bias-fit-func}
+\end{equation}  
+We determine the values of $\alpha$ and $\bar{b}(m_{\mathrm{lim}})$ in a two-step weighted, linear least squares fit: we first fit Eq.~\ref{eq:bias-fit-func} to all five samples separately and determine our fiducial $\alpha$ as the median of these values\footnote{We note that we find slightly better results using the median, which is the reason for preferring it over the mean.}. We then fit Eq.~\ref{eq:bias-fit-func} to all samples again, obtaining constraints on $\bar{b}(m_{\mathrm{lim}})$ for $\alpha$ fixed to our fiducial value. In a last step, we fit a linear function to $\bar{b}(m_{\mathrm{lim}})$, finally yielding
+\begin{align}
+\alpha &= -1.32, \\
+\bar{b}(m_{\mathrm{lim}}) &= b_{1}m_{\mathrm{lim}} + b_{0},
+\label{eq:bias-fit-func}
+\end{align}  
+where $b_{1} = -0.0627$ and $b_{0} = 2.35$. The results from this fitting function are shown as solid lines in Fig.~\ref{fig:magnitude-cuts-bias}, alongside the values obtained from the HOD fit. As can be seen, the fitting function provides a rather good fit and it might thus become a useful tool for e.g. modeling the galaxy bias when forecasting the constraining power of magnitude-limited galaxy samples.
+
+\begin{figure}
+\begin{center}
+\subfigure{\includegraphics[width=0.32\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}} 
+\subfigure{\includegraphics[width=0.32\textwidth]{figures/bias-growth-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}}
+\subfigure{\includegraphics[width=0.32\textwidth]{figures/bias-mlim_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}} 
+\caption{Constraints on the large-scale galaxy bias $b(z, m_{\mathrm{lim}})$ as a function of redshift and limiting magnitude for the different galaxy samples considered in this analysis. For all plots, the points denote the values derived from the mean of the posterior distribution of the parameters and the solid lines show the predictions from the fitting function given in Eq.~\ref{eq:bias-fit-func}. The shaded regions denote the $68 \%$ c.l..}
+\label{fig:magnitude-cuts-bias}
+\end{center}
+\end{figure}
+
+
 
 \section{Discussion and Conclusions}\label{sec:discussion}
 
