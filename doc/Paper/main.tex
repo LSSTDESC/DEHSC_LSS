@@ -823,16 +823,16 @@ In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias
   \subsection{Joint cosmology and HOD constraints}\label{ssec:results.cosmo}
     Additionally we also consider jointly fitting cosmological, HOD and photo-$z$ systematics parameters. This analysis should be regarded as exploratory and only provide a means to illustrate the potential of photometric galaxy clustering analyses to jointly constrain these parameters. An in-depth cosmological analysis would require validation of the analysis and HOD modeling framework on simulations, which is beyond the scope of this work.
 
-    To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.807\substack{+0.149 \\ -0.143}$ and $\Omega_{m} = 0.298 \pm 0.025$,
+    To illustrate the cosmological constraining power of the data considered in our analysis, we allow for variations in the r.m.s. of linear matter fluctuations in spheres of comoving radius 8 $h^{-1}$ Mpc, $\sigma_{8}$, and the fractional cold matter density today, $\Omega_{c}$, in addition to our baseline set of parameters (c.f. Sec.~\ref{ssec:methods.constr}). All other cosmological parameters remain fixed to their fiducial Planck 2018 values. From a joint fit to all auto- and cross power spectra we obtain $\sigma_{8} = 0.807\substack{+0.149 \\ -0.143}$ and $\Omega_{m} = 0.286 \pm 0.025$,
 %%%-> 0.247+0.0493+0.06/93.4/0.7**2 = 0.297611
-    consistent with our assumed fiducial cosmology.  In particular, this is consistent with Planck and BAO measurement, which give $\Omega_m=0.3110\pm 0.006$ and $\sigma_8=0.8099 \pm 0.0071$ \cite{1807.06209} albeit with a different parameterization. The HSC analysis of the weak lensing data from the the full first year HSC data (similar in size, but somewhat larger than the public release) gives $\Omega_m=0.346^{+0.052}_{-0.100}$ \cite{1906.06041}, showing an excellent internal consistency. We note that our modeling makes considerably stronger modeling assumption and thus gives errorbars that are likely under-estimated.
+    consistent with our assumed fiducial cosmology.  In particular, this is consistent with Planck and BAO measurement, which give $\Omega_m=0.3110\pm 0.006$ and $\sigma_8=0.8099 \pm 0.0071$ \cite{Planck:2018} albeit with a different parameterization. The HSC analysis of the weak lensing data from the the full first year HSC data (similar in size, but somewhat larger than the public release) gives $\Omega_m=0.346^{+0.052}_{-0.100}$ \cite{1906.06041}, showing an excellent internal consistency. We note that our analysis makes considerably stronger modeling assumption and thus gives errorbars that are likely under-estimated.
 
     The corresponding constraints are shown in Fig.~\ref{fig:constraints-fit=Oc+s8}. As can be seen from Tab.~\ref{tab:constraints_robustness}, the derived constraints on HOD parameters agree well with our fiducial results, which shows that our HOD constraints are robust to variations in $\Omega_{c}$ and $\sigma_{8}$ as allowed by the data. This exploratory cosmological analysis further shows that the data are able to constrain $\Omega_{c}$ while $\sigma_{8}$ is largely unconstrained, showing that the halo model is sufficiently flexible to allow effective marginalization over linear galaxy bias. Therefore, photometric current and future galaxy clustering analyses constitute a promising way to jointly constrain HOD and cosmological parameters, which we leave to future work. 
  
     \begin{figure}
       \begin{center}
-        \includegraphics[width=0.49\textwidth]{figures/contours-Oc-s8_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_fit=Oc+s8.pdf}
-        \caption{Constraints on cosmological parameters obtained from a joint fit to all auto- and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.). \as{Can we replot this as $\Omega_m$ rather than $\Omega_c$.?}}
+        \includegraphics[width=0.49\textwidth]{figures/contours-Om-s8_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_fit=Oc+s8.pdf}
+        \caption{Constraints on cosmological parameters obtained from a joint fit to all auto- and cross power spectra. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
         \label{fig:constraints-fit=Oc+s8}
       \end{center}
     \end{figure} 
@@ -856,11 +856,11 @@ We determine the values of $\alpha$ and $\bar{b}(m_{\mathrm{lim}})$ in a three-s
 \end{equation}
 where $b_{1} = -0.0627$ and $b_{0} = 2.35$. \as{Do we want to rewrite this as $\bar{b} = b_0 + b_1 (m-24)$?} The results from this fitting function are shown as solid lines in Fig.~\ref{fig:magnitude-cuts-bias}, alongside the values obtained from the HOD fit.
 
-This analysis yields a few interesting results. First we find that the approximation $b(z)\propto D(z)^{-1}$ (i.e $\alpha=-1$ is only approximately valid. In fact, there is no physical reason for it, because the cut is on the observed magnitude, so at the same observed magnituce cut, the low redshift galaxies are \emph{different population} of galaxies. We find that the bias increases somewhat faster than the standard empirical assumption of $D(z)^{-1}$. 
+This analysis yields a few interesting results. First we find that the approximation $b(z)\propto D(z)^{-1}$ (i.e $\alpha=-1$ is only approximately valid. In fact, there is no physical reason for it, because the cut is on the observed magnitude, so at the same observed magnitude cut, the low redshift galaxies are \emph{different population} of galaxies. We find that the bias increases somewhat faster than the standard empirical assumption of $D(z)^{-1}$. 
 
 The most common use of this results is for Fisher matrix forecasts for constraining power of magnitude-limited samples. \as{Do we want to show our result for LSST vs SRD assumption of $0.95/D(z)$?}
 
-An alternative use is galaxy evolution studies, where this results provides a convenient cross-check formula. Our full parameter chains for different magnitudes are available upon request. \as{Is this the case?}
+An alternative use is galaxy evolution studies, where this results provides a convenient cross-check formula. Our full parameter chains for different magnitudes are available upon request. \as{Is this the case?} \an{That would be totally fine with me.}
   
 
 \begin{figure}
