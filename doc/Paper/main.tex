@@ -854,7 +854,14 @@ We determine the values of $\alpha$ and $\bar{b}(m_{\mathrm{lim}})$ in a three-s
 \label{eq:bias-fit-func-result}
 \end{aligned}  
 \end{equation}
-where $b_{1} = -0.0627$ and $b_{0} = 2.35$. The results from this fitting function are shown as solid lines in Fig.~\ref{fig:magnitude-cuts-bias}, alongside the values obtained from the HOD fit. As can be seen, the fitting function provides a rather good fit and it might thus become a useful tool for e.g. modeling galaxy bias when forecasting the constraining power of magnitude-limited samples.
+where $b_{1} = -0.0627$ and $b_{0} = 2.35$. \as{Do we want to rewrite this as $\bar{b} = b_0 + b_1 (m-24)$?} The results from this fitting function are shown as solid lines in Fig.~\ref{fig:magnitude-cuts-bias}, alongside the values obtained from the HOD fit.
+
+This analysis yields a few interesting results. First we find that the approximation $b(z)\propto D(z)^{-1}$ (i.e $\alpha=-1$ is only approximately valid. In fact, there is no physical reason for it, because the cut is on the observed magnitude, so at the same observed magnituce cut, the low redshift galaxies are \emph{different population} of galaxies. We find that the bias increases somewhat faster than the standard empirical assumption of $D(z)^{-1}$. 
+
+The most common use of this results is for Fisher matrix forecasts for constraining power of magnitude-limited samples. \as{Do we want to show our result for LSST vs SRD assumption of $0.95/D(z)$?}
+
+An alternative use is galaxy evolution studies, where this results provides a convenient cross-check formula. Our full parameter chains for different magnitudes are available upon request. \as{Is this the case?}
+  
 
 \begin{figure}
 \begin{center}
