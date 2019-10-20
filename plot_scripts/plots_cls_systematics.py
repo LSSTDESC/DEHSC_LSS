@@ -33,10 +33,10 @@ def read_cls_coadd(msk_name,directory,wdpj=True):
            for typ in ['data','noise','dpj_bias']}
     return s_all
 
-s_fid=read_cls_coadd('sirius','CovAna_NoiAna_MskSirius_ClFit_Dpj1_DpjBands1',wdpj=True)
-s_ndp=read_cls_coadd('sirius','CovAna_NoiAna_MskSirius_ClFit_Dpj1_DpjBands1',wdpj=False)
-s_sys=read_cls_coadd('sirius','CovAna_NoiAna_MskSiriusSyst_ClFit_Dpj0_DpjBands1',wdpj=True)
-s_msk=read_cls_coadd('arcturus','CovAna_NoiAna_MskArcturus_ClFit_Dpj0_DpjBands1',wdpj=True)
+s_fid=read_cls_coadd('sirius','CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1_newDepth',wdpj=True)
+s_ndp=read_cls_coadd('sirius','CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1_newDepth',wdpj=False)
+s_sys=read_cls_coadd('sirius','CovAna_NoiAna_MskSiriusSyst_ClFit_Dpj0_DpjBands1_newDepth',wdpj=True)
+s_msk=read_cls_coadd('arcturus','CovAna_NoiAna_MskArcturus_ClFit_Dpj0_DpjBands1_newDepth',wdpj=True)
 
 lmaxs=np.array([2170,2515,3185,4017])
 
