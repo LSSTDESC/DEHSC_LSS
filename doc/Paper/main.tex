@@ -265,7 +265,7 @@ Our basic method is to measure the two point function of all possible combinatio
     \begin{equation}\label{eq:deproj1}
       \delta_g^{\rm obs}(\nv) = \delta_g^{\rm true}(\nv) + A_{\rm syst}\,\Delta_{\rm syst}(\nv),
     \end{equation}
-    where $\Delta_{\rm syst}$ is a template map of the fluctuation of a given contaminant around its mean across the survey footprint, and $A_{\rm syst}$ is an unknown linear factor. Template deprojection methods avoid systematic biases by removing all modes from the observed maps that are common to any of the systematic template maps, effectively projecting the input map onto the subspace that is orthogonal to all the contaminant templates. This is equivalent to building a Gaussian model for the observed map using Equation \ref{eq:deproj1} and marginalizing over the free amplitude $A_{\rm sys}$. In the context of pseudo-$C_\ell$ estimators this is achieved in practice by obtaining the best-fit value of $A_{\rm syst}$, subtracting the corresponding best-fit contaminant contribution from the maps and analytically accounting for the associated loss of modes when computing the angular power spectrum. Further details of this method can be found in \cite{2017MNRAS.465.1847E,2019MNRAS.484.4127A}.
+    where $\Delta_{\rm syst}$ is a template map of the fluctuation of a given contaminant around its mean across the survey footprint, and $A_{\rm syst}$ is an unknown linear factor. Template deprojection methods avoid systematic biases by removing all modes from the observed maps that are common to any of the systematic template maps, effectively projecting the input map onto the subspace that is orthogonal to all the contaminant templates. This is equivalent to building a Gaussian model for the observed map using Equation \ref{eq:deproj1} and marginalizing over the free amplitude $A_{\rm sys}$. In the context of pseudo-$C_\ell$ estimators this is achieved in practice by obtaining the best-fit value of $A_{\rm syst}$, subtracting the corresponding best-fit contaminant contribution from the maps and analytically accounting for the associated loss of modes when computing the angular power spectrum. Further details about this method can be found in \cite{2017MNRAS.465.1847E,2019MNRAS.484.4127A}.
     
     We must note that star contamination is a special type of contaminant, since it is an additive contribution to the observed galaxy number density $n_g$, not its overdensity. In the simplest scenario, a fraction $f$ of stars contribute to the observed galaxy density: $n_g^{\rm obs}=n^{\rm true}_g+f\,n_s$, where $n_s$ is the local number density of stars. A fluctuation in the star density around the mean $\Delta_s(\nv)=n_s(\nv)/\bar{n}_s-1$, therefore produces both a multiplicative and an additive effect on $\delta_g$:
     \begin{equation}
@@ -314,7 +314,7 @@ Our basic method is to measure the two point function of all possible combinatio
       \bar{n}_g=\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
       \label{eq:ng_hod}
     \end{equation}
-    A central assumption in standard HOD parametrizations is that centrals/satellites follow a binomial/Poisson distribution.
+    A central assumption in standard HOD parametrizations is that centrals/satellites follow a Bernoulli/Poisson distribution.
 
     Following \cite{2011ApJ...736...59Z}, we parametrise the number of centrals and satellites as a function of mass as:
     \begin{align}
