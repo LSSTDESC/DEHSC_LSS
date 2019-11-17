@@ -14,7 +14,7 @@
 \usepackage{xfrac}
 \usepackage{aas_macros}
 \usepackage{mathrsfs}
-\usepackage{subfigure}
+\usepackage{subcaption}
 \usepackage{rotating}
 \newcommand{\nv}{\vec{\theta}}
 %\newcommand{\pasj}{Publications of the ASJ}
@@ -593,10 +593,22 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
 
     \begin{figure}
       \begin{center}
-        \subfigure[$C_{\ell}^{00}$]{\includegraphics[width=0.49\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=0.pdf}}
-        \subfigure[$C_{\ell}^{11}$]{\includegraphics[width=0.49\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=1.pdf}} \\
-        \subfigure[$C_{\ell}^{22}$]{\includegraphics[width=0.49\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=2.pdf}}
-        \subfigure[$C_{\ell}^{33}$]{\includegraphics[width=0.49\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=3.pdf}} 
+        \begin{subfigure}{0.49\textwidth}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=0.pdf}
+        \caption{$C_{\ell}^{00}$}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=1.pdf} \\
+        \caption{$C_{\ell}^{11}$}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=2.pdf}
+        \caption{$C_{\ell}^{22}$}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=3.pdf}
+        \caption{$C_{\ell}^{33}$}
+        \end{subfigure}
         \caption{Comparison of the different contributions to the covariance matrix for the four auto-power spectra considered in our analysis.} \label{fig:covariance-contributions}
       \end{center}
     \end{figure}
@@ -626,8 +638,12 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
 
       \begin{figure}
         \begin{center}
-          \subfigure{\includegraphics[width=0.49\textwidth]{figures/logM_min_z_dependence_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_best-fit+random-draws.pdf}}
-          \subfigure{\includegraphics[width=0.49\textwidth]{figures/logM_1_z_dependence_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_best-fit+random-draws.pdf}}
+          \begin{subfigure}[t]{0.49\textwidth}
+          \includegraphics[width=\textwidth]{figures/logM_min_z_dependence_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_best-fit+random-draws.pdf}
+          \end{subfigure}
+          \begin{subfigure}[t]{0.49\textwidth}
+          \includegraphics[width=\textwidth]{figures/logM_1_z_dependence_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_best-fit+random-draws.pdf}
+          \end{subfigure}
           \caption{Functional forms for the logarithm of $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ derived from our best-fit theoretical model alongside the functions derived from 1000 random realizations of the MCMCs to illustrate the uncertainty.} 
           \label{fig:hod-params-z-dep}
         \end{center}
@@ -743,9 +759,15 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
       In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias as a function of redshift derived from our best-fit HOD model. As can be seen, the large-scale bias scales approximately as $b(z) \propto \sfrac{1}{D(z)}$, where $D(z)$ denotes the linear growth factor. This behavior is consistent with e.g. studies of galaxies in the DEEP2 survey, which found constant clustering strengths as a function of redshift (and thus $b(z) \propto \sfrac{1}{D(z)}$) for magnitude-limited samples \cite{Coil:2004}.
       \begin{figure}
         \begin{center}
-          \subfigure{\includegraphics[width=0.32\textwidth]{figures/M_halo_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}}
-          \subfigure{\includegraphics[width=0.32\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}}
-          \subfigure{\includegraphics[width=0.32\textwidth]{figures/bias-growth_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}}
+          \begin{subfigure}{0.32\textwidth}
+          \includegraphics[width=\textwidth]{figures/M_halo_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+          \end{subfigure}
+          \begin{subfigure}{0.32\textwidth}
+          \includegraphics[width=\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+          \end{subfigure}
+          \begin{subfigure}{0.32\textwidth}
+          \includegraphics[width=\textwidth]{figures/bias-growth_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+          \end{subfigure}
           \caption{Redshift dependence of the mean halo mass $\bar{M}_{\mathrm{halo}}$ and the large-scale galaxy bias $b_{\mathrm{HOD}}$ as derived from our best-fit HOD model. The third panel illustrates the empirical scaling $b(z) \propto \sfrac{1}{D(z)}$ derived from the galaxy sample used in this analysis.}
           \label{fig:HOD-redshift}
         \end{center}
@@ -794,8 +816,16 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
     The magnitude of the magnification signal crucially depends on the derivative of the cumulative galaxy number counts with respect to observed magnitude, $s(z)$. In order to obtain a data-driven model for magnification in our particular sample, we therefore estimate $s(z)$ from the observed number counts. Using linear least squares, we fit a fourth-order polynomial to the logarithm of the observed cumulative apparent $\tt{i}$-band magnitude distribution $N(<m, z)$ in each of the four tomographic redshift bins considered in our analysis. We then determine $s(z)$ at the effective redshift of each bin\footnote{We define the effective redshift for each tomographic bin as the mean redshift of the galaxy distribution.} by taking the derivative of the best-fit function at the magnitude limit of our sample, i.e. $m_{i, \mathrm{lim}} = 24.5$. In addition to the WIDE HSC galaxy data used in this work, HSC DR1 also contains data from two deep patches, called DEEP and UDEEP. We repeat the above analysis with these galaxy samples to ensure the stability of our results. As an example, Fig.~\ref{fig:s-func-estimation} shows the observed number counts as a function of $i$-band magnitude for the lowest redshift bin in the WIDE sample alongside the derived best-fit function. In Fig.~\ref{fig:s-func-estimation}, we also show the $s(z)$ functions derived as outlined above for HSC WIDE, DEEP and UDEEP. As can be seen, the three estimates agree well with each other and we use the $s(z)$ function derived from our fiducial WIDE sample in the following. Our uncertainty on the estimation of $s(z)$ is subdominant given the statistical precision of our measurement, and we therefore ignore it.
     \begin{figure}
       \begin{center}
-        \subfigure[Cumulative galaxy number counts as a function of $i$-band magnitude for the lowest tomographic redshift bin used in this analysis.]{\includegraphics[width=0.49\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}}
-        \subfigure[Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using the WIDE, DEEP and UDEEP HSC galaxy samples.]{\includegraphics[width=0.49\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}} 
+        \begin{subfigure}[t]{0.47\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/mag-dist-cumulative=True+fit-mmin=23-sample=WIDE-bin=0.pdf}
+        \caption{Cumulative galaxy number counts as a function of $i$-band magnitude for the lowest tomographic redshift bin used in this analysis.}
+        \end{subfigure}\hfill
+        \begin{subfigure}[t]{0.47\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/s-z-func-samples=WIDE-DEEP-UDEEP.pdf}
+        \caption{Comparison of $s(z)$ (see Eq.~\ref{eq:s-func}) derived using the WIDE, DEEP and UDEEP HSC galaxy samples.}
+        \end{subfigure}
         \caption{Illustration of data-driven estimation of $s(z)$ for the galaxy sample used in our analysis.} 
         \label{fig:s-func-estimation}
       \end{center}
@@ -867,10 +897,18 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
     %Our measured evolution of bias is thus consistent with previous measurements, such as those from DEEP2 survey \cite{Coil:2004} and are also in agreement the LSST DESC SRD forecasting exercise, which assumed $b(z) = 0.95/D(z)$ \cite{1809.01669} to better than 5\%. The same data could also be used to compare the effective number densities. In fact \cite{1809.01669} already uses the HSC-SSP data to estimate number densities. We do find, however, that compared to LSST DESC SRD, the area lost to masking is considerably higher, around 20\% rather than 12\% assumed in \cite{1809.01669}.
     \begin{figure}
       \begin{center}
-        \subfigure{\includegraphics[width=0.48\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}} 
-        \subfigure{\includegraphics[width=0.48\textwidth]{figures/bias-growth-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}}
-        \subfigure{\includegraphics[width=0.48\textwidth]{figures/bias-mlim_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}} 
-          \subfigure{\includegraphics[width=0.48\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_i24p5-vs-DESC-SRD.pdf}} 
+        \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=0.9\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}
+        \end{subfigure}
+        \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=0.9\textwidth]{figures/bias-growth-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}
+        \end{subfigure}
+       \begin{subfigure}{0.48\textwidth}
+       \includegraphics[width=0.9\textwidth]{figures/bias-mlim_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_magnitude_cuts_fitting-func.pdf}
+       \end{subfigure}
+          \begin{subfigure}{0.48\textwidth}
+          \includegraphics[width=0.9\textwidth]{figures/bias-redshift_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_i24p5-vs-DESC-SRD.pdf}
+           \end{subfigure}
         \caption{\textit{Upper panels:} Constraints on the large-scale galaxy bias $b(z)$ and $b(z)D(z)$ as a function of redshift for the different magnitude-limited galaxy samples considered in this analysis. For all plots, the points denote the values derived from the mean of the posterior distribution of the parameters and the solid lines show the predictions from the fitting function given in Equations \ref{eq:bias-fit-func} and \ref{eq:bias-fit-func-result}. The shaded regions denote the $68 \%$ c.l.. \textit{Lower left panel:} Constraints on $\bar{b}(m_{\mathrm{lim}})$, as defined in Eq.~\ref{eq:bias-fit-func}. The solid line illustrates the best-fit relation given in Eq.~\ref{eq:bias-fit-func-result}. \textit{Lower right panel:} Comparison of the results obtained in this analysis to the bias values assumed for LSST forecasts in the DESC SRD.}
         \label{fig:magnitude-cuts-bias}
       \end{center}
