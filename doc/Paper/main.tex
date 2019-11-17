@@ -16,6 +16,7 @@
 \usepackage{mathrsfs}
 \usepackage{subcaption}
 \usepackage{rotating}
+\usepackage{chngcntr}
 \newcommand{\nv}{\vec{\theta}}
 %\newcommand{\pasj}{Publications of the ASJ}
 %\newcommand{\aap}{Astronomy and Astrophysics}
@@ -175,7 +176,7 @@
   \caption{Summary of the 4 redshift bins used in our analysis. The first two columns show the photo-$z$ bin edges. We used the {\tt photoz\_best} redshift estimator for the photo-$z$ code {\tt ephor\_ab} to assign galaxies to different bins. The second column shows the mean redshift of each bin calculated from the fiducial redshift distributions described in Section \ref{ssec:methods.nz}. The last column shows the number of galaxies in each bin. The bin edges were chosen to roughly contain an equal number of galaxies in each of them.} \label{tab:bins_summary}
   \end{table}
   
-  In this work, we use data from the first data release of the Hyper Suprime-Cam Subaru Strategic Program (HSC DR1 hereon)\footnote{\url{https://hsc-release.mtk.nao.ac.jp}}. The release is extensively documented in \cite{2018PASJ...70S...8A}, and here we only provide the details of the galaxy sample and associated data used for our clustering analysis.
+  In this work, we use data from the first data release of the Hyper Suprime-Cam Subaru Strategic Program (HSC DR1 hereon)\footnote{\url{https://hsc-release.mtk.nao.ac.jp}.}. The release is extensively documented in \cite{2018PASJ...70S...8A}, and here we only provide the details of the galaxy sample and associated data used for our clustering analysis.
 
   HSC-SSP is a photometric galaxy survey that has been awarded 300 nights on the Subaru Telescope starting in 2014. DR1 includes data from 61.5 nights observed to three different depths: Wide (108 square degrees to $i\sim 26.4$), Deep (26 square degrees to $i\sim26.5$) and UltraDeep (4 square degrees to $i\sim 27$). In this work we focus on the Wide field, which has been observed in five broadband filters ($grizy$) and is distributed among 6 fields  of areas varying between 5 and 20 square degrees. The image quality is impressive with a median seeing of around 0.6 arcsec, which is considerably better than other comparable surveys (e.g. DES with around 0.9 arc sec) and also likely better than the median seeing expected to be achieved by LSST. The data are processed with \texttt{hscPipe} \cite{2018PASJ...70S...5B} and are available to the community through a public database.
   
@@ -841,17 +842,17 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
 
     \begin{figure}
       \begin{center}
-        \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-bias-vs-mag-bias-free.pdf}
-        \caption{Comparison of our fiducial HOD constraints to those obtained when varying the magnification amplitude. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-        \label{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}
+        \includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
+        \caption{Comparison of the constraints on magnification amplitude obtained from auto-power spectra alone to those obtained from auto- and cross-power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model, described in Sec.~\ref{ssec:results.magnification}.}
+        \label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
       \end{center}
     \end{figure}
 
     \begin{figure}
       \begin{center}
-        \includegraphics[width=0.3\textwidth]{figures/contours-A_mu_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_mag-bias-free-fit=auto+cross-vs-mag-bias-free-fit=auto.pdf}
-        \caption{Comparison of the constraints on magnification amplitude obtained from auto-power spectra alone to those obtained from auto- and cross-power spectra. The solid line denotes the expectation value of the magnification amplitude determined from our data-driven fiducial model, described in Sec.~\ref{ssec:results.magnification}.}
-        \label{fig:constraints-fit=mag-bias-ampl_fit=auto+cross-vs-fit=mag-bias-ampl_fit=auto}
+        \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_no-mag-bias-vs-mag-bias-free.pdf}
+        \caption{Comparison of our fiducial HOD constraints to those obtained when varying the magnification amplitude. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+        \label{fig:constraints-no-mag-bias-vs-fit=mag-bias-ampl}
       \end{center}
     \end{figure}
 
@@ -944,42 +945,8 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
   This paper is based on data collected at the Subaru Telescope and retrieved from the HSC data archive system, which is operated by Subaru Telescope and Astronomy Data Center at National Astronomical Observatory of Japan. Data analysis was in part carried out with the cooperation of Center for Computational Astrophysics, National Astronomical Observatory of Japan.
 
 \appendix
+\counterwithin{figure}{section}
 
-\begin{figure}
-  \begin{center}
-    \includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
-    \caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-    \label{fig:constraints-fid-full}
-  \end{center}
-\end{figure}
-
-%\begin{figure}
-%\begin{center}
-%\includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
-%\caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} marginalizing over shifts in the means and setting $z_{w, i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-%\label{fig:constraints-HOD-fit-pz-shifts-pz-methods}
-%\end{center}
-%\end{figure}
-%
-%\begin{figure}
-%\begin{center}
-%\includegraphics[width=0.95\textwidth]{figures/contours-pz-syst_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2_fit=auto+cross_cosmo=const-LINBIAS_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
-%\caption{Comparison of the constraints on photo-$z$ systematics parameters obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} marginalizing over shifts in the means and setting $z_{w, i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-%\label{fig:constraints-pz-syst-fit-pz-shifts-pz-methods}
-%\end{center}
-%\end{figure}
-
-\begin{figure}
-  \begin{center}
-    \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_no-pz-shifts_fit=auto+cross_cosmo=const_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
-    \caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} setting $z_{w, i} = 0, \Delta z_{i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
-    \label{fig:constraints-HOD-no-pz-shifts-pz-methods}
-  \end{center}
-\end{figure}
-
-\bibliography{bibliography}
-
-\appendix
 \section{Reconstructing depth from discrete sources}\label{app:depth}
   The depth map used in our analysis (see Section \ref{ssec:methods.syst}) is constructed from the signal-to-noise ratios of sources classified as stars. The use of all sources, including galaxies, to generate this map, would result in spurious correlations with the true galaxy distribution that would cause a bias in the power spectra after deprojecting it. We explore this effect further in this section.
   
@@ -995,5 +962,23 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
   where we have defined $\langle f\rangle_p\equiv \sum_\alpha \bar{N}_\alpha f_{\alpha,p}/\sum_\alpha \bar{N}_\alpha$, and we have expanded to first order in $\delta$ in the second line. If $Q$ is constant across all galaxies, the second and third term in the second line cancel, and the resulting map would receive no noise from the inhomogeneous galaxy distribution ($\bar{Q}_p=\langle Q\rangle_p$) up to second order. This is however not the case for the flux errors used to estimate the depth map. Brighter sources have lower number densities (and therefore stronger shot-noise fluctuations), and also larger flux errors. Therefore, although the depth map estimated from mean galaxy flux errors is dominated by the large-scale depth fluctuations, the small-scale fluctuations trace the spatial distribution of the brightest galaxies, and thus correlate with the true galaxy distribution. This violates the core assumption of template deprojection (that the deprojected contaminant templates do not correlate with the true map fluctuations), and causes a bias in the estimated power spectrum.
   
   Our depth map is computed from star-classified objects and therefore, although it will be subject to the same small-scale noise due to this discrete sampling, these noise fluctuations do not correlate with the galaxy distribution, and therefore do not bias our results. A second-order correlation could arise from the small fraction of galaxies mis-classified as stars, but the associated effect is negligible given our uncertainties. Due to these complications, in the future it will be desirable to estimate the survey depth using image properties directly (e.g. by injecting fake galaxies, or using the background noise integrated over PSF-size apertures).
+  
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{figures/contours_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts+prior=0p2-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
+    \caption{Fiducial constraints on HOD and systematics parameters obtained in this work. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+    \label{fig:constraints-fid-full}
+  \end{center}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_no-pz-shifts_fit=auto+cross_cosmo=const_HOD-param=zfid_clfit=HOD-zevol_pz-methods.pdf}
+    \caption{Comparison of the HOD constraints obtained using the redshift distributions derived from COSMOS30, \texttt{Ephor\_AB}, \texttt{Ephor}, \texttt{DEmP} and \texttt{FRANKEN-Z} setting $z_{w, i} = 0, \Delta z_{i} = 0$. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).}
+    \label{fig:constraints-HOD-no-pz-shifts-pz-methods}
+  \end{center}
+\end{figure}  
+
+\bibliography{bibliography}
 
 \end{document}
