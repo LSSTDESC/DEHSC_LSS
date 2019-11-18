@@ -384,13 +384,13 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
     \end{equation}
     where $M_{\ell\ell'}$ are the mode-coupling matrices described in the previous section, except now they are computed from the products of two masks. It has been shown by \cite{2019arXiv190611765G} that this approach yields a very good approximation for the power spectrum covariance, fully accounting for the effects of mode coupling due to survey geometry.
 
-    The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we estimate this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as (see e.g. \cite{Krause:2017})
+    The second contribution to the total covariance matrix for galaxy clustering is caused by the connected part of the trispectrum, which accounts for mode-coupling due to the non-Gaussian nature of the density field. In our work we compute this contribution using the halo model coupled with a halo occupation distribution. In general, this contribution is given by the angular projection of the three-dimensional trispectrum as (see e.g. \cite{Krause:2017})
     \begin{equation}
     \begin{aligned}
       \mathrm{Cov}_{\mathrm{NG}}(C^{ab}_{\ell}, C^{cd}_{\ell'}) = \frac{1}{4 \pi f_{\mathrm{sky}}} \int_{\vert \boldsymbol{\ell} \vert \in \ell_{1}} \int_{\vert \boldsymbol{\ell}' \vert \in \ell_{2}} \int \frac{\mathrm{d}^{2}\boldsymbol{\ell}}{A(\ell_{1})} \; \frac{\mathrm{d}^{2}\boldsymbol{\ell}'}{A(\ell_{2})} \; \mathrm{d}\chi \; \frac{q^{a}(\chi)q^{b}(\chi)q^{c}(\chi)q^{d}(\chi)}{\chi^{6}} \times \\ T^{abcd}(\sfrac{\boldsymbol{\ell}}{\chi}, \sfrac{-\boldsymbol{\ell}}{\chi}, \sfrac{\boldsymbol{\ell}'}{\chi}, \sfrac{-\boldsymbol{\ell}'}{\chi}).
     \end{aligned}
     \end{equation}
-    The quantity $A(\ell_{i})$ denotes the area of an annulus of width $\Delta \ell_{i}$ around $\ell_{i}$, i.e. $A(\ell_{i}) \equiv \int_{\vert \boldsymbol{\ell} \vert \in \ell_{i}} \mathrm{d}^{2}\boldsymbol{\ell}$, which is approximately given by $A(\ell_{i}) \approx 2 \pi \Delta \ell_{i} \ell_{i}$ for $\ell_{i} \gg \Delta \ell_{i}$. $q^a(\chi)\equiv H(z)p^a(z)$ is the window function for the $a$-th redshift bin.
+    The quantity $A(\ell_{i})$ denotes the area of an annulus of width $\Delta \ell_{i}$ around $\ell_{i}$, i.e. $A(\ell_{i}) \equiv \int_{\vert \boldsymbol{\ell} \vert \in \ell_{i}} \mathrm{d}^{2}\boldsymbol{\ell}$, which is approximately given by $A(\ell_{i}) \approx 2 \pi \Delta \ell_{i} \ell_{i}$ for $\ell_{i} \gg \Delta \ell_{i}$. Finally, $q^a(\chi(z))\equiv \sfrac{H(z)}{c} \;p^a(z)$ is the window function for the $a$-th redshift bin.
     
     Using the halo model, the connected part of the trispectrum $T^{abcd}$ can be written as (e.g. \cite{Takada:2013}):
     \begin{equation}
@@ -584,11 +584,11 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
       
     
   \subsection{Covariance matrix}\label{ssec:results.covariance}
-    We estimate the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{sssec:methods.theory.covar} and the resulting correlation matrix is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
+    We compute the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{sssec:methods.theory.covar} and the resulting correlation matrix is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
     \begin{figure}
       \begin{center}
         \includegraphics[width=0.5\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_G+NG+SSC.pdf}
-        \caption{Correlation matrix for all auto- and cross-power spectra considered in our analysis, estimated as described in Sec.~\ref{sssec:methods.theory.covar}.}\label{fig:covmat}
+        \caption{Correlation matrix for all auto- and cross-power spectra considered in our analysis, computed analytically as described in Sec.~\ref{sssec:methods.theory.covar}.}\label{fig:covmat}
       \end{center}
     \end{figure}
 
@@ -758,6 +758,9 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
       These results suggest that red galaxies are increasingly underrepresented with respect to blue galaxies in our sample at higher redshifts. This is due to the applied magnitude limit of $i < 24.5$: the $i$-band filter translates to rest-frame wavelengths smaller than $4000$ \AA \, at redshifts $z \gtrsim 0.9$. Red galaxies with a strong $4000$ \AA \, break therefore become very faint at these wavelengths and drop out of our selection, thus explaining the observed constancy of $M_{\mathrm{min}}(z)$ and $M_{1}(z)$ with redshift. This interpretation is consistent with the results from the HOD fits that predict a decreasing mean halo mass as a function of redshift for our sample (see Fig.~\ref{fig:HOD-redshift}).
 
       In Fig.~\ref{fig:HOD-redshift}, we additionally show the large-scale galaxy bias as a function of redshift derived from our best-fit HOD model. As can be seen, the large-scale bias scales approximately as $b(z) \propto \sfrac{1}{D(z)}$, where $D(z)$ denotes the linear growth factor. This behavior is consistent with e.g. studies of galaxies in the DEEP2 survey, which found constant clustering strengths as a function of redshift (and thus $b(z) \propto \sfrac{1}{D(z)}$) for magnitude-limited samples \cite{Coil:2004}.
+      
+Finally we note that in our analysis, we assume the observed fraction of central galaxies $f_{c}$ to be unity and constant with redshift. In light of the observed drop-out of red galaxies from our sample at high redshift, this may not be true, as $f_{c}$ could potentially decrease with redshift. In order to test our assumption, we perform separate HOD fits to the four redshift bins, allowing for variations in $f_{c}$ on top of $M_{\mathrm{min}}, M_{1}$ and $M_{0}$. We find the data to not have the statistical power to constrain $f_{c}$ and the derived values to be consistent with redshift-independent. Furthermore, our constraints on $M_{\mathrm{min}}, M_{1}$ and $M_{0}$ are robust to variations in $f_{c}$. We therefore conclude that our results are not significantly affected by the choice of $f_{c}=1$.  
+
       \begin{figure}
         \begin{center}
           \begin{subfigure}{0.32\textwidth}
@@ -773,14 +776,6 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
           \label{fig:HOD-redshift}
         \end{center}
       \end{figure}
-
-%\begin{figure}
-%\begin{center}
-%\includegraphics[scale=0.55]{figures/color-magnitude_cut=pz_best_eab_nbin=4_weights=True.pdf}
-%\caption{Synopsis of the framework for integrated probe combination employed in this work.}
-%\label{fig:color-mag}
-%\end{center}
-%\end{figure}
 
       \begin{sidewaysfigure}
         \begin{center}
