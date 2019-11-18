@@ -1,6 +1,7 @@
 import flatmaps as fm
 import numpy as np
 import matplotlib.pyplot as plt
+from astropy import units as u
 
 prefix="/global/cscratch1/sd/damonge/HSC_ceci/WIDE_"
 field="VVDS"
@@ -19,12 +20,18 @@ ax=fig.add_subplot(211,projection=fsk.wcs)
 ax.set_title("Sirius mask",fontsize=14)
 im=ax.imshow((msk1+msk2).reshape([fsk.ny,fsk.nx]),vmin=0,vmax=2,
              origin='lower', interpolation='nearest')
+yticks = np.array([0., 1., 2.])
+ax.coords[1].set_ticks(yticks * u.deg)
+ax.coords[1].set_major_formatter('dd')
 ax.set_xlabel('R.A.', fontsize=14)
 ax.set_ylabel('Dec.', fontsize=14)
 ax=fig.add_subplot(212,projection=fsk.wcs)
 ax.set_title("Arcturus mask",fontsize=14)
 im=ax.imshow(msk3.reshape([fsk.ny,fsk.nx]),vmin=0,vmax=1,
              origin='lower', interpolation='nearest')
+yticks = np.array([0., 1., 2.])
+ax.coords[1].set_ticks(yticks * u.deg)
+ax.coords[1].set_major_formatter('dd')
 ax.set_xlabel('R.A.', fontsize=14)
 ax.set_ylabel('Dec.', fontsize=14)
 plt.savefig("../doc/Paper/figures/systmask.pdf",

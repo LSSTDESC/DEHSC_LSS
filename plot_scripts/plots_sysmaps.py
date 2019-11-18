@@ -1,6 +1,7 @@
 import flatmaps as fm
 import numpy as np
 import matplotlib.pyplot as plt
+from astropy import units as u
 
 prefix="/global/cscratch1/sd/damonge/HSC_ceci/WIDE_XMMLSS_sirius_i24p5_out/"
 fsk,msk=fm.read_flat_map(prefix+"masked_fraction.fits")
@@ -30,6 +31,9 @@ def plot_syst(name,fname,band,units=None,savename=None):
     im.cmap.set_under('#FFFFFF')
     cbar=plt.colorbar(im,orientation='horizontal')
     cbar.ax.set_xlabel(label,fontsize=14)
+    yticks = np.array([-6., -5., -4.])
+    ax.coords[1].set_ticks(yticks * u.deg)
+    ax.coords[1].set_major_formatter('dd')
     ax.set_xlabel('R.A.', fontsize=14)
     ax.set_ylabel('Dec.', fontsize=14)
     if savename is not None:
