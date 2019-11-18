@@ -212,7 +212,7 @@ Our basic method is to measure the two point function of all possible combinatio
       \item We upgrade the low-resolution binary mask to a higher resolution (0.2 arcmin), and remove all pixels containing objects flagged by the bright object mask. We then remove all disconnected, unmasked groups of pixels, corresponding to spurious islands within the exclusion radius of a bright object with no sources in the catalogs.
       \item We downgrade the resulting mask back to the original resolution through an averaging procedure, producing a map quantifying the observed fraction of each pixel.
     \end{enumerate}
-    It is worth noting that the resolution of the resulting mask ($0.6$ arcminutes) defines the resolution of all maps used in this analysis. After this procedure, we further mask all pixels with a $10\sigma$ depth below our magnitude limit of $i<24.5$, where the depth is estimated as described in Section \ref{ssec:methods.syst}.
+    We verified that the resulting mask is robust by comparing the power spectra estimated with it with those found with an observed fraction map defined simply as the fraction of objects in each pixel outside the bright object mask. It is worth noting that the resolution of this mask ($0.6$ arcminutes) defines the resolution of all maps used in this analysis. After this procedure, we further mask all pixels with a $10\sigma$ depth below our magnitude limit of $i<24.5$, where the depth is estimated as described in Section \ref{ssec:methods.syst}.
 
     This defines our fiducial masks, which are shown in Figure \ref{fig:masks} for each field. As part of our systematics analysis (see Section \ref{sssec:results.spectra.syst}), we also study the effect of masking regions with significant contamination from the different observing conditions (described in Section \ref{ssec:methods.syst}) on our measurements. It is worth noting that the NOMAD star catalog \cite{2004AAS...205.4815Z}, one of the datasets used to construct the bright-object mask described above, is contaminated by a small fraction of bright nearby galaxies ($\sim10\%$). To study the impact of this contamination on our clustering measurements, we have also estimated the angular power spectra using a more recent version of the star mask (the so-called ``Arcturus'' mask described in \cite{2018PASJ...70S...7C}).
 
@@ -327,7 +327,7 @@ where we have assumed a flat cosmological model, i.e. $\Omega_{k} = 0$ for simpl
       \bar{n}_g=\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
       \label{eq:ng_hod}
     \end{equation}
-    A central assumption in standard HOD parameterizations is that centrals/satellites follow a Bernoulli/Poisson distribution.
+    A central assumption in standard HOD parameterizations is that centrals/satellites follow a Bernoulli/Poisson distribution. The model used here also assumes that halos can only contain satellites if they contain a central.
 
     Following \cite{2011ApJ...736...59Z}, we parametrize the number of centrals and satellites as a function of mass as:
     \begin{align}
@@ -794,14 +794,14 @@ Finally we note that in our analysis, we assume the observed fraction of central
     \end{equation}
     where $\Delta_m$ is the 3D matter overdensity (we have omitted the dependence on $t$ and $\chi\nv$ for brevity) and $W_\mu$ is the magnification kernel
     \begin{equation}
-      W_\mu(z)=\frac{3H_0^2\Omega_{m}(1+z)}{2}\int_z^\infty \mathrm{d}z'\,p^i(z)\,\left(5s(z')-2\right)\,\frac{\chi(z')-\chi(z)}{\chi(z)\chi(z')}.
+      W_\mu(z)=\frac{3H_0^2\Omega_{m}(1+z)}{2}\int_z^\infty \mathrm{d}z'\,p^i(z)\,\left(5s(z',m_{\rm lim})-2\right)\,\frac{\chi(z')-\chi(z)}{\chi(z)\chi(z')}.
     \end{equation}
     Here, $H_0\equiv H(z=0)$, $\Omega_{m}$ is the fractional matter density today, and $s$ is the logarithmic slope of the cumulative apparent magnitude distribution $N(<m, z)$:
     \begin{equation}
-      \left. s(z) \equiv \frac{\partial \log_{10}N(<m, z)}{\partial m}\right \rvert_{m=m_{\mathrm{lim}}},
+      \left. s(z,m_{\rm lim}) \equiv \frac{\partial \log_{10}N(<m, z)}{\partial m}\right \rvert_{m=m_{\mathrm{lim}}},
       \label{eq:s-func}
     \end{equation}
-    where $m$ denotes the observed magnitude and $m_{\mathrm{lim}}$ is the magnitude limit of the galaxy sample considered. In short, the observed density contrast does not depend solely on the distribution of galaxies in the tomographic redshift bin of interest, but also on the distribution of matter along the line of sight to these galaxies. Overdensities along the line of sight cause the local angular separation between galaxies to increase (lowering the observed number density), while lensing magnification causes fainter galaxies to enter the observed sample (increasing the observed number density). The two effects cancel at leading order when $s=\sfrac{2}{5}$. 
+    where $m$ denotes the observed magnitude and $m_{\mathrm{lim}}$ is the magnitude limit of the galaxy sample considered. In what follows we will omit the dependence of $s$ on $m_{\rm lim}$ for brevity. In short, the observed density contrast does not depend solely on the distribution of galaxies in the tomographic redshift bin of interest, but also on the distribution of matter along the line of sight to these galaxies. Overdensities along the line of sight cause the local angular separation between galaxies to increase (lowering the observed number density), while lensing magnification causes fainter galaxies to enter the observed sample (increasing the observed number density). The two effects cancel at leading order when $s=\sfrac{2}{5}$. 
 
     The angular power spectrum is then given by
     \begin{equation}\label{eq:cell_gg_wmag}
