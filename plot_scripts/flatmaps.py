@@ -2,9 +2,10 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-import pymaster as nmt
+#import pymaster as nmt
 from astropy.io import fits
 from astropy.wcs import WCS
+import formatting
 
 class FlatMapInfo(object) :
     def __init__(self,wcs,nx=None,ny=None,lx=None,ly=None) :
