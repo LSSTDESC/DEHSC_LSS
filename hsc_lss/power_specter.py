@@ -6,7 +6,7 @@ from astropy.io import fits
 import pymaster as nmt
 from .tracer import Tracer
 import os
-import sacc
+#import sacc
 from scipy.interpolate import interp1d
 
 class PowerSpecter(PipelineStage) :

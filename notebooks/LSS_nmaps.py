@@ -14,12 +14,15 @@ from astropy.wcs import WCS
 from numpy.random import poisson
 from hsc_lss.flatmaps import read_flat_map, FlatMapInfo
 from hsc_lss.map_utils import createCountsMap
-from hsc_lss.tracer import Tracer
 import pymaster as nmt
 from tqdm import tqdm
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
+from matplotlib import rc
+# rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+# rc('text', usetex=True)
+
 
 
 catalogs = glob('/global/cscratch1/sd/damonge/HSC_ceci/WIDE_*_sirius_out/')
@@ -242,7 +245,7 @@ class field:
 
 
 
-def plot_shotnoise_avg_test():
+def plot_shotnoise_avg_test(savepath = False):
 
     """
     Plots the average shot noise estimates across all of the HSC fields
@@ -279,20 +282,35 @@ def plot_shotnoise_avg_test():
     fig = plt.figure(figsize = (8,8))
     sp = fig.add_subplot(111)
 
-    for znum, (this_atn, this_ase) in enumerate(zip(avg_theoretical_noise, avg_shot_estimate)):
+    labeltext = ['$%.2f<z<%.2f$'%(zbin1, zbin2) for zbin1, zbin2 in zip(pz_bins[:-1], pz_bins[1:])]
+
+    for znum, (this_atn, this_ase, thislabel) in enumerate(zip(avg_theoretical_noise, avg_shot_estimate, labeltext)):
 
         sp.plot(ells, avg_theoretical_noise[znum], linewidth = 1.5, color = 'C' + str(znum), zorder = 0, alpha = 0.4)
-        sp.plot(ells, avg_shot_estimate[znum], linewidth = 2, color = 'C' + str(znum), zorder = 1)
+        sp.plot(ells, avg_shot_estimate[znum], linewidth = 2, color = 'C' + str(znum), zorder = 1, label = thislabel)
+
+    if savepath:
+        header = 'Estimated Shot Noise from Adam\'s LSS_nmaps.py\n'
+        header+= 'en_zb: Estimated noise in redshift bins; calculated from 0.25*(<s1s1> + <s2s2> - 2*<s1s2>)\n'
+        header+= 'tn_zp: Theoretical noise in redshift bins; calculted by Namaster\n'
+        header+= '' + '{:15}'*(((len(pz_bins)-1) * 2) + 1) + '\n'
+        columns = ['ells'] + ['en_zb' + str(x) for x in range(len(pz_bins)-1)] + ['tn_zb' + str(x) for x in range(len(pz_bins)-1)]
+        header = header.format(*columns)
+        np.savetxt(savepath, np.vstack((ells, avg_shot_estimate, avg_theoretical_noise)).T, header = header, fmt = '  ' + '%15.8e'*len(columns))
 
     sp.set_xscale('log')
-    sp.set_yscale('log')
+    # sp.set_yscale('log')
 
-    sp.plot([],[],linewidth = 1.5, color = 'C0', alpha = 0.4, label = 'Analytic')
-    sp.plot([],[],linewidth = 2, color = 'C0', label = 'Split Map')
+    sp.tick_params(labelsize = 'large')
 
-    sp.legend(loc = 'upper right', fontsize = 18)
+    # sp.plot([],[],linewidth = 1.5, color = 'C0', alpha = 0.4, label = 'Analytic')
+    # sp.plot([],[],linewidth = 2, color = 'C0', label = 'Split Map')
+
+    sp.legend(loc = 'upper right', fontsize = 18, frameon = False)
 
     sp.set_xlabel(r'$\ell$', fontsize = 20)
-    sp.set_ylabel('Estimated Shot Noise', fontsize = 20)
+    sp.set_ylabel('Shot-Noise Power Spectrum', fontsize = 20)
     
+    sp.legend(loc = 'upper right')
+
     return fig, sp
