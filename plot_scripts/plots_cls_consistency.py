@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sacc
 from scipy.stats import chi2 as chi2f
+import formatting
 
 prefix="/global/cscratch1/sd/damonge/HSC_ceci/"
 
@@ -9,6 +10,7 @@ def read_cls(field,
              msk_name='sirius',
              directory='CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1_newDepth'):
     file_prefix=prefix+"WIDE_"+field+"_"+msk_name+'_i24p5_out/'+directory+'/'
+    file_prefix='../data_replotting/'+field+'/'+directory+'/'
 
     s=sacc.SACC.loadFromHDF(file_prefix+"power_spectra_wdpj.sacc")
     sn=sacc.SACC.loadFromHDF(file_prefix+"noi_bias.sacc")
@@ -25,6 +27,7 @@ colors={'GAMA09H':'#CC0000',
         'VVDS':'#009900',
         'WIDE12H':'#004C99',
         'XMMLSS':'#990099'}
+colors={k:formatting.cmap1[i] for i,k in enumerate(field_names)}
 
 s_fields={}
 for f in field_names:
@@ -45,18 +48,18 @@ nbins=4
 for b1 in range(nbins) :
     for b2 in range(nbins) :
         if b2<b1 :
-            axes[b1,b2].axis('off')
+            axes[b2,b1].axis('off')
 
 ndx_all=[]
 for t1,t2,typ,ells,ndx in s_all['data'].sortTracers():
     lmax=min(lmaxs[t1],lmaxs[t2])
     mask=ells<lmax
     ndx_all+=list(ndx[mask])
-    ax=axes[t1,t2]
+    ax=axes[t2,t1]
     dmean=s_all['data'].mean.vector[ndx]-s_all['noise'].mean.vector[ndx]
     covmean=s_all['data'].precision.getCovarianceMatrix()[ndx,:][:,ndx]
     print("%d-%d"%(t1+1,t2+1))
-    ax.plot([2,20000],[0,0],'k--')
+    ax.plot([2,20000],[0,0],'k--',lw=2)
     for i_f,f in enumerate(field_names):
         c=colors[f]
         s=s_fields[f]
@@ -76,20 +79,19 @@ for t1,t2,typ,ells,ndx in s_all['data'].sortTracers():
             label=None
         ax.errorbar(ells[mask]*(0.95+0.1*(i_f+0.5)/6.),((d-dmean)/e)[mask],
                     yerr=np.ones_like(e)[mask],
-                    fmt='.',c=c,label=label)
+                    fmt='.',c=c,label=label,
+                    markersize=5, elinewidth=1.5, capthick=1.5, capsize=3.5)
     ax.set_xscale('log')
     ax.set_ylim([-3.9,3.9])
     ax.set_xlim([90,4000])
     ax.text(0.05,0.9,'$(%d,%d)$'%(t1+1,t2+1),transform=ax.transAxes,fontsize=12)
-    if t1==t2 :
-        ax.set_xlabel("$\\ell$",fontsize=16)
-        ax.set_ylabel("$\\Delta C_\\ell/\\sigma(C_\\ell)$",fontsize=16)
-        for tick in ax.xaxis.get_major_ticks():
-            tick.label.set_fontsize(14)
-        for tick in ax.yaxis.get_major_ticks():
-            tick.label.set_fontsize(14)
-    else :
-        ax.tick_params(axis='both', which='both',length=0)
+    ax.set_xlabel("$\\ell$",fontsize=18)
+    ax.set_ylabel("$\\Delta C_\\ell/\\sigma(C_\\ell)$",fontsize=18)
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(14)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label.set_fontsize(14)
+        #ax.tick_params(axis='both', which='both',length=0)
         
 print("All:")
 ndx_all=np.array(ndx_all)
@@ -106,7 +108,7 @@ for f in field_names:
     ndof=len(res)
     print("  %s : %.3lf %d %.3lf"%(f,chi2,ndof,1-chi2f.cdf(chi2,ndof)))
 
-fig.legend(loc=(0.15,0.15),frameon=False,ncol=2,fontsize=16)
+fig.legend(loc=(0.65,0.85),frameon=False,ncol=2,fontsize=20)
 plt.savefig('../doc/Paper/figures/cls_consistency.pdf',
             bbox_inches='tight')
 plt.show()

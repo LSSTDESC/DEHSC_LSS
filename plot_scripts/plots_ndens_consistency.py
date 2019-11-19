@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import flatmaps as fm
 from scipy.interpolate import interp1d
+import formatting
 
 # Read best-fit Cls and interpolate them
 d=np.loadtxt("../hsc_lss_params/cls_guess_i24p5.txt",unpack=True)
@@ -18,8 +19,9 @@ def get_ndens_and_error(field_name):
     # for all redshift bins for a given field.
 
     # Read mask
-    prefix="/global/cscratch1/sd/damonge/HSC_ceci/"
-    fsk,mskfrac=fm.read_flat_map(prefix+"WIDE_"+field_name+"_sirius_i24p5_out/masked_fraction.fits")
+    prefix="/global/cscratch1/sd/damonge/HSC_ceci/WIDE_"+field_name+"_sirius_i24p5_out/"
+    prefix="../data_replotting/"+field_name+"/"
+    fsk,mskfrac=fm.read_flat_map(prefix+"masked_fraction.fits")
     msk_bin=np.zeros_like(mskfrac)
     msk_bin[mskfrac>0.5]=1
     mskfrac*=msk_bin;
@@ -29,8 +31,7 @@ def get_ndens_and_error(field_name):
     
     # Count number of galaxies in each redshift bin
     ngals=np.array([np.sum(msk_bin*
-                           fm.read_flat_map(prefix+"WIDE_"+field_name+
-                                            "_sirius_i24p5_out/ngal_maps.fits",
+                           fm.read_flat_map(prefix+"ngal_maps.fits",
                                             i_map=2*i)[1])
                     for i in range(4)])
 
@@ -79,17 +80,17 @@ ndens_mean=np.sum(ndens/sigcvs**2,axis=1)/np.sum(1./sigcvs**2,axis=1)
 print(np.amax(np.fabs((ndens-ndens_mean[:,None])/sigcvs)))
 
 # Plot results
-fig,axes=plt.subplots(4,1,figsize=(10,10),sharex=True)
-plt.subplots_adjust(hspace=0)
+fig,axes=plt.subplots(4,1,figsize=(8,8),sharex=True)
+plt.subplots_adjust(left=0.2)
 for ib,(ax,n,nm,s) in enumerate(zip(axes,ndens,ndens_mean,sigcvs)):
-    ax.errorbar(ifields,n,yerr=s,fmt='r.')
+    ax.errorbar(ifields,n,yerr=s,fmt='.',c=formatting.cmap1[2],markersize=13, elinewidth=2.2, capthick=2.2, capsize=3.5,)
     ax.plot([-1,nfields],[nm,nm],'k--')
     ax.set_xticks(ifields)
     ax.set_xticklabels([])
     ax.tick_params(labelsize="large")
-    ax.text(0.9,0.8,'Bin %d'%(ib+1),transform=ax.transAxes,fontsize=14)
+    ax.text(0.9,0.8,'Bin %d'%(ib+1),transform=ax.transAxes,fontsize=18)
     ax.set_xlim([-0.5,nfields-0.5])
-fig.text(0.04,0.5,'$\\bar{n}\\,[{\\rm arcmin}^{-2}]$',fontsize=14,va='center',rotation='vertical')
+    ax.set_ylabel('$\\bar{n}\\,[{\\rm arcmin}^{-2}]$',fontsize=18)#,va='center',rotation='vertical')
 ax.set_xticklabels(field_names)
 plt.savefig('../doc/Paper/figures/ndens_consistency.pdf',
             bbox_inches='tight')
