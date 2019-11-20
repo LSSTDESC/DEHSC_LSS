@@ -322,7 +322,7 @@ where we have assumed a flat cosmological model, i.e. $\Omega_{k} = 0$ for simpl
       & P_{gg,{\rm 1h}}(k)=\frac{1}{\bar{n}_g^2} \int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M} \bar{N}_c\,\left[\bar{N}_s^2u_s^2(k)+2\bar{N}_su_s^2(k)\right],\\
       & P_{gg,{\rm 2h}}(k)=\left(\frac{1}{\bar{n}_g} \int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}\,b_h(M)\,\bar{N}_c\,\left[1+\bar{N}_su_s(k)\right]\right)^2\,P_{\rm lin}(k).
     \end{align}
-    Here, $M$ represents halo mass, $\sfrac{\mathrm{d}n}{\mathrm{d}M}$ is the halo mass function, $b_h(M)$ is the halo bias, $\bar{N}_c(M)$ is the mean number of central galaxies, $\bar{N}_s(M)$ is the mean number of satellites for halos containing a central galaxy\footnote{Note that, since $\bar{N}_s$ is the average number of satellites for halos with $N_c=1$, the mean number of satellites for all halos is just $\bar{N}_s\bar{N}_c$, since we assume that halos can only contain satellites if they have a central, and that there can be at most one central.}, and $u_s(k)$ is the Fourier transform of the normalized density profile of satellite galaxies, $P_{\rm lin}(k)$ is the linear matter power spectrum and $\bar{n}_g$ is the total mean galaxy density, given by
+    The quantity $M$ denotes halo mass, which we give in units of Solar mass $M_{\odot}$ throughout this work. In addition, $\sfrac{\mathrm{d}n}{\mathrm{d}M}$ is the halo mass function, $b_h(M)$ is the halo bias, $\bar{N}_c(M)$ denotes the mean number of central galaxies, $\bar{N}_s(M)$ is the mean number of satellites for halos containing a central galaxy\footnote{Note that, since $\bar{N}_s$ is the average number of satellites for halos with $N_c=1$, the mean number of satellites for all halos is just $\bar{N}_s\bar{N}_c$, since we assume that halos can only contain satellites if they have a central, and that there can be at most one central.}, and $u_s(k)$ is the Fourier transform of the normalized density profile of satellite galaxies. Finally, $P_{\rm lin}(k)$ is the linear matter power spectrum and $\bar{n}_g$ denotes the total mean galaxy density, given by
     \begin{equation}
       \bar{n}_g=\int \mathrm{d}M\,\frac{\mathrm{d}n}{\mathrm{d}M}\bar{N}_c(M)\left[1+\bar{N}_s(M)\right].
       \label{eq:ng_hod}
@@ -338,7 +338,7 @@ where we have assumed a flat cosmological model, i.e. $\Omega_{k} = 0$ for simpl
     \begin{equation}
       u_s(k|M)=\frac{\sin x\left[{\rm Si}\left((1+c)\,x\right)-{\rm Si}(x)\right]+\cos x\left[{\rm Ci}\left((1+c)x\right)-{\rm Ci}(x)\right]-\frac{\sin(cx)}{(1+c)x}}{{\rm ln}(1+c)-\frac{c}{1+c}},
     \end{equation}
-    where $x=\sfrac{k R_\Delta}{c}$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. In this work, we model the halo mass function $\sfrac{\mathrm{d}n}{\mathrm{d}M}$ following \cite{Tinker:2010}\footnote{More accurate estimates of the mass function can be obtained through the use of emulators \citep{2019ApJ...872...53M}. We verified that our analysis was not too sensitive to the choice of parameterization, and therefore we leave a more thorough studies of these choices for future work.} Furthermore, we employ the concentration-mass relation $c(M)$ (which depends on the choice of $\Delta$) derived by \cite{Duffy:2008}.
+    where $x=\sfrac{k R_\Delta}{c}$, $R_\Delta$ is the halo radius, $c=c(M)$ is the concentration parameter, and ${\rm Si}/{\rm Ci}$ are the sine and cosine integral functions. We define $R_\Delta$ as the radius that encloses $\Delta=200$ times the background matter density. In this work, we model the halo mass function $\sfrac{\mathrm{d}n}{\mathrm{d}M}$ following \cite{Tinker:2010}\footnote{More accurate estimates of the mass function can be obtained through the use of emulators \citep{2019ApJ...872...53M}. We verified that our analysis was not too sensitive to the choice of parameterization, and therefore we leave a more thorough study of these choices for future work.} Furthermore, we employ the concentration-mass relation $c(M)$ (which depends on the choice of $\Delta$) derived by \cite{Duffy:2008}.
 
     In order to include lensing magnification in the theory prediction (see Section \ref{ssec:results.magnification}), we also need to model the galaxy-matter and matter-matter power spectra (see Eq. \ref{eq:cell_gg_wmag}). Following the HOD parametrization, the 1-halo and 2-halo contributions to $P_{gm}(k)$ are given by:
     \begin{align}
@@ -351,7 +351,7 @@ where we have assumed a flat cosmological model, i.e. $\Omega_{k} = 0$ for simpl
     \begin{equation}
       R(z,k)=\frac{P^{\rm Halofit}_{mm}(z,k)}{P^{\rm halo\,model}_{mm}(z,k)}.
     \end{equation}
-We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Sec.~\ref{ssec:methods.constr}.
+We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Sec.~\ref{ssec:methods.constr}. The amplitude of this correction is close to unity at large scales but can reach values of $\sim 1.3$ for large $k$, c.f. Ref.~\cite{2015MNRAS.454.1958M}.
  
     We expect mean galaxy properties to evolve as a function of redshift $z$ for the magnitude-limited sample considered in this analysis. Instead of fitting a separate HOD model to each redshift bin, we fit redshift-dependent functions to $M_{\mathrm{min}}(z)$, $M_{0}(z)$ and $M_{1}(z)$ and choose a functional form given by:
     \begin{equation}
@@ -573,7 +573,7 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
       \begin{figure}
         \centering
         \includegraphics[width=0.6\textwidth]{figures/shotnoise_avg.pdf}
-        \caption{Comparison between the shot noise power spectra estimated analytically using Eq. \ref{eq:nell} (transparent lines) and estimated from the difference-map power spectra (solid lines). Results are shown for the four different redshift bins. Our analytic estimate agrees well with this alternative method.}
+        \caption{Comparison between the shot noise power spectra estimated analytically using Eq.~\ref{eq:nell} and estimated from the difference-map power spectra. Results are shown for the four different redshift bins. Our analytic estimate agrees well with this alternative method. The shot noise power spectra for the different bins have been offset fort clarity.}
         \label{fig:shotnoise_avg}
       \end{figure}
       As described in Section \ref{ssec:methods.cell}, we subtract the shot-noise contribution to the auto-correlation power spectra using an analytical estimate, given by Eq. \ref{eq:nell}. Since it has been argued \citep{2013PhRvD..88h3507B} that non-linearities may produce deviations from this simple relation, we verify the validity of our calculation as follows.
