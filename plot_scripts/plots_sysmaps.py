@@ -22,6 +22,8 @@ def plot_syst(name,fname,band,units=None,savename=None):
     mp_plot=msk_bin*(mp-mp_mean)+mp_mean
     mp_min=np.amin(mp_plot)
     mp_max=np.amax(mp_plot)
+    if name == "Star count":
+        mp_max=4
     mp_plot[msk_bin<1]=mp_min-1
     fig=plt.figure()
     ax=fig.add_subplot(111,projection=fsk.wcs)

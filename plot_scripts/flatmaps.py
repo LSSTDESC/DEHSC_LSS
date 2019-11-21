@@ -5,7 +5,6 @@ from matplotlib import cm
 #import pymaster as nmt
 from astropy.io import fits
 from astropy.wcs import WCS
-import formatting
 
 class FlatMapInfo(object) :
     def __init__(self,wcs,nx=None,ny=None,lx=None,ly=None) :
