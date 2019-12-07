@@ -1,6 +1,7 @@
 import flatmaps as fm
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from astropy import units as u
 
 yticks={'GAMA09H':[0.,1.,2.],
@@ -16,7 +17,8 @@ for field in ['GAMA09H','GAMA15H','HECTOMAP','VVDS','WIDE12H','XMMLSS']:
     ax=fig.add_subplot(111,projection=fsk.wcs)
     ax.set_title(field,fontsize=14)
     im=ax.imshow(msk.reshape([fsk.ny,fsk.nx]),vmin=0,vmax=1,
-                 origin='lower', interpolation='nearest')
+                 origin='lower', interpolation='nearest',
+                 cmap=cm.gray)
     ax.set_xlabel('R.A.', fontsize=14)
     ax.set_ylabel('Dec.', fontsize=14)
     ax.coords[1].set_ticks(np.array(yticks[field]) * u.deg)
