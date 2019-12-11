@@ -16,7 +16,7 @@ def createCountsMap(ra, dec, flatSkyGrid):
     
     return mp
 
-def createSpin2Map(ra, dec, q, u, flatSkyGrid, weights=None, shearrot=None):
+def createSpin2Map(ra, dec, q, u, flatSkyGrid, weights=None, shearrot=None, weightmask=True):
     """
     Creates two maps containing the averages (optionally weighted) of the Q, U components of a
     spin-2 field.
@@ -43,11 +43,18 @@ def createSpin2Map(ra, dec, q, u, flatSkyGrid, weights=None, shearrot=None):
     qmap[weightsmap != 0] /= weightsmap[weightsmap != 0]
     umap[weightsmap != 0] /= weightsmap[weightsmap != 0]
 
+    if weightmask:
+        logger.info('Computing weightmask.')
+        mask = weightsmap
+    else:
+        logger.info('Computing binary mask.')
+        mask = weightsmap != 0.
+        mask = mask.astype('int')
+
     if shearrot is None:
         logger.info('shearrot is None. Not applying shear transformation.')
 
     else:
-
         if shearrot == 'flipqu':
             logger.info('shearrot is {}. Applying shear transformation.'.format(shearrot))
             qmap *= (-1.)
@@ -65,7 +72,7 @@ def createSpin2Map(ra, dec, q, u, flatSkyGrid, weights=None, shearrot=None):
 
     mp = [qmap, umap]
 
-    return mp
+    return mp, mask
 
 def createMeanStdMaps(ra, dec, quantity, flatSkyGrid) :
     """

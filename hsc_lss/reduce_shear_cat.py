@@ -10,9 +10,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class ShearCalib(PipelineStage):
+class ReduceShearCat(PipelineStage):
 
-    name = "ReduceCat"
+    name = "ReduceShearCat"
     inputs = [('raw_data', None)]
     outputs = [('calib_catalog', FitsFile),('R', ASCIIFile),('mhat',ASCIIFile)]
     config_options = {'photoz_method': 'ephor_ab_photoz_best', 'photoz_min':0.3, 'photoz_max': 1.5}
