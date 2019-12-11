@@ -12,12 +12,10 @@ logger = logging.getLogger(__name__)
 
 class ShearCalib(PipelineStage):
 
-    name="ReduceCat"
-    inputs=[('raw_data', None)]
-    outputs=[('calib_catalog', FitsFile),('R', ASCIIFile),('mhat',ASCIIFile)]
-    # config_options={'min_snr':10.,'depth_cut':24.5,'res':0.0285,
-    #                 'res_bo':0.003,'pad':0.1,'band':'i','depth_method':'fluxerr',
-    #                 'flat_project':'CAR','mask_type':'sirius'}
+    name = "ReduceCat"
+    inputs = [('raw_data', None)]
+    outputs = [('calib_catalog', FitsFile),('R', ASCIIFile),('mhat',ASCIIFile)]
+    config_options = {'photoz_method': 'ephor_ab_photoz_best', 'photoz_min':0.3, 'photoz_max': 1.5}
 
     def _responsivity(self, cat):
         """
@@ -85,10 +83,29 @@ class ShearCalib(PipelineStage):
 
         return cat_calib, e1_corr, e2_corr
 
+    def pz_cut(self, cat):
+        """
+        Apply pz cut to catalog.
+        :param cat:
+        :return:
+        """
+
+        logger.info('Applying pz cut to catalog. Using {} with zmin = {}, zmax = {}.'.\
+                    format(self.config['photoz_method'], self.config['photoz_min'], self.config['photoz_max']))
+
+        photozmask = (cat[self.config['photoz_method']]>=self.config['photoz_min'])\
+                     &(cat[self.config['photoz_method']]<self.config['photoz_max'])
+
+        cat = copy.deepcopy(cat)
+        cat = cat[photozmask]
+
+        return cat
+
     def run(self) :
         """
         Main function.
         This stage:
+        - Reduces shear catalog.
         - Computes responsivity and multiplicative bias.
         - Computes calibrated shear components g1, g2 and writes calibrated catalog.
         """
@@ -106,6 +123,8 @@ class ShearCalib(PipelineStage):
                 cat = vstack([cat, c], join_type='exact')
 
         logger.info('Initial catalog size: {}.'.format(len(cat)))
+        cat = self.pz_cut(cat)
+        logger.info('Catalog size after pz cut: {}.'.format(len(cat)))
 
         cat_calib, R, mhat = self.calibrated_catalog(cat)
 
