@@ -930,22 +930,38 @@ Finally we note that in our analysis, we assume the observed fraction of central
 
 
 \acknowledgments
-This paper has undergone internal review in the LSST Dark Energy Science Collaboration. 
-We would like to thank the internal reviewers Elisabeth Krause, Jonathan Loveday, Thomas McClintock and Masahiro Takada for their comments, which helped improve this paper. We would also like to thank David Spergel for numerous helpful discussions and suggestions.
+  This paper has undergone internal review in the LSST Dark Energy Science Collaboration. 
+  We would like to thank the internal reviewers Elisabeth Krause, Jonathan Loveday, Thomas McClintock and Masahiro Takada for their comments, which helped improve this paper. We would also like to thank David Spergel for numerous helpful discussions and suggestions.
 
   DA acknowledges support from the Beecroft trust and from the Science and Technology Facilities Council through an Ernest Rutherford Fellowship, grant reference ST/P004474/1.
-AN acknowledges support from National Science Foundation Grant No. 1814971.
-HA has been supported by the Rutgers Discovery Informatics Institute Fellowship of Excellence in Computational and Data Science (AY 2017-2020) and Rutgers University \& Bevier Dissertation Completion Fellowship (AY 2019-2020); HA also thanks the LSSTC Data Science Fellowship Program, which is funded by LSSTC, NSF Cybertraining Grant No. 1829740, the Brinson Foundation, and the Moore Foundation, as participation in the program has benefited this work. HA, AB, and EG were supported by the Department of Energy (grants DE-SC0011636 and DE-SC0010008).
+  HA has been supported by the Rutgers Discovery Informatics Institute Fellowship of Excellence in Computational and Data Science (AY 2017-2020) and Rutgers University \& Bevier Dissertation Completion Fellowship (AY 2019-2020); HA also thanks the LSSTC Data Science Fellowship Program, which is funded by LSSTC, NSF Cybertraining Grant No. 1829740, the Brinson Foundation, and the Moore Foundation, as participation in the program has benefited this work. HA, AB, and EG were supported by the Department of Energy (grants DE-SC0011636 and DE-SC0010008).
   ZG is supported by a Rhodes Scholarship granted by the Rhodes Trust.
   RM is supported by the Department of Energy Cosmic Frontier program, grant DE-SC0010118.
   HM has been supported by the Jet Propulsion Laboratory, California Institute of Technology, under a contract with the National Aeronautics and Space Administration and Grant-in-Aid for Scientific Research from the JSPS Promotion of Science (No. 18H04350). 
   JAN us supported by grant DOE DE-SC0007914 from the U.S. Department of Energy Office of Science (Office of High Energy Physics).
+  AN acknowledges support from National Science Foundation Grant No. 1814971.
   This manuscript has been authored by Fermi Research Alliance, LLC under Contract No. DE-AC02-07CH11359 with the U.S. Department of Energy, Office of Science, Office of High Energy Physics.
   The work by JS was supported by the U.S. Department of Energy award DE-SC0009920.
   This work was supported by the grant MDM-2015-0509 from the Spanish Ministry of Science and Innovation.
   This project was supported in part by the U.S. Department of Energy, Office of Science, Office of Workforce Development for Teachers and Scientists (WDTS) under the Science Undergraduate Laboratory Internships Program (SULI).
 
-The DESC acknowledges ongoing support from the Institut National de Physique Nucl\'eaire et de Physique des Particules in France; the Science \& Technology Facilities Council in the United Kingdom; and the Department of Energy, the National Science Foundation, and the LSST Corporation in the United States.  DESC uses resources of the IN2P3 Computing Center (CC-IN2P3--Lyon/Villeurbanne - France) funded by the Centre National de la Recherche Scientifique; the National Energy Research Scientific Computing Center, a DOE Office of Science User Facility supported by the Office of Science of the U.S.\ Department of Energy under Contract No.\ DE-AC02-05CH11231; STFC DiRAC HPC Facilities, funded by UK BIS National E-infrastructure capital grants; and the UK particle physics grid, supported by the GridPP Collaboration.  This work was performed in part under DOE Contract DE-AC02-76SF00515.
+  The contributions from the authors are listed below:
+  AN: co-led project, led signal modeling, photo-$z$ systematics characterization, likelihood analysis and interpretation of results.
+  DA: co-led project, led development of the data analysis pipeline, contributed to likelihood and modelling efforts.
+  JS: development of data analysis pipeline, comparisons with simulated data, checked impact of observing conditions (systematics).
+  AS: co-led project, advised student, cross checked MCMC chains, calculated $N(z)$ sample variance uncertainty, contributed to modelling efforts, wrote initial likelihood code.
+  HA: carried out initial data exploration, analyzed HSC photo-$z$ pdfs, and determined tomographic bin selection.
+  AB: shot noise estimation, small updates to HSC pipeline.
+  JD: provided advice and guidance.
+  ZG: calibrated redshift distributions from COSMOS 30-band data.
+  EG: galaxy sample selection and shot noise estimation.
+  RM: provided guidance on how to use the HSC data.
+  HM: provided guidance on how to use the HSC data.
+  JN: assistance in interpretation of galaxy clustering results.
+  SS: model parametrization, testing MCMC chains, studied uncertainties in the first bin's $N(z)$.
+  EW: produced observing condition maps.
+
+  The DESC acknowledges ongoing support from the Institut National de Physique Nucl\'eaire et de Physique des Particules in France; the Science \& Technology Facilities Council in the United Kingdom; and the Department of Energy, the National Science Foundation, and the LSST Corporation in the United States.  DESC uses resources of the IN2P3 Computing Center (CC-IN2P3--Lyon/Villeurbanne - France) funded by the Centre National de la Recherche Scientifique; the National Energy Research Scientific Computing Center, a DOE Office of Science User Facility supported by the Office of Science of the U.S.\ Department of Energy under Contract No.\ DE-AC02-05CH11231; STFC DiRAC HPC Facilities, funded by UK BIS National E-infrastructure capital grants; and the UK particle physics grid, supported by the GridPP Collaboration.  This work was performed in part under DOE Contract DE-AC02-76SF00515.
 
   The Hyper Suprime-Cam (HSC) collaboration includes the astronomical communities of Japan and Taiwan, and Princeton University. The HSC instrumentation and software were developed by the National Astronomical Observatory of Japan (NAOJ), the Kavli Institute for the Physics and Mathematics of the Universe (Kavli IPMU), the University of Tokyo, the High Energy Accelerator Research Organization (KEK), the Academia Sinica Institute for Astronomy and Astrophysics in Taiwan (ASIAA), and Princeton University. Funding was contributed by the FIRST program from Japanese Cabinet Office, the Ministry of Education, Culture, Sports, Science and Technology (MEXT), the Japan Society for the Promotion of Science (JSPS), Japan Science and Technology Agency (JST), the Toray Science Foundation, NAOJ, Kavli IPMU, KEK, ASIAA, and Princeton University. 
 
