@@ -31,11 +31,11 @@ class ShearCatMapper(PipelineStage) :
         for zi, zf in zip(self.zi_arr, self.zf_arr) :
             msk_bin = (cat[self.column_mark]<=zf) & (cat[self.column_mark]>zi)
             subcat = cat[msk_bin]
-            gammamaps, gammamask = createSpin2Map(subcat['ra'], subcat['dec'], subcat['ishape_hsm_regauss_e1_calib'], \
+            gammamaps, gammamasks = createSpin2Map(subcat['ra'], subcat['dec'], subcat['ishape_hsm_regauss_e1_calib'], \
                                      subcat['ishape_hsm_regauss_e2_calib'], self.fsk, \
                                      weights=subcat['ishape_hsm_regauss_derived_shape_weight'], \
                                      shearrot=self.config['shearrot'])
-            maps_combined = [gammamaps, gammamask]
+            maps_combined = [gammamaps, gammamasks]
             maps.append(maps_combined)
 
         return maps
@@ -91,8 +91,11 @@ class ShearCatMapper(PipelineStage) :
                 hdu = fits.ImageHDU(data=m_list[0][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head = header.copy()
-                head['DESCR'] = ('gamma mask, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                head['DESCR'] = ('gamma weight mask, bin %d'%(im+1), 'Description')
+                hdu = fits.ImageHDU(data=m_list[1][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdus.append(hdu)
+                head['DESCR'] = ('gamma binary mask, bin %d'%(im+1), 'Description')
+                hdu = fits.ImageHDU(data=m_list[1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
             else:
                 head = header.copy()
@@ -104,8 +107,11 @@ class ShearCatMapper(PipelineStage) :
                 hdu = fits.ImageHDU(data=m_list[0][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head = header.copy()
-                head['DESCR'] = ('gamma mask, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                head['DESCR'] = ('gamma weight mask, bin %d'%(im+1), 'Description')
+                hdu = fits.ImageHDU(data=m_list[1][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdus.append(hdu)
+                head['DESCR'] = ('gamma binary mask, bin %d'%(im+1), 'Description')
+                hdu = fits.ImageHDU(data=m_list[1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
 
         hdulist = fits.HDUList(hdus)
