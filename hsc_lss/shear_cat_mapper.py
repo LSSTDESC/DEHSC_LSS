@@ -40,6 +40,30 @@ class ShearCatMapper(PipelineStage) :
 
         return maps
 
+    def get_e2rms(self, cat):
+        """
+        Get e1_2rms, e2_2rms from catalog.
+        :param cat:
+        :return:
+        """
+
+        if not 'ishape_hsm_regauss_e1_calib' in cat.dtype.names:
+            raise RuntimeError('get_e2rms must be called with calibrated shear catalog. Aborting.')
+        e2rms_arr = []
+
+        for zi, zf in zip(self.zi_arr, self.zf_arr) :
+            msk_bin = (cat[self.column_mark]<=zf) & (cat[self.column_mark]>zi)
+            subcat = cat[msk_bin]
+            e1_2rms = np.average(subcat['ishape_hsm_regauss_e1_calib']**2,
+                                 weights=subcat['ishape_hsm_regauss_derived_shape_weight'])
+            e2_2rms = np.average(subcat['ishape_hsm_regauss_e2_calib'] ** 2,
+                                 weights=subcat['ishape_hsm_regauss_derived_shape_weight'])
+
+            e2rms_combined = np.array([e1_2rms, e2_2rms])
+            e2rms_arr.append(e2rms_combined)
+
+        return e2rms_arr
+
     def parse_input(self):
         """
         Check config parameters for consistency
@@ -76,6 +100,9 @@ class ShearCatMapper(PipelineStage) :
         logger.info("Creating shear maps and corresponding masks.")
         gammamaps = self.get_gamma_maps(cat)
 
+        logger.info("Computing e2rms.")
+        e2rms = self.get_e2rms(cat)
+
         print("Writing output to {}.".format(self.get_output('gamma_maps')))
         header = self.fsk.wcs.to_header()
         hdus = []
@@ -84,35 +111,45 @@ class ShearCatMapper(PipelineStage) :
             if im == 0 :
                 head = header.copy()
                 head['DESCR'] = ('gamma1, bin %d'%(im+1), 'Description')
-                hdu = fits.PrimaryHDU(data=m_list[0][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.PrimaryHDU(data=m_list[im][0][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head = header.copy()
                 head['DESCR'] = ('gamma2, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[0][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][0][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head = header.copy()
                 head['DESCR'] = ('gamma weight mask, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[1][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][1][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head['DESCR'] = ('gamma binary mask, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdus.append(hdu)
+                head['DESCR'] = ('counts map (shear sample), bin %d'%(im+1), 'Description')
+                hdu = fits.ImageHDU(data=m_list[im][1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
             else:
                 head = header.copy()
                 head['DESCR'] = ('gamma1, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[0][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][0][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head = header.copy()
                 head['DESCR'] = ('gamma2, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[0][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][0][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head = header.copy()
                 head['DESCR'] = ('gamma weight mask, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[1][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][1][0].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
                 head['DESCR'] = ('gamma binary mask, bin %d'%(im+1), 'Description')
-                hdu = fits.ImageHDU(data=m_list[1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdu = fits.ImageHDU(data=m_list[im][1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
                 hdus.append(hdu)
+                head['DESCR'] = ('counts map (shear sample), bin %d'%(im+1), 'Description')
+                hdu = fits.ImageHDU(data=m_list[im][1][1].reshape([self.fsk.ny,self.fsk.nx]), header=head)
+                hdus.append(hdu)
+
+            # e2rms
+            cols = [fits.Column(name='e2rms', array=e2rms[im], format='E')]
+            hdus.append(fits.BinTableHDU.from_columns(cols))
 
         hdulist = fits.HDUList(hdus)
         hdulist.writeto(self.get_output('gamma_maps'), overwrite=True)

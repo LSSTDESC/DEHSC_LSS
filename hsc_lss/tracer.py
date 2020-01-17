@@ -65,10 +65,13 @@ class Tracer(object) :
         else:
             logger.info('Creating tracer object for shear.')
             # Read shear map
-            self.fsk, gammamaps = read_flat_map(None, hdu=[hdu_list[4*i_bin], hdu_list[4*i_bin+1]])
+            self.fsk, gammamaps = read_flat_map(None, hdu=[hdu_list[6*i_bin], hdu_list[6*i_bin+1]])
             compare_infos(fsk, self.fsk)
 
-            _, masks = read_flat_map(None, hdu=[hdu_list[4*i_bin+2], hdu_list[4*i_bin+3]])
+            _, masks = read_flat_map(None, hdu=[hdu_list[6*i_bin+2], hdu_list[6*i_bin+3], hdu_list[6*i_bin+4]])
+
+            #Read N(z)
+            self.nz_data=hdu_list[2*i_bin+1].data.copy()
 
             # Make sure other maps are compatible
             if not self.fsk.is_map_compatible(masks[0]) :
@@ -80,20 +83,31 @@ class Tracer(object) :
                     if not self.fsk.is_map_compatible(c) :
                         raise ValueError("%d-th contaminant template is incompatible."%ic)
 
-            if weightmask:
-                logger.info('Using weight mask.')
-                self.weight = masks[0]
-            else:
-                logger.info('Using binary mask.')
-                self.weight = masks[1]
+            self.weight = masks[0]
+            mask_binary = masks[1]
+            nmap = masks[2]
 
             # Reshape contaminants
             conts = None
             if contaminants is not None:
                 conts = [[c.reshape([self.fsk.ny, self.fsk.nx])] for c in contaminants]
 
+            ndens = np.sum(nmap * mask_binary) / np.sum(weights)
+            self.ndens_perad = ndens / (np.radians(self.fsk.dx) * np.radians(self.fsk.dy))
+            self.e1_2rms_pix = np.average(gammamaps[0]**2, weights=weights)
+            self.e2_2rms_pix = np.average(gammamaps[1] ** 2, weights=weights)
+            self.e1_2rms_cat, self.e2_2rms_cat = hdu_list[6*i_bin+5].data.copy()
+
             # Form NaMaster field
-            self.field = nmt.NmtFieldFlat(np.radians(self.fsk.lx), np.radians(self.fsk.ly),
-                        self.weight.reshape([self.fsk.ny,self.fsk.nx]),
-                        [gammamaps[0].reshape([self.fsk.ny,self.fsk.nx]), gammamaps[1].reshape([self.fsk.ny,self.fsk.nx])],
-                        templates=conts)
+            if weightmask:
+                logger.info('Using weight mask.')
+                self.field = nmt.NmtFieldFlat(np.radians(self.fsk.lx), np.radians(self.fsk.ly),
+                            weights.reshape([self.fsk.ny,self.fsk.nx]),
+                            [gammamaps[0].reshape([self.fsk.ny,self.fsk.nx]), gammamaps[1].reshape([self.fsk.ny,self.fsk.nx])],
+                            templates=conts)
+            else:
+                logger.info('Using binary mask.')
+                self.field = nmt.NmtFieldFlat(np.radians(self.fsk.lx), np.radians(self.fsk.ly),
+                            mask_binary.reshape([self.fsk.ny,self.fsk.nx]),
+                            [gammamaps[0].reshape([self.fsk.ny,self.fsk.nx]), gammamaps[1].reshape([self.fsk.ny,self.fsk.nx])],
+                            templates=conts)

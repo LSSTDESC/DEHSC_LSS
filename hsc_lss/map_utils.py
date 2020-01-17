@@ -39,6 +39,7 @@ def createSpin2Map(ra, dec, q, u, flatSkyGrid, weights=None, shearrot=None):
     qmap = np.bincount(flatmap, weights=q, minlength=flatSkyGrid.get_size())
     umap = np.bincount(flatmap, weights=u, minlength=flatSkyGrid.get_size())
     weightsmap = np.bincount(flatmap, weights=weights, minlength=flatSkyGrid.get_size())
+    nmap = np.bincount(flatmap, weights=None, minlength=flatSkyGrid.get_size())
 
     qmap[weightsmap != 0] /= weightsmap[weightsmap != 0]
     umap[weightsmap != 0] /= weightsmap[weightsmap != 0]
@@ -77,7 +78,7 @@ def createSpin2Map(ra, dec, q, u, flatSkyGrid, weights=None, shearrot=None):
             logger.error('Accepted values of shearrot = [noflip, flipq, flipu, flipqu].')
 
     mp = [qmap, umap]
-    ms = [weightmask, mask]
+    ms = [weightmask, mask, nmap]
 
     return mp, ms
 
