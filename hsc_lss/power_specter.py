@@ -13,8 +13,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-#TODO: Covariance MCM precompute all cwsps with counts
-#TODO: Put counts in same framework
+#TODO: Names of files to read
 #TODO: COSMOS nz for shear weights
 
 class PowerSpecter(PipelineStage) :
@@ -60,103 +59,71 @@ class PowerSpecter(PipelineStage) :
 
         return temp
 
-    def get_sacc_windows(self,wsp) :
+    def get_windows(self,wsp) :
         """
         Get window functions for each bandpower so they can be stored into the final SACC files.
         """
 
         # Compute window functions
-        if self.nshear_maps == 0:
-            print("Computing window functions for counts and shear.")
-            nbands=wsp.wsp.bin.n_bands
-            l_arr=np.arange(self.lmax+1)
-            if not os.path.isfile(self.get_output_fname('windows_l',ext='npz')) :
-                print("Computing window functions")
-                windows=np.zeros([nbands,self.lmax+1])
-                t_hat=np.zeros(self.lmax+1);
-                for il,l in enumerate(l_arr) :
-                    t_hat[il]=1.;
-                    windows[:,il]=wsp.decouple_cell(wsp.couple_cell(l_arr,[t_hat]))
-                    t_hat[il]=0.;
-                np.savez(self.get_output_fname('windows_l'),windows=windows)
-            else :
-                print("Reading window functions")
-                windows=np.load(self.get_output_fname('windows_l',ext='npz'))['windows']
+        print("Computing window functions.")
+        nbands = wsp[0, 0].wsp.bin.n_bands
+        l_arr = np.arange(self.lmax + 1)
 
-            windows_sacc=[]
-            #i_x=0
-            for i in range(self.nbins) :
-                for j in range(i,self.nbins) :
-                    for b in range(nbands) :
-                        windows_sacc.append(sacc.Window(l_arr,windows[b]))
+        windows_list = [[0 for i in range(self.ntracers)] for ii in range(self.ntracers)]
+
+        if not os.path.isfile(self.get_output_fname('windows_l', ext='npz')[0]):
+            print("Computing window functions for counts.")
+            windows_counts = np.zeros([nbands, self.lmax + 1])
+            t_hat = np.zeros(self.lmax + 1)
+            for il, l in enumerate(l_arr):
+                t_hat[il] = 1.
+                windows_counts[:, il] = wsp[0, 0].decouple_cell(wsp[0, 0].couple_cell(l_arr, [t_hat]))
+                t_hat[il] = 0.
+            np.savez(self.get_output_fname('windows_l')[0], windows=windows_counts)
         else:
-            print("Computing window functions for counts and shear.")
-            nbands = wsp.wsp.bin.n_bands
-            l_arr = np.arange(self.lmax + 1)
+            print("Reading window functions for counts.")
+            windows_counts = np.load(self.get_output_fname('windows_l', ext='npz')[0])['windows']
 
-            nspectra = self.nbins * (self.nbins + 1) / 2
-            windows_list = [0 for i in range(nspectra)]
-
-            if not os.path.isfile(self.get_output_fname('windows_l', ext='npz')[0]):
-                print("Computing window functions for counts.")
-                windows_counts = np.zeros([nbands, self.lmax + 1])
-                t_hat = np.zeros(self.lmax + 1);
-                for il, l in enumerate(l_arr):
-                    t_hat[il] = 1.;
-                    windows_counts[:, il] = wsp.decouple_cell(wsp.couple_cell(l_arr, [t_hat]))
-                    t_hat[il] = 0.;
-                np.savez(self.get_output_fname('windows_l')[0], windows=windows_counts)
-            else:
-                print("Reading window functions for counts.")
-                windows_counts = np.load(self.get_output_fname('windows_l', ext='npz')[0])['windows']
-
-            for i in range(self.nbins):
-                for ii in range(i, self.nbins):
-                    if i < self.ncounts_maps and ii < self.ncounts_maps:
-                        windows_list[self.ordering[i, ii]] = windows_counts
-                    elif i == 0 and ii >= self.ncounts_maps:
-                        if not os.path.isfile(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]]):
-                            print("Computing window functions for counts x shear.")
-                            windows = np.zeros([nbands, self.lmax + 1])
-                            t_hat = np.zeros(self.lmax + 1);
-                            for il, l in enumerate(l_arr):
-                                t_hat[il] = 1.;
-                                windows[:, il] = wsp.decouple_cell(wsp.couple_cell(l_arr, [t_hat]))
-                                t_hat[il] = 0.;
-                            np.savez(self.get_output_fname('windows_l')[0], windows=windows)
-                        else:
-                            print("Reading window functions for counts x shear.")
-                            windows = np.load(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]])['windows']
-
-                        windows_list[self.ordering[i, ii]] = windows
-                    elif i != 0 and i < self.ncounts_maps and ii >= self.ncounts_maps:
-                        windows_list[self.ordering[i, ii]] = windows_list[self.ordering[0, ii]]
-                    elif i >= self.ncounts_maps and ii >= self.ncounts_maps:
-                        if not os.path.isfile(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]]):
-                            print("Computing window functions for shear.")
-                            windows = np.zeros([nbands, self.lmax + 1])
-                            t_hat = np.zeros(self.lmax + 1);
-                            for il, l in enumerate(l_arr):
-                                t_hat[il] = 1.;
-                                windows[:, il] = wsp.decouple_cell(wsp.couple_cell(l_arr, [t_hat]))
-                                t_hat[il] = 0.;
-                            np.savez(self.get_output_fname('windows_l')[0], windows=windows)
-                        else:
-                            print("Reading window functions for shear.")
-                            windows = np.load(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]])['windows']
-
-                        windows_list[self.ordering[i, ii]] = windows
+        for i in range(self.ntracers):
+            for ii in range(i, self.ntracers):
+                if i < self.ncounts_maps and ii < self.ncounts_maps:
+                    windows_list[i, ii] = windows_counts
+                elif i == 0 and ii >= self.ncounts_maps:
+                    if not os.path.isfile(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]]):
+                        print("Computing window functions for counts x shear.")
+                        windows = np.zeros([nbands, self.lmax + 1])
+                        t_hat = np.zeros(self.lmax + 1)
+                        for il, l in enumerate(l_arr):
+                            t_hat[il] = 1.
+                            windows[:, il] = wsp[i, ii].decouple_cell(wsp[i, ii].couple_cell(l_arr, [t_hat]))
+                            t_hat[il] = 0.
+                        np.savez(self.get_output_fname('windows_l')[0], windows=windows)
                     else:
-                        raise RunTimeError("Messed-up indexing in window function computation.")
+                        print("Reading window functions for counts x shear.")
+                        windows = np.load(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]])['windows']
 
-            windows_sacc = []
-            # i_x=0
-            for i in range(self.nbins):
-                for j in range(i, self.nbins):
-                    for b in range(nbands):
-                        windows_sacc.append(sacc.Window(l_arr, windows_list[self.ordering[i, j]][b]))
+                    windows_list[i, ii] = windows
+                elif i != 0 and i < self.ncounts_maps and ii >= self.ncounts_maps:
+                    windows_list[i, ii] = windows_list[0, ii]
+                elif i >= self.ncounts_maps and ii >= self.ncounts_maps:
+                    if not os.path.isfile(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]]):
+                        print("Computing window functions for shear.")
+                        windows = np.zeros([nbands, self.lmax + 1])
+                        t_hat = np.zeros(self.lmax + 1)
+                        for il, l in enumerate(l_arr):
+                            t_hat[il] = 1.
+                            windows[:, il] = wsp[i, ii].decouple_cell(wsp[i, ii].couple_cell(l_arr, [t_hat]))
+                            t_hat[il] = 0.
+                        np.savez(self.get_output_fname('windows_l')[0], windows=windows)
+                    else:
+                        print("Reading window functions for shear.")
+                        windows = np.load(self.get_output_fname('windows_l', ext='npz')[self.ordering[i, ii]])['windows']
 
-        return windows_sacc
+                    windows_list[i, ii] = windows
+                else:
+                    raise RunTimeError("Messed-up indexing in window function computation.")
+
+        return windows_list
 
     def get_noise(self,tracers,wsp,bpws,nsims=1000) :
         """
@@ -271,101 +238,78 @@ class PowerSpecter(PipelineStage) :
             cls_deproj_all=s.mean.vector.reshape([self.ncross,self.nell])
         else :
             print("Computing deprojection bias")
-            if self.ntracers_shear == 0:
-                cls_deproj_all=[]
-                i_x=0
-                for i in range(self.nbins) :
-                    for j in range(i,self.nbins) :
-                        print(i,j)
-                        cl_deproj_bias=nmt.deprojection_bias_flat(trc[i].field,trc[j].field,bpws,
-                                                                  lth,[clth[i_x]])[0]
-                        cls_deproj_all.append(cl_deproj_bias)
-                        i_x+=1
-
-                #Remove deprojection bias
-                cls_all=[]
-                i_x=0
-                for i in range(self.nbins) :
-                    for j in range(i,self.nbins) :
-                        cls_all.append(wsp.decouple_cell([cl_coupled[i_x]],
-                                                         cl_bias=[cls_deproj_all[i_x]])[0])
-                        i_x+=1
-                cl_deproj = np.array(cls_all)
-                cl_deproj_bias = cls_deproj_all
-
-            else:
-                # Compute and remove deprojection bias
-                map_i = 0
-                map_j = 0
-                for tr_i in range(self.ntracers):
-                    for tr_j in range(tr_i, self.ntracers):
-                        if trc[tr_i].spin == 0 and trc[tr_j].spin == 0:
-                            cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
-                                                                                lth, [clth[map_i, map_j]])
-                            cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j]], cl_bias=cl_deproj_bias_temp)
-                            cl_deproj_bias[map_i, map_j] = cl_deproj_bias_temp[0]
-                            cl_deproj[map_i, map_j] = cl_deproj_temp[0]
-                            map_j += 1
-                        elif trc[tr_i].spin == 0 and tr[tr_j].spin == 2:
-                            cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
-                                                                    lth, [clth[map_i, map_j], clth[map_i, map_j + 1]])
-                            cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j], cl_coupled[map_i, map_j + 1]],
-                                                               cl_bias=cl_deproj_bias_temp)
-                            # For one spin-0 field and one spin-2 field, NaMaster gives: n_cls=2, [C_TE,C_TB]
-                            cl_deproj_bias_tempe = cl_deproj_bias_temp[0]
-                            cl_deproj_bias_tempb = cl_deproj_bias_temp[1]
-                            cl_deproj_bias[map_i, map_j] = cl_deproj_bias_tempe
-                            cl_deproj_bias[map_i, map_j + 1] = cl_deproj_bias_tempb
-                            cl_deproj_tempe = cl_deproj_temp[0]
-                            cl_deproj_tempb = cl_deproj_temp[1]
-                            cl_deproj[map_i, map_j] = cl_deproj_tempe
-                            cl_deproj[map_i, map_j + 1] = cl_deproj_tempb
-                            map_j += 2
-                        elif trc[tr_i].spin == 2 and tr[tr_j].spin == 0:
-                            cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
-                                                                    lth, [clth[map_i, map_j], clth[map_i + 1, map_j]])
-                            cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j], cl_coupled[map_i + 1, map_j]],
-                                                               cl_bias=cl_deproj_bias_temp)
-                            # For one spin-0 field and one spin-2 field, NaMaster gives: n_cls=2, [C_TE,C_TB]
-                            cl_deproj_bias_tempe = cl_deproj_bias_temp[0]
-                            cl_deproj_bias_tempb = cl_deproj_bias_temp[1]
-                            cl_deproj_bias[map_i, map_j] = cl_deproj_bias_tempe
-                            cl_deproj_bias[map_i + 1, map_j] = cl_deproj_bias_tempb
-                            cl_deproj_tempe = cl_deproj_temp[0]
-                            cl_deproj_tempb = cl_deproj_temp[1]
-                            cl_deproj[map_i, map_j] = cl_deproj_tempe
-                            cl_deproj[map_i + 1, map_j] = cl_deproj_tempb
-                            map_j += 1
-                        else:
-                            cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
-                                                            lth, [clth[map_i, map_j], clth[map_i, map_j + 1],
-                                                                  clth[map_i + 1, map_j], clth[map_i + 1, map_j + 1]])
-                            cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j], cl_coupled[map_i, map_j + 1],
-                                                                cl_coupled[map_i + 1, map_j], cl_coupled[map_i + 1, map_j + 1]],
-                                                               cl_bias=cl_deproj_bias_temp)
-                            # For two spin-2 fields, NaMaster gives: n_cls=4, [C_E1E2,C_E1B2,C_E2B1,C_B1B2]
-                            cl_deproj_bias_tempe = cl_deproj_bias_temp[0]
-                            cl_deproj_bias_tempeb = cl_deproj_bias_temp[1]
-                            cl_deproj_bias_tempbe = cl_deproj_bias_temp[2]
-                            cl_deproj_bias_tempb = cl_deproj_bias_temp[3]
-                            cl_deproj_bias[map_i, map_j] = cl_deproj_bias_tempe
-                            cl_deproj_bias[map_i, map_j + 1] = cl_deproj_bias_tempeb
-                            cl_deproj_bias[map_i + 1, map_j] = cl_deproj_bias_tempbe
-                            cl_deproj_bias[map_i + 1, map_j + 1] = cl_deproj_bias_tempb
-                            cl_deproj_tempe = cl_deproj_temp[0]
-                            cl_deproj_tempeb = cl_deproj_temp[1]
-                            cl_deproj_tempbe = cl_deproj_temp[2]
-                            cl_deproj_tempb = cl_deproj_temp[3]
-                            cl_deproj[map_i, map_j] = cl_deproj_tempe
-                            cl_deproj[map_i, map_j + 1] = cl_deproj_tempeb
-                            cl_deproj[map_i + 1, map_j] = cl_deproj_tempbe
-                            cl_deproj[map_i + 1, map_j + 1] = cl_deproj_tempb
-                            map_j += 2
-
-                    if trc[tr_i].spin == 2:
-                        map_i += 2
+            # Compute and remove deprojection bias
+            map_i = 0
+            map_j = 0
+            for tr_i in range(self.ntracers):
+                for tr_j in range(tr_i, self.ntracers):
+                    if trc[tr_i].spin == 0 and trc[tr_j].spin == 0:
+                        cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
+                                                                            lth, [clth[map_i, map_j]])
+                        cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j]], cl_bias=cl_deproj_bias_temp)
+                        cl_deproj_bias[map_i, map_j] = cl_deproj_bias_temp[0]
+                        cl_deproj[map_i, map_j] = cl_deproj_temp[0]
+                        map_j += 1
+                    elif trc[tr_i].spin == 0 and tr[tr_j].spin == 2:
+                        cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
+                                                                lth, [clth[map_i, map_j], clth[map_i, map_j + 1]])
+                        cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j], cl_coupled[map_i, map_j + 1]],
+                                                           cl_bias=cl_deproj_bias_temp)
+                        # For one spin-0 field and one spin-2 field, NaMaster gives: n_cls=2, [C_TE,C_TB]
+                        cl_deproj_bias_tempe = cl_deproj_bias_temp[0]
+                        cl_deproj_bias_tempb = cl_deproj_bias_temp[1]
+                        cl_deproj_bias[map_i, map_j] = cl_deproj_bias_tempe
+                        cl_deproj_bias[map_i, map_j + 1] = cl_deproj_bias_tempb
+                        cl_deproj_tempe = cl_deproj_temp[0]
+                        cl_deproj_tempb = cl_deproj_temp[1]
+                        cl_deproj[map_i, map_j] = cl_deproj_tempe
+                        cl_deproj[map_i, map_j + 1] = cl_deproj_tempb
+                        map_j += 2
+                    elif trc[tr_i].spin == 2 and tr[tr_j].spin == 0:
+                        cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
+                                                                lth, [clth[map_i, map_j], clth[map_i + 1, map_j]])
+                        cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j], cl_coupled[map_i + 1, map_j]],
+                                                           cl_bias=cl_deproj_bias_temp)
+                        # For one spin-0 field and one spin-2 field, NaMaster gives: n_cls=2, [C_TE,C_TB]
+                        cl_deproj_bias_tempe = cl_deproj_bias_temp[0]
+                        cl_deproj_bias_tempb = cl_deproj_bias_temp[1]
+                        cl_deproj_bias[map_i, map_j] = cl_deproj_bias_tempe
+                        cl_deproj_bias[map_i + 1, map_j] = cl_deproj_bias_tempb
+                        cl_deproj_tempe = cl_deproj_temp[0]
+                        cl_deproj_tempb = cl_deproj_temp[1]
+                        cl_deproj[map_i, map_j] = cl_deproj_tempe
+                        cl_deproj[map_i + 1, map_j] = cl_deproj_tempb
+                        map_j += 1
                     else:
-                        map_i += 1
+                        cl_deproj_bias_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field, trc[tr_j].field, bpws,
+                                                        lth, [clth[map_i, map_j], clth[map_i, map_j + 1],
+                                                              clth[map_i + 1, map_j], clth[map_i + 1, map_j + 1]])
+                        cl_deproj_temp = wsp.decouple_cell([cl_coupled[map_i, map_j], cl_coupled[map_i, map_j + 1],
+                                                            cl_coupled[map_i + 1, map_j], cl_coupled[map_i + 1, map_j + 1]],
+                                                           cl_bias=cl_deproj_bias_temp)
+                        # For two spin-2 fields, NaMaster gives: n_cls=4, [C_E1E2,C_E1B2,C_E2B1,C_B1B2]
+                        cl_deproj_bias_tempe = cl_deproj_bias_temp[0]
+                        cl_deproj_bias_tempeb = cl_deproj_bias_temp[1]
+                        cl_deproj_bias_tempbe = cl_deproj_bias_temp[2]
+                        cl_deproj_bias_tempb = cl_deproj_bias_temp[3]
+                        cl_deproj_bias[map_i, map_j] = cl_deproj_bias_tempe
+                        cl_deproj_bias[map_i, map_j + 1] = cl_deproj_bias_tempeb
+                        cl_deproj_bias[map_i + 1, map_j] = cl_deproj_bias_tempbe
+                        cl_deproj_bias[map_i + 1, map_j + 1] = cl_deproj_bias_tempb
+                        cl_deproj_tempe = cl_deproj_temp[0]
+                        cl_deproj_tempeb = cl_deproj_temp[1]
+                        cl_deproj_tempbe = cl_deproj_temp[2]
+                        cl_deproj_tempb = cl_deproj_temp[3]
+                        cl_deproj[map_i, map_j] = cl_deproj_tempe
+                        cl_deproj[map_i, map_j + 1] = cl_deproj_tempeb
+                        cl_deproj[map_i + 1, map_j] = cl_deproj_tempbe
+                        cl_deproj[map_i + 1, map_j + 1] = cl_deproj_tempb
+                        map_j += 2
+
+                if trc[tr_i].spin == 2:
+                    map_i += 2
+                else:
+                    map_i += 1
 
         return cl_deproj, cl_deproj_bias
 
@@ -384,29 +328,18 @@ class PowerSpecter(PipelineStage) :
             data=np.loadtxt(self.config['guess_spectrum'],unpack=True)
             l_use=data[0]
             cl_use=data[1:]
-            if self.ntracers_shear == 0:
-                if len(cl_use)!=self.ncross :
-                    raise ValueError("Theory power spectra have a wrong shape")
-            else:
-                if cl_use.shape != (self.nmaps, self.nmaps, self.nell):
-                    raise ValueError("Theory power spectra have a wrong shape.")
+            if cl_use.shape != (self.nmaps, self.nmaps, self.nell):
+                raise ValueError("Theory power spectra have a wrong shape.")
         #Interpolate
         lth=np.arange(2,self.lmax+1)
-        if self.ntracers_shear == 0:
-            clth=np.zeros([self.ncross,len(lth)])
-            for i in range(self.ncross):
-                clf = interp1d(l_use, cl_use[i], bounds_error=False, fill_value=0, kind='linear')
-                clth[i, :] = clf(lth)
-                clth[i, lth <= l_use[0]] = cl_use[i, 0]
-                clth[i, lth >= l_use[-1]] = cl_use[i, -1]
-        else:
-            clth = np.zeros((self.nmaps, self.nmaps, lth.shape[0]))
-            for i in range(self.nmaps):
-                for ii in range(i, self.nmaps):
-                    clf = interp1d(l_use, cl_use[i, ii], bounds_error=False, fill_value=0, kind='linear')
-                    clth[i, ii, :] = clf(lth)
-                    clth[i, ii, lth <= l_use[0]] = cl_use[i, ii, 0]
-                    clth[i, ii, lth >= l_use[-1]] = cl_use[i, ii, -1]
+
+        clth = np.zeros((self.nmaps, self.nmaps, lth.shape[0]))
+        for i in range(self.nmaps):
+            for ii in range(i, self.nmaps):
+                clf = interp1d(l_use, cl_use[i, ii], bounds_error=False, fill_value=0, kind='linear')
+                clth[i, ii, :] = clf(lth)
+                clth[i, ii, lth <= l_use[0]] = cl_use[i, ii, 0]
+                clth[i, ii, lth >= l_use[-1]] = cl_use[i, ii, -1]
 
         return lth, clth
 
@@ -426,7 +359,7 @@ class PowerSpecter(PipelineStage) :
         for tr_i in range(self.ntracers) :
             for tr_j in range(tr_i, self.ntracers) :
                 cl_coupled_temp = nmt.compute_coupled_cell_flat(trc[tr_i].field,trc[tr_j].field,bpws)
-                cl_decoupled_temp = wsp[self.ordering[tr_i, tr_j]].decouple_cell(cl_coupled_temp)
+                cl_decoupled_temp = wsp[tr_i, tr_j].decouple_cell(cl_coupled_temp)
                 if trc[tr_i].spin == 0 and trc[tr_j].spin == 0:
                     cls_coupled[map_i, map_j] = cl_coupled_temp[0]
                     cls_decoupled[map_i, map_j] = cl_decoupled_temp[0]
@@ -505,60 +438,47 @@ class PowerSpecter(PipelineStage) :
         Get NmtWorkspaceFlat for our mask
         """
 
-        if self.nshear_maps == 0:
-            print("No shear maps to compute MCMC for.")
-            wsp=nmt.NmtWorkspaceFlat()
-            if not os.path.isfile(self.get_output_fname('mcm',ext='dat')) :
-                print("Computing MCM for counts.")
-                wsp.compute_coupling_matrix(tracers[0].field,tracers[0].field,bpws)
-                wsp.write_to(self.get_output_fname('mcm',ext='dat'))
-            else :
-                print("Reading MCM for counts.")
-                wsp.read_from(self.get_output_fname('mcm',ext='dat'))
-            wsps = wsp
+        print("Computing MCM.")
+        wsps = [[0 for i in range(self.ntracers)] for ii in range(self.ntracers)]
 
-        else:
-            print("Computing MCMC for counts and shear maps.")
-            wsps = [[0 for i in range(self.ntracers)] for ii in range(self.ntracers)]
+        # Compute wsp for counts (is always the same as mask is the same)
+        wsp_counts = nmt.NmtWorkspaceFlat()
+        if not os.path.isfile(self.get_output_fname('mcm',ext='dat')[0]) :
+            print("Computing MCM for counts.")
+            wsp_counts.compute_coupling_matrix(tracers[0].field,tracers[0].field,bpws)
+            wsp_counts.write_to(self.get_output_fname('mcm',ext='dat')[0])
+        else :
+            print("Reading MCM for counts.")
+            wsp_counts.read_from(self.get_output_fname('mcm',ext='dat')[0])
 
-            # Compute wsp for counts (is always the same as mask is the same)
-            wsp_counts = nmt.NmtWorkspaceFlat()
-            if not os.path.isfile(self.get_output_fname('mcm',ext='dat')[0]) :
-                print("Computing MCM for counts.")
-                wsp_counts.compute_coupling_matrix(tracers[0].field,tracers[0].field,bpws)
-                wsp_counts.write_to(self.get_output_fname('mcm',ext='dat')[0])
-            else :
-                print("Reading MCM for counts.")
-                wsp_counts.read_from(self.get_output_fname('mcm',ext='dat')[0])
-
-            for i in range(self.ntracers):
-                for ii in range(i, self.ntracers):
-                    if i < self.ntracers_counts and ii < self.ntracers_counts:
-                        wsps[i, ii] = wsp_counts
-                    elif i == 0 and ii >= self.ncounts_maps:
-                        wsp = nmt.NmtWorkspaceFlat()
-                        if not os.path.isfile(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]]):
-                            print("Computing MCM for counts x shear.")
-                            wsp.compute_coupling_matrix(tracers[i].field, tracers[ii].field, bpws)
-                            wsp.write_to(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
-                        else:
-                            print("Reading MCM for counts x shear.")
-                            wsp.read_from(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
-                        wsps[i, ii] = wsp
-                    elif i != 0 and i < self.ntracers_counts and ii >= self.ntracers_counts:
-                        wsps[i, ii] = wsps[0, ii]
-                    elif i >= self.ntracers_counts and ii >= self.ntracers_counts:
-                        wsp = nmt.NmtWorkspaceFlat()
-                        if not os.path.isfile(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]]):
-                            print("Computing MCM for shear.")
-                            wsp.compute_coupling_matrix(tracers[i].field, tracers[ii].field, bpws)
-                            wsp.write_to(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
-                        else:
-                            print("Reading MCM for shear.")
-                            wsp.read_from(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
-                        wsps[i, ii] = wsp
+        for i in range(self.ntracers):
+            for ii in range(i, self.ntracers):
+                if i < self.ntracers_counts and ii < self.ntracers_counts:
+                    wsps[i, ii] = wsp_counts
+                elif i == 0 and ii >= self.ncounts_maps:
+                    wsp = nmt.NmtWorkspaceFlat()
+                    if not os.path.isfile(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]]):
+                        print("Computing MCM for counts x shear.")
+                        wsp.compute_coupling_matrix(tracers[i].field, tracers[ii].field, bpws)
+                        wsp.write_to(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
                     else:
-                        raise RunTimeError("Messed-up indexing in wsp computation.")
+                        print("Reading MCM for counts x shear.")
+                        wsp.read_from(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
+                    wsps[i, ii] = wsp
+                elif i != 0 and i < self.ntracers_counts and ii >= self.ntracers_counts:
+                    wsps[i, ii] = wsps[0, ii]
+                elif i >= self.ntracers_counts and ii >= self.ntracers_counts:
+                    wsp = nmt.NmtWorkspaceFlat()
+                    if not os.path.isfile(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]]):
+                        print("Computing MCM for shear.")
+                        wsp.compute_coupling_matrix(tracers[i].field, tracers[ii].field, bpws)
+                        wsp.write_to(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
+                    else:
+                        print("Reading MCM for shear.")
+                        wsp.read_from(self.get_output_fname('mcm', ext='dat')[self.ordering[i, ii]])
+                    wsps[i, ii] = wsp
+                else:
+                    raise RunTimeError("Messed-up indexing in wsp computation.")
         return wsps
 
     def get_covar_mcm(self,tracers,bpws):
@@ -568,51 +488,44 @@ class PowerSpecter(PipelineStage) :
         cwsp=nmt.NmtCovarianceWorkspaceFlat()
         if not os.path.isfile(self.get_output_fname('cov_mcm',ext='dat')) :
             print("Computing covariance MCM")
-            if self.ntracers_shear == 0:
-                cwsp.compute_coupling_coefficients(tracers[0].field,
-                                                   tracers[0].field,bpws)
-                cwsp.write_to(self.get_output_fname('cov_mcm',ext='dat'))
-            else:
-                cwsp = [[[[0 for i in range(self.nmaps)] for ii in self.nmaps]
-                         for j in range(self.nmaps)] for jj in range(self.nmaps)]
-                # Compute wsp for counts (is always the same as mask is the same)
-                cwsp_counts = nmt.NmtCovarianceWorkspaceFlat()
-                print("Computing covariance MCM for counts.")
-                cwsp_counts.compute_coupling_coefficients(tracers[0].field, tracers[0].field, bpws)
-                cwsp_counts.write_to(self.get_output_fname('cov_mcm', ext='dat')[0])
+            cwsp = [[[[0 for i in range(self.nmaps)] for ii in self.nmaps]
+                     for j in range(self.nmaps)] for jj in range(self.nmaps)]
+            # Compute wsp for counts (is always the same as mask is the same)
+            cwsp_counts = nmt.NmtCovarianceWorkspaceFlat()
+            print("Computing covariance MCM for counts.")
+            cwsp_counts.compute_coupling_coefficients(tracers[0].field, tracers[0].field, bpws)
+            cwsp_counts.write_to(self.get_output_fname('cov_mcm', ext='dat')[0])
 
-                ix_1 = 0
-                for i1 in enumerate(self.nmaps):
-                    for j1 in enumerate(i1, self.nmaps):
-                        ix_2 = 0
-                        for i2 in enumerate(self.nmaps):
-                            for j2 in enumerate(i2, self.nmaps):
-                                tr_i1, tr_j1 = self.pss2tracers(i1, j1)
-                                tr_i2, tr_j2 = self.pss2tracers(i2, j2)
-                                tr_indxs = np.array([tr_i1, tr_j1, tr_i2, tr_j2])
-                                if np.all(tr_indxs < self.ntracers_counts):
-                                    cwsp_curr = cwsp_counts
-                                elif np.any(tr_indxs < self.ntracers_counts) and np.all(tr_indxs != 0):
-                                    i1_curr = i1
-                                    j1_curr = j1
-                                    i2_curr = i2
-                                    j2_curr = j2
-                                    if tr_i1 < self.ntracers_counts:
-                                        i1_curr = 0
-                                    if tr_j1 < self.ntracers_counts:
-                                        j1_curr = 0
-                                    if tr_i2 < self.ntracers_counts:
-                                        i2_curr = 0
-                                    if tr_j2 < self.ntracers_counts:
-                                        j2_curr = 0
-                                    cwsp_curr = cwsp[i1_curr, j1_curr, i2_curr, j2_curr]
-                                else:
-                                    cwsp_curr = nmt.NmtCovarianceWorkspaceFlat()
-                                    cwsp_curr.compute_coupling_coefficients(tracers[tr_i1].field, tracers[tr_j1].field, bpws,
-                                                                            tracers[tr_i2].field, tracers[tr_j2].field, bpws)
+            for i1 in enumerate(self.nmaps):
+                for j1 in enumerate(i1, self.nmaps):
+                    for i2 in enumerate(self.nmaps):
+                        for j2 in enumerate(i2, self.nmaps):
+                            tr_i1, tr_j1 = self.pss2tracers(i1, j1)
+                            tr_i2, tr_j2 = self.pss2tracers(i2, j2)
+                            tr_indxs = np.array([tr_i1, tr_j1, tr_i2, tr_j2])
+                            if np.all(tr_indxs < self.ntracers_counts):
+                                cwsp_curr = cwsp_counts
+                            elif np.any(tr_indxs < self.ntracers_counts) and np.all(tr_indxs != 0):
+                                i1_curr = i1
+                                j1_curr = j1
+                                i2_curr = i2
+                                j2_curr = j2
+                                if tr_i1 < self.ntracers_counts:
+                                    i1_curr = 0
+                                if tr_j1 < self.ntracers_counts:
+                                    j1_curr = 0
+                                if tr_i2 < self.ntracers_counts:
+                                    i2_curr = 0
+                                if tr_j2 < self.ntracers_counts:
+                                    j2_curr = 0
+                                cwsp_curr = cwsp[i1_curr, j1_curr, i2_curr, j2_curr]
+                            else:
+                                cwsp_curr = nmt.NmtCovarianceWorkspaceFlat()
+                                cwsp_curr.compute_coupling_coefficients(tracers[tr_i1].field, tracers[tr_j1].field, bpws,
+                                                                        tracers[tr_i2].field, tracers[tr_j2].field, bpws)
 
-                                cwsp[i1, j1, i2, j2] = cwsp_curr
-                                cwsp_curr.write_to(self.get_output_fname('cov_mcm', ext='dat')[0])
+                            cwsp[i1, j1, i2, j2] = cwsp_curr
+                            cwsp_curr.write_to(self.get_output_fname('cov_mcm', ext='dat')[0])
         else :
             print("Reading covariance MCM")
             cwsp.read_from(self.get_output_fname('cov_mcm',ext='dat'))
@@ -1123,7 +1036,7 @@ class PowerSpecter(PipelineStage) :
         wsp = self.get_mcm(tracers_nc,bpws)
 
         print("Computing window function")
-        windows=self.get_sacc_windows(wsp)
+        windows = self.get_windows(wsp)
 
         print("Computing power spectra")
         print(" No deprojections")
