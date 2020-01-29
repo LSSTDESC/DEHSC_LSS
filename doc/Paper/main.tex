@@ -39,6 +39,15 @@
 \usepackage[T1]{fontenc} % if needed
 \usepackage{natbib}
 \bibliographystyle{JHEP}
+
+\usepackage{eso-pic}% http://ctan.org/pkg/eso-pic
+\AddToShipoutPictureBG*{%
+  \AtPageUpperLeft{%
+    \hspace{0.75\paperwidth}%
+    \raisebox{-3.5\baselineskip}{%
+      \makebox[0pt][l]{\textnormal{FERMILAB-PUB-19-626-AE}}
+}}}%
+
 \title{Tomographic galaxy clustering with the Subaru Hyper Suprime-Cam first year public data release}
 
 \author[a,1]{Andrina Nicola,}
@@ -50,14 +59,14 @@
 \author[f]{Humna Awan,}
 \author[f]{Adam Broussard,}
 \author[a,g]{Jo Dunkley,}
-\author[b]{Zahra Gomes,}
 \author[f]{Eric Gawiser,}
+\author[b]{Zahra Gomes,}
 \author[h]{Rachel Mandelbaum,}
 \author[i,j,k,l]{Hironao Miyatake,}
 \author[m]{Jeffrey A. Newman,}
 \author[n]{Ignacio Sevilla,}
 \author[e,o]{Sarah Skinner,}
-\author[p]{Erica Wagoner}
+\author[p]{Erika L. Wagoner}
 
 \author{\\(The LSST Dark Energy Science Collaboration)}
 
@@ -177,7 +186,7 @@
     1.0  & 1.5  & 1.26 & 1,752,359 \\
     \hline
   \end{tabular}
-  \caption{Summary of the 4 redshift bins used in our analysis. The first two columns show the photo-$z$ bin edges. We used the {\tt photoz\_best} redshift estimator for the photo-$z$ code {\tt Ephor\_AB} to assign galaxies to different bins. The third column shows the mean redshift of each bin calculated from the fiducial redshift distributions described in Section \ref{ssec:methods.nz}. The last column shows the number of galaxies in each bin. The bin edges were chosen to roughly contain an equal number of galaxies in each of them.} \label{tab:bins_summary}
+  \caption{Summary of the 4 redshift bins used in our analysis. The first two columns show the photo-$z$ bin edges. We used the {\tt photoz\_best} redshift estimator for the photo-$z$ code {\tt Ephor\_AB} to assign galaxies to different bins. The second column shows the mean redshift of each bin calculated from the fiducial redshift distributions described in Section \ref{ssec:methods.nz}. The last column shows the number of galaxies in each bin. The bin edges were chosen to roughly contain an equal number of galaxies in each of them.} \label{tab:bins_summary}
   \end{table}
   
   In this work, we use data from the first data release of the Hyper Suprime-Cam Subaru Strategic Program (HSC DR1 hereon)\footnote{\url{https://hsc-release.mtk.nao.ac.jp}.}. The release is extensively documented in \cite{2018PASJ...70S...8A}, and here we only provide the details of the galaxy sample and associated data used for our clustering analysis.
@@ -249,7 +258,7 @@ Our basic method is to measure the two point function of all possible combinatio
     \begin{figure}
       \centering
       \includegraphics[width=0.9\textwidth]{figures/nzs.pdf}
-      \caption{Redshift distributions used in this analysis. The histograms in each panel are the same, and correspond to the redshift distributions estimated from the COSMOS 30-band catalog. These are the fiducial redshift distributions used in our analysis. The solid curves in each panel show the stacked redshift distributions inferred by stacking the per-object photo-$z$ probability distributions obtained with the four alternative photo-$z$ codes explored here ({\tt DEmP}, {\tt Ephor}, {\tt Ephor\_AB} and {\tt FRANKEN-Z} from left to right and top to bottom). The redshift distributions for the four different redshift bins listed in Table \ref{tab:bins_summary} are shown in different colors. Note that all four redshift estimation codes use the same COSMOS 30-band catalog so the level of visual agreement might not provide a realistic measure of uncertainty on the redshift distributions.}
+      \caption{Redshift distributions used in this analysis. The histograms in each panel are the same, and correspond to the redshift distributions estimated from the COSMOS 30-band catalog. These are the fiducial redshift distributions used in our analysis. The solid curves in each panel show the stacked redshift distributions inferred by stacking the per-object photo-$z$ probability distributions obtained with the four alternative photo-$z$ codes explored here ({\tt DEmP}, {\tt Ephor}, {\tt Ephor\_AB} and {\tt FRANKEN-Z} from left to right and top to bottom). The redshift distributions for the four different redshift bins listed in Table \ref{tab:bins_summary} are shown in different colors. Note that all four redshift estimation codes use the same COSMOS 30-band catalog so the level of visual agreement should not be taken as realistic measure of uncertainty on the redshift distributions.}
       \label{fig:nzs}
     \end{figure}
     The underlying redshift distributions of our tomographic samples ($p^i(z)$ in Eq. \ref{eq:cell_gg_limber}) are a central component of the theory model used to infer astrophysical and cosmological parameters. Estimating redshift distributions for photometric samples is a non-trivial problem that has been studied extensively in the literature \citep{2008MNRAS.390..118L,2008ApJ...684...88N,2018MNRAS.478..592H}. We use two different methods to estimate $p^i(z)$.
@@ -534,7 +543,7 @@ Finally we note that using the galaxy number density $\bar{n}$ as an additional 
       \begin{figure}
         \centering
         \includegraphics[width=0.7\textwidth]{figures/ndens_consistency.pdf}
-        \caption{Source number densities estimated in the 6 different fields ($x$-axis) and in the 4 different redshift bins (in each panel, from top to bottom). We find no significant evidence of inconsistency between the number density of sources found in each field.}
+        \caption{Source number densities estimated in the 6 different fields ($x$-axis) and in the 4 different redshift bins (in each panel, from top to bottom). We find no evidence of inconsistency between the number density of sources found in each field.}
         \label{fig:ndens_consistency}
       \end{figure}
 
@@ -550,7 +559,7 @@ Finally we note that using the galaxy number density $\bar{n}$ as an additional 
       \begin{figure}
         \centering
         \includegraphics[width=0.99\textwidth]{figures/cls_consistency.pdf}
-        \caption{Difference between the power spectra measured in each field and the mean coadded spectra normalized by the 1$\sigma$ errors. The pair of numbers in the upper left corner of each panel corresponds to the indices of the bins being cross-correlated. We find consistency between the different measurements.}
+        \caption{Difference between the power spectra measured in each field and the mean coadded spectra normalized by the 1$\sigma$ errors. The pair of numbers in the upper left corner of each panel corresponds to the indices of the bins being cross-correlated. We find no inconsistency between the different measurements.}
         \label{fig:cls_consistency}
       \end{figure}
       
@@ -595,7 +604,7 @@ Finally we note that using the galaxy number density $\bar{n}$ as an additional 
       
     
   \subsection{Covariance matrix}\label{ssec:results.covariance}
-    We compute the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{sssec:methods.theory.covar} and the resulting correlation matrix\footnote{The correlation matrix $\mathsf{Corr}$ is obtained from the covariance matrix $\mathsf{C}$ as $\mathsf{Corr}_{ij} = \sfrac{\mathsf{C}_{ij}}{\sqrt{\mathsf{C}_{ii} \mathsf{C}_{jj}}}$.} is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
+    We compute the covariance matrix of all measured power spectra analytically as described in Sec.~\ref{sssec:methods.theory.covar} and the resulting correlation matrix is shown in Fig.~\ref{fig:covmat}. In Fig.~\ref{fig:covariance-contributions}, we split the auto-covariances for the four redshift bins into the Gaussian, non-Gaussian and SSC contributions. As can be seen, the Gaussian contribution is dominant on large scales while the non-Gaussian part becomes important at small scales and low redshift. The high redshift bins are mostly insensitive to non-Gaussian contributions to the covariance. Finally, the SSC is subdominant in all cases. This is mainly due to the number density correction in Eq.~\ref{eq:ps-resp}, which significantly suppresses any SSC contributions to the total covariance.
     \begin{figure}
       \begin{center}
         \includegraphics[width=0.5\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_G+NG+SSC.pdf}
@@ -698,7 +707,7 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
       \begin{figure}
         \begin{center}
           \includegraphics[width=0.95\textwidth]{figures/contours-Mmin-M1_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_HOD-param=zfid_clfit=HOD-zevol_cov=G+NG+SSC-vs-fit=auto-vs-cov=G-vs-cov=G+SSC.pdf}
-          \caption{Comparison of our fiducial constraints on HOD parameters to those obtained from auto-power spectra alone, accounting only for Gaussian or Gaussian and SSC contributions to the covariance matrix. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).} \label{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC-vs-fit=auto}
+          \caption{Comparison of our fiducial constraints on HOD parameters to those obtained from auto-power spectra alone, accounting only for Gaussian and Gaussian and SSC contributions to the covariance matrix. The inner (outer) contour shows the $68 \%$ c.l. ($95 \%$ c.l.).} \label{fig:constraints-cov=G+NG+SSC-vs-cov=G-vs-cov=G+SSC-vs-fit=auto}
         \end{center}
       \end{figure}
 
@@ -784,7 +793,7 @@ Finally we note that in our analysis, we assume the observed fraction of central
           \begin{subfigure}{0.32\textwidth}
           \includegraphics[width=\textwidth]{figures/bias-growth_mPk=HOD_fix=alpha-fc-sigmaM_HOD=zevol_fit=pz-shifts-pz-widths+prior=0p2_fit=auto+cross_cosmo=const_cov=G+NG+SSC-LINBIAS_HOD-param=zfid_clfit=HOD-zevol.pdf}
           \end{subfigure}
-          \caption{Redshift dependence of the mean halo mass $\bar{M}_{\mathrm{halo}}$ and the large-scale galaxy bias $b_{\mathrm{HOD}}$ as derived from our best-fit HOD model. The third panel illustrates the empirical scaling $b(z) \propto \sfrac{1}{D(z)}$ and shows that $b(z)$ is consistent with $\sfrac{1}{D(z)}$ to within approximately $3-7 \%$.}
+          \caption{Redshift dependence of the mean halo mass $\bar{M}_{\mathrm{halo}}$ and the large-scale galaxy bias $b_{\mathrm{HOD}}$ as derived from our best-fit HOD model. The third panel illustrates the empirical scaling $b(z) \propto \sfrac{1}{D(z)}$ and shows that $b(z)$ is consistent with $D(z)$ to within approximately $3-7 \%$.}
           \label{fig:HOD-redshift}
         \end{center}
       \end{figure}
@@ -922,11 +931,11 @@ Finally we note that in our analysis, we assume the observed fraction of central
     \end{figure}
 
 \section{Discussion and Conclusions}\label{sec:discussion}
-  In this work, we have presented a comprehensive analysis of photometric galaxy clustering in the public HSC-SSP DR1 data using a magnitude-limited sample with $i<24.5$. We have split this sample into four tomographic redshift bins and computed all possible auto- and cross-power spectra, accounting for observational systematics in the number density fluctuations through map-level deprojection. We have then fitted the data using a halo model coupled with a halo occupation distribution, marginalizing over a flexible model for photometric redshift uncertainties. Our results are well fitted by our theoretical model including scales up to $k_{\mathrm{max}} = 1$ Mpc$^{-1}$. We find monotonically decreasing average halo masses as a function of redshift, which can be interpreted in terms of the drop-out of red galaxies at high redshifts for a magnitude-limited sample, consistent with previous analyses. In order to test the stability of our results, we performed a suite of alternative analyses, finding our results to be robust to photometric redshift uncertainties. We extended our analysis to include the effects of lensing magnification, which results in a $\sim 3 \sigma$ detection of magnification from these data alone. In addition to this, we also allowed for variations in $\Omega_{c}$ and $\sigma_{8}$, finding that, within our strong model priors, the data are able to constrain $\Omega_{c}$, while $\sigma_{8}$ remains unconstrained. Finally, we used these data to derive a simple fitting function for the linear, large-scale galaxy bias of magnitude-limited samples as a function of redshift and limiting $i$-band magnitude (Eq. \ref{eq:bias-fit-func-result}).
+  In this work, we have presented a comprehensive analysis of photometric galaxy clustering in HSC-SSP DR1 data using a magnitude-limited sample with $i<24.5$. We have split this sample into four tomographic redshift bins and computed all possible auto- and cross-power spectra, accounting for observational systematics in the number density fluctuations through map-level deprojection. We have then fitted the data using a halo model coupled with a halo occupation distribution, marginalizing over a flexible model for photometric redshift uncertainties. Our results are well fitted by our theoretical model including scales up to $k_{\mathrm{max}} = 1$ Mpc$^{-1}$. We find monotonically decreasing average halo masses as a function of redshift, which can be interpreted in terms of the drop-out of red galaxies at high redshifts for a magnitude-limited sample, consistent with previous analyses. In order to test the stability of our results, we performed a suite of alternative analyses, finding our results to be robust to photometric redshift uncertainties. We extended our analysis to include the effects of lensing magnification, which results in a $\sim 3 \sigma$ detection of magnification from our data alone. In addition to this, we also allowed for variations in $\Omega_{c}$ and $\sigma_{8}$, finding that, within our strong model priors, the data are able to constrain $\Omega_{c}$, while $\sigma_{8}$ remains unconstrained. Finally, we used our data to derive a simple fitting function for the linear, large-scale galaxy bias of magnitude-limited samples as a function of redshift and limiting $i$-band magnitude (Eq. \ref{eq:bias-fit-func-result}).
 
-  Our analysis hence shows that the quality of the HSC data allows scientific analyses leading to new insights into both physics of galaxy formation as well as analysis strategies for galaxy clustering. In terms of physics, we show that a simple magnitude cut leading to a sufficiently homogeneous sample can be used to carry out robust galaxy clustering analyses, provided that photo-$z$ systematic uncertainties can be kept under control. This contrasts with other approaches that focus on red galaxies to create significantly smaller samples with more precise redshifts (see e.g. \cite{1507.05460,1807.10163}). Using magnitude-limited samples, on the other hand, results in larger galaxy samples with smaller shot noise and therefore improved total statistical sensitivity of the survey, despite their less pronounced clustering amplitude due to lower galaxy bias and larger systematics deprojection effects. In addition we find that the cross-correlations between redshift bins carry important information, as they drive the constraints on both parameters accounting for photometric redshift uncertainties as well as lensing magnification.
+  Our analysis hence shows that the quality of the HSC data allows scientific analyses leading to new insights into both physics of galaxy formation as well as analysis strategies for galaxy clustering. In terms of physics, we show that a simple magnitude cut leading to a sufficiently homogeneous sample can be used to carry out robust galaxy clustering analyses, provided that photo-$z$ systematic uncertainties can be kept under control. This contrasts with other approaches that focus on red galaxies to create significantly smaller samples with more precise redshifts (see e.g. \cite{1507.05460,1807.10163}). Using magnitude-limited samples on the other hand, results in larger galaxy samples with smaller shot noise and therefore improved total statistical sensitivity of the survey, despite their less pronounced clustering amplitude due to lower galaxy bias and larger systematic projection effects. In addition we find that the cross-correlations between redshift bins carry important information, as they drive the constraints on both parameters accounting for photometric redshift uncertainties as well as lensing magnification.
 
-  Despite the small fraction of sky covered by the data used in this work, HSC DR1 constitutes an ideal proxy for the data expected for LSST. Our analysis demonstrates the feasibility of photometric galaxy clustering studies using such high signal-to-noise datasets. In particular, this work shows the level of readiness of the LSST DESC analysis pipelines, and showcases the application of power spectrum methods for galaxy clustering and the use of template deprojection techniques to handle contamination from sky systematics. We anticipate that future development of this pipeline will include improvements to photo-$z$ marginalization and non-linear bias modeling, thus permitting its application to magnitude-limited galaxy samples with even higher signal-to-noise. These results therefore bode well for future cosmological constraints using galaxy clustering data from LSST.
+  Despite the small fraction of sky covered by the data used in this work, HSC DR1 constitutes an ideal proxy for the data expected for LSST. Our analysis demonstrates the feasibility of photometric galaxy clustering studies using such high signal-to-noise datasets. In particular, this work shows the level of readiness of the LSST DESC analysis pipelines, and showcases the application of power spectrum methods for galaxy clustering, and the use of template deprojection techniques to handle contamination from sky systematics. We anticipate that future development of this pipeline will include improvements to photo-$z$ marginalization and non-linear bias modeling, thus permitting its application to magnitude-limited galaxy samples with even higher signal-to-noise. These results therefore bode well for future cosmological constraints using galaxy clustering data from LSST.
 
 
 \acknowledgments
