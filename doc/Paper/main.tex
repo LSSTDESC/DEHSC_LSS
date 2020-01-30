@@ -376,7 +376,7 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
     where $\log$ is the logarithm to base 10, $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto-power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}(z)$, $M_{0}(z)$ and $M_{1}(z)$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters.
 
   \subsubsection{Photometric redshift systematics modeling}\label{sssec:methods.theory.photoz_syst}
-    Uncertainties in photometric redshifts represent one of the major systematic uncertainties in photometric galaxy clustering analyses. To lowest order, errors in photo-$z$'s cause shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies. In this work, we therefore choose to parametrize the impact of photo-$z$ errors on the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by
+    Uncertainties in photometric redshifts represent one of the major systematic uncertainties in photometric galaxy clustering analyses. \rev{In this work, we choose to model photo-$z$ errors as causing shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies\footnote{We note our photo-$z$ error model does not take into account the effect of catastrophic outliers but we do test for the presence of this systematic in Sec.~\ref{sec:photoz}.}. This allows us to parametrize the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by}
     \begin{equation}
       p_{i}(z) \propto \hat{p}_{i}(z_{c} + (1 + z_{w, i})(z-z_{c}) + \Delta z_{i}),
       \label{eq:photo-z-model}
@@ -712,7 +712,7 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
         \end{center}
       \end{figure}
 
-    \subsubsection{Robustness to photometric redshift uncertainties}
+    \subsubsection{Robustness to photometric redshift uncertainties}\label{sec:photoz}
       One of the most important potential systematics in photometric galaxy clustering analyses are photometric redshift uncertainties and we therefore test the stability of our results to photo-$z$s in several different ways, as described in detail below. 
      
       In Fig.~\ref{fig:constraints-pz-syst-auto+cross-vs-auto}, we show the constraints on photometric redshift systematics parameters derived in our fiducial analysis. We find that the data cannot separately constrain the mean shift parameters $\Delta z_{i}$, as opposed to pairwise differences between those. We therefore show the constraints in terms of the reparameterized variables $\Sigma_{i=0}^{3} \Delta z_{i}, \Delta z_{1} - \Delta z_{0}, \Delta z_{2} - \Delta z_{1}, \Delta z_{3} - \Delta z_{2}$, which denote the sum of the $\Delta z_{i}$ and their pairwise differences respectively. While $\Sigma_{i=0}^{3} \Delta z_{i}$ and the width parameters $z_{w, i}$ are largely unconstrained, we find that we can constrain the three pairwise differences $\Delta z_{i} - \Delta z_{j}$ to within $\sigma_{\Delta z_{i} - \Delta z_{j}} \approx 0.023$ ($68 \%$ c.l.). This means that the data do not constrain the absolute position of each redshift bin, but are quite sensitive to their relative positions.
