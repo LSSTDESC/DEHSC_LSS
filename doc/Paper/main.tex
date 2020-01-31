@@ -378,7 +378,7 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
     where $\log$ is the logarithm to base 10, $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto-power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}(z)$, $M_{0}(z)$ and $M_{1}(z)$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters.
 
   \subsubsection{Photometric redshift systematics modeling}\label{sssec:methods.theory.photoz_syst}
-    Uncertainties in photometric redshifts represent one of the major systematic uncertainties in photometric galaxy clustering analyses. \rev{In this work, we choose to model photo-$z$ errors as causing shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies\footnote{We note our photo-$z$ error model does not take into account the full effect of catastrophic outliers but we do test for the presence of this systematic in Sec.~\ref{sssec:results.pz}.}. This allows us to parametrize the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by}
+    Uncertainties in photometric redshifts represent one of the major systematic uncertainties in photometric galaxy clustering analyses. \rev{In this work, we choose to model photo-$z$ errors as causing shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies. This allows us to parametrize the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by}
     \begin{equation}
       p_{i}(z) \propto \hat{p}_{i}(z_{c} + (1 + z_{w, i})(z-z_{c}) + \Delta z_{i}),
       \label{eq:photo-z-model}
@@ -454,7 +454,7 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
     \begin{equation}
       W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s)}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}),
     \end{equation}
-    where $J_1(x)$ is the cylindrical Bessel function of order 1. \rev{It is worth noting that the impact of the SSC on the covariance matrix for galaxy clustering is reduced due to the integral constraint, and therefore this approximation does not affect our results significantly (see also Sections \ref{ssec:results.covariance} and \ref{sssec:results.choices}).}
+    where $J_1(x)$ is the cylindrical Bessel function of order 1. \rev{It is worth noting that the impact of the SSC on the covariance matrix for galaxy clustering is reduced due to the integral constraint (c.f. Eq.~\ref{eq:ps-resp}), and therefore this approximation does not affect our results significantly (see also Sections \ref{ssec:results.covariance} and \ref{sssec:results.choices}).}
     The quantity $\partial P_{ab}(k, z)/\partial \delta_{\rm LS}$ is the response of the power spectrum $P_{ab}$ to a large-scale density fluctuation, which we estimate using the halo model and results from perturbation theory as (e.g. \cite{Krause:2017}):
      \begin{equation}
     \begin{aligned}
@@ -622,9 +622,9 @@ Finally we note that using the galaxy number density $\bar{n}$ as an additional 
         \caption{$C_{\ell}^{11}$}
         \end{subfigure}
         \begin{subfigure}{0.49\textwidth}
-        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=1.pdf} \\
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=1.pdf} 
         \caption{$C_{\ell}^{22}$}
-        \end{subfigure}
+        \end{subfigure}\\
         \begin{subfigure}{0.49\textwidth}
         \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=2.pdf}
         \caption{$C_{\ell}^{33}$}
@@ -938,7 +938,7 @@ Finally we note that in our analysis, we assume the observed fraction of central
 
   Our analysis hence shows that the quality of the HSC data allows scientific analyses leading to new insights into both physics of galaxy formation as well as analysis strategies for galaxy clustering. In terms of physics, we show that a simple magnitude cut leading to a sufficiently homogeneous sample can be used to carry out robust galaxy clustering analyses, provided that photo-$z$ systematic uncertainties can be kept under control. This contrasts with other approaches that focus on red galaxies to create significantly smaller samples with more precise redshifts (see e.g. \cite{1507.05460,1807.10163}). Using magnitude-limited samples on the other hand, results in larger galaxy samples with smaller shot noise and therefore improved total statistical sensitivity of the survey, despite their less pronounced clustering amplitude due to lower galaxy bias and larger systematic projection effects. In addition we find that the cross-correlations between redshift bins carry important information, as they drive the constraints on both parameters accounting for photometric redshift uncertainties as well as lensing magnification.
 
-  Despite the small fraction of sky covered by the data used in this work, HSC DR1 constitutes an ideal proxy for the data expected for LSST. Our analysis demonstrates the feasibility of photometric galaxy clustering studies using such high signal-to-noise datasets. In particular, this work shows the level of readiness of the LSST DESC analysis pipelines, and showcases the application of power spectrum methods for galaxy clustering, and the use of template deprojection techniques to handle contamination from sky systematics. We anticipate that future development of this pipeline will include improvements to photo-$z$ marginalization and non-linear bias modeling, thus permitting its application to magnitude-limited galaxy samples with even higher signal-to-noise. \rev{In particular, the increased statistical power of LSST will require not only a more rigorous marginalization over photo-$z$ uncertainties, but also a calibration sample significantly larger than the COSMOS 30-band catalog use here in order to reduce the associated sample variance.} These results therefore bode well for future cosmological constraints using galaxy clustering data from LSST.
+  Despite the small fraction of sky covered by the data used in this work, HSC DR1 constitutes an ideal proxy for the data expected for LSST. Our analysis demonstrates the feasibility of photometric galaxy clustering studies using such high signal-to-noise datasets. In particular, this work shows the level of readiness of the LSST DESC analysis pipelines, and showcases the application of power spectrum methods for galaxy clustering, and the use of template deprojection techniques to handle contamination from sky systematics. We anticipate that future development of this pipeline will include improvements to photo-$z$ marginalization and non-linear bias modeling, thus permitting its application to magnitude-limited galaxy samples with even higher signal-to-noise. \rev{In particular, the increased statistical power of LSST will require not only a more rigorous marginalization over photo-$z$ uncertainties, but also a calibration sample significantly larger than the COSMOS 30-band catalog used here in order to reduce the associated sample variance. The results presented in this analysis} bode well for future cosmological constraints using galaxy clustering data from LSST.
 
 
 \acknowledgments
@@ -959,9 +959,9 @@ Finally we note that in our analysis, we assume the observed fraction of central
 
   The contributions from the authors are listed below:
   AN: co-led project, led signal modeling, photo-$z$ systematics characterization, likelihood analysis and interpretation of results.
-  DA: co-led project, led development of the data analysis pipeline, contributed to likelihood and modelling efforts.
+  DA: co-led project, led development of the data analysis pipeline, contributed to likelihood and modeling efforts.
   JS: development of data analysis pipeline, comparisons with simulated data, checked impact of observing conditions (systematics).
-  AS: co-led project, advised student, cross checked MCMC chains, calculated $N(z)$ sample variance uncertainty, contributed to modelling efforts, wrote initial likelihood code.
+  AS: co-led project, advised student, cross checked MCMC chains, calculated $N(z)$ sample variance uncertainty, contributed to modeling efforts, wrote initial likelihood code.
   HA: carried out initial data exploration, analyzed HSC photo-$z$ pdfs, and determined tomographic bin selection.
   AB: shot noise estimation, small updates to HSC pipeline.
   JD: provided advice and guidance.
