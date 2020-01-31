@@ -378,7 +378,7 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
     where $\log$ is the logarithm to base 10, $i \in [\mathrm{min}, 0, 1]$ and $z_{p}$ denotes a pivot redshift, which we set to $z_{p} = 0.65$. This functional form is motivated by an initial analysis in which we separately fit an HOD to each auto-power spectrum and determine a function consistent with the observed redshift evolution of the three parameters $M_{\mathrm{min}}(z)$, $M_{0}(z)$ and $M_{1}(z)$. We additionally include a pivot redshift $z_{p}$ in our parametrization to remove degeneracies between the fitted parameters.
 
   \subsubsection{Photometric redshift systematics modeling}\label{sssec:methods.theory.photoz_syst}
-    Uncertainties in photometric redshifts represent one of the major systematic uncertainties in photometric galaxy clustering analyses. \rev{In a simplified scenario,} errors in photo-$z$'s \rev{can} cause shifts in the mean and width of the derived redshift distribution for a population of galaxies. In this work, we therefore choose to parametrize the impact of photo-$z$ errors on the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by
+    Uncertainties in photometric redshifts represent one of the major systematic uncertainties in photometric galaxy clustering analyses. \rev{In this work, we choose to model photo-$z$ errors as causing shifts in the means and changes in the width of the derived redshift distribution for a population of galaxies\footnote{We note our photo-$z$ error model does not take into account the full effect of catastrophic outliers but we do test for the presence of this systematic in Sec.~\ref{sssec:results.pz}.}. This allows us to parametrize the derived galaxy redshift distributions $p_{i}(z)$ using a two-parameter model given by}
     \begin{equation}
       p_{i}(z) \propto \hat{p}_{i}(z_{c} + (1 + z_{w, i})(z-z_{c}) + \Delta z_{i}),
       \label{eq:photo-z-model}
@@ -450,7 +450,7 @@ We compute the quantity $R(z,k)$ for our fiducial cosmological model given in Se
     \begin{equation}
       \sigma_b^2(z) = \int \frac{\mathrm{d}k_\perp^2}{(2\pi)^2}P_{\rm lin}(k_\perp,z)\left|W(k_\perp,z)\right|^2.
     \end{equation}
-    Furthermore $W(k_\perp,z)$ denotes the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set:
+    Furthermore $W(k_\perp,z)$ denotes the Fourier transform of the survey footprint, which we approximate as a compact circle with an area matched to our data set\footnote{\rev{We expect this approximation to be acceptable for the present analysis as HSC covers a small sky fraction and we mainly consider large angular multipoles (see e.g. Refs.~\cite{Krause:2017a, Barreira:2018}).}}:
     \begin{equation}
       W(k_\perp,z)=\frac{2 J_1(k_\perp\chi(z)\theta_s)}{k_\perp \chi(z)\theta_s},\hspace{12pt} \theta_s={\rm arccos}(1-2f_{\rm sky}),
     \end{equation}
@@ -611,7 +611,7 @@ Finally we note that using the galaxy number density $\bar{n}$ as an additional 
     \begin{figure}
       \begin{center}
         \includegraphics[width=0.5\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_G+NG+SSC.pdf}
-        \caption{Correlation matrix for all auto- and cross-power spectra considered in our analysis, computed analytically as described in Sec.~\ref{sssec:methods.theory.covar}. \rev{The indices denote redshift bins, e.g. the sub-covariance matrix with indices 00-00 denotes $\mathrm{Cov}(C^{00}_{\ell}, C^{00}_{\ell'})$, 00-01 denotes $\mathrm{Cov}(C^{00}_{\ell}, C^{01}_{\ell'})$ etc.}}\label{fig:covmat}
+        \caption{Correlation matrix for all auto- and cross-power spectra considered in our analysis, computed analytically as described in Sec.~\ref{sssec:methods.theory.covar}. \rev{The indices denote redshift bins, e.g. the sub-covariance matrix with indices 11-11 denotes $\mathrm{Cov}(C^{11}_{\ell}, C^{11}_{\ell'})$, 11-12 denotes $\mathrm{Cov}(C^{11}_{\ell}, C^{12}_{\ell'})$ etc.}}\label{fig:covmat}
       \end{center}
     \end{figure}
 
@@ -619,19 +619,19 @@ Finally we note that using the galaxy number density $\bar{n}$ as an additional 
       \begin{center}
         \begin{subfigure}{0.49\textwidth}
         \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=0.pdf}
-        \caption{$C_{\ell}^{00}$}
-        \end{subfigure}
-        \begin{subfigure}{0.49\textwidth}
-        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=1.pdf} \\
         \caption{$C_{\ell}^{11}$}
         \end{subfigure}
         \begin{subfigure}{0.49\textwidth}
-        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=2.pdf}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=1.pdf} \\
         \caption{$C_{\ell}^{22}$}
         \end{subfigure}
         \begin{subfigure}{0.49\textwidth}
-        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=3.pdf}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=2.pdf}
         \caption{$C_{\ell}^{33}$}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+        \includegraphics[width=\textwidth]{figures/covmat_HSC_dg_hoddg_hodxdg_hoddg_hod_trisp=4h3h2h_SSC=LINBIAS-resp_l=ells_eff_all_wcross_clfit=HOD-zevol_culled=True_coadd=area_comparison=G+NG+SSC_bin=3.pdf}
+        \caption{$C_{\ell}^{44}$}
         \end{subfigure}
         \caption{Comparison of the different contributions to the covariance matrix for the four auto-power spectra considered in our analysis.} \label{fig:covariance-contributions}
       \end{center}
@@ -688,8 +688,8 @@ In Fig.~\ref{fig:hod-params-z-dep} we show the redshift dependence of the logari
             G+SSC cov & $\sfrac{86.2}{80}$ $(0.30)$ & $-0.4\substack{+2.0 \\ -1.9}$ & $11.89 \pm 0.20$ & $1.0\substack{+2.6 \\ -2.4}$ & $13.09\substack{+0.24 \\ -0.25}$ & - & - & - \\
             no $z_{w, i}$ & $\sfrac{88.0}{84}$ $(0.36)$ & $-0.86 \pm 0.65$ & $11.87 \pm 0.11$ & $0.33\substack{+0.89 \\ -0.90}$ & $13.07 \pm 0.15$ & - & - & - \\
             no $z_{w, i}, \Delta z_{i}$ & $\sfrac{95.2}{88}$ $(0.28)$ & $-1.09\substack{+0.62 \\ -0.77}$ & $11.78 \pm 0.13$ & $-0.11\substack{+0.73 \\ -0.94}$ & $12.93 \pm 0.16$ & - & - & - \\
-            bins = 0, 1, 2 & $\sfrac{44.4}{43}$ $(0.41)$ & $-0.4\pm 2.3$ & $11.88\substack{+0.22 \\ -0.23}$ & $0.6\substack{+2.9 \\ -2.8}$ & $13.09\substack{+0.27 \\ -0.28}$ & - & - & - \\
-            bins = 1, 2, 3 & $\sfrac{44.4}{46}$ $(0.54)$ & $1.2\pm 2.9$ & $11.97\substack{+0.31 \\ -0.36}$ & $3.5\substack{+3.7 \\ -3.6}$ & $13.23\substack{+0.39 \\ -0.43}$ & - & - & - \\
+            bins = 1, 2, 3 & $\sfrac{44.4}{43}$ $(0.41)$ & $-0.4\pm 2.3$ & $11.88\substack{+0.22 \\ -0.23}$ & $0.6\substack{+2.9 \\ -2.8}$ & $13.09\substack{+0.27 \\ -0.28}$ & - & - & - \\
+            bins = 2, 3, 4 & $\sfrac{44.4}{46}$ $(0.54)$ & $1.2\pm 2.9$ & $11.97\substack{+0.31 \\ -0.36}$ & $3.5\substack{+3.7 \\ -3.6}$ & $13.23\substack{+0.39 \\ -0.43}$ & - & - & - \\
             pz = \texttt{Ephor\_AB} & $\sfrac{93.6}{80}$ $(0.14)$ & $0.3\substack{+2.1 \\ -1.9}$ & $12.14\substack{+0.19 \\ -0.17}$ & $1.8\substack{+2.9 \\ -2.6}$ & $13.39\substack{+0.24 \\ -0.23}$ & - & - & - \\
             pz = \texttt{Ephor} & $\sfrac{107.2}{80}$ $(0.023)$ & $0.9\pm 2.0$ & $12.15 \pm 0.17$ & $2.6\substack{+2.7 \\ -2.8}$ & $13.40\substack{+0.23 \\ -0.22}$ & - & - & - \\
             pz = \texttt{DEmP} & $\sfrac{105.4}{80}$ $(0.031)$ & $0.6\pm 1.9$ & $12.07\substack{+0.17 \\ -0.16}$ & $2.3\pm 2.6$ & $13.30\substack{+0.22 \\ -0.21}$ & - & - & - \\
