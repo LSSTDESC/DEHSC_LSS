@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class ShearCatMapper(PipelineStage, CatMapper) :
+class ShearCatMapper(CatMapper) :
     name="ShearCatMapper"
     inputs=[('clean_catalog', FitsFile), ('masked_fraction', FitsFile)]
     outputs=[('gamma_maps', FitsFile)]
