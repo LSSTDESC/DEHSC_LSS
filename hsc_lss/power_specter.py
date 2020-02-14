@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class PowerSpecter(PipelineStage) :
     name="PowerSpecter"
-    inputs=[('masked_fraction',FitsFile),('ngal_maps',FitsFile),('shear_maps',FitsFile)
+    inputs=[('masked_fraction',FitsFile),('ngal_maps',FitsFile),('shear_maps',FitsFile),
             ('dust_map',FitsFile),('star_map',FitsFile),('depth_map',FitsFile),
             ('ccdtemp_maps',FitsFile),('airmass_maps',FitsFile),('exptime_maps',FitsFile),
             ('skylevel_maps',FitsFile),('sigma_sky_maps',FitsFile),('seeing_maps',FitsFile),
