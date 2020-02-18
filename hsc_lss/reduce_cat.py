@@ -96,9 +96,10 @@ class ReduceCat(PipelineStage) :
         else :
             arr1=cat['%scmodel_mag'%band]
             arr2=snrs
-        depth,_=get_depth(method,cat['ra'],cat['dec'],band,
+        depth,_=get_depth(method,cat['ra'],cat['dec'],
                           arr1=arr1,arr2=arr2,
-                          flatSkyGrid=fsk,SNRthreshold=self.config['min_snr'])
+                          fsk=fsk,snrthreshold=self.config['min_snr'],
+                          interpolate=True,count_threshold=4)
         desc='%d-s depth, '%(self.config['min_snr'])+band+' '+method+' mean'
         return depth,desc
 
@@ -193,7 +194,6 @@ class ReduceCat(PipelineStage) :
         # Above magnitude limit
         mstar,descstar=self.make_star_map(cat,fsk,sel_maglim*sel_stars*sel_fluxcut*sel_blended)
         fsk.write_flat_map(self.get_output('star_map'),mstar,descript=descstar)
-
         
         #Binary BO mask
         mask_bo,fsg=self.make_bo_mask(cat,fsk)
@@ -206,7 +206,7 @@ class ReduceCat(PipelineStage) :
 
         ####
         # Compute depth map
-        depth,desc=self.make_depth_map(cat,fsk)
+        depth,desc=self.make_depth_map(cat[sel_stars],fsk)
         fsk.write_flat_map(self.get_output('depth_map'),depth,descript=desc)
 
         ####

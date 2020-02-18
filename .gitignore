@@ -5,6 +5,7 @@
 *.jpg
 *.sublime-workspace
 *.sublime-project
+run*.sh
 .ipynb_checkpoints/
 data_query/*.sql
 core.*

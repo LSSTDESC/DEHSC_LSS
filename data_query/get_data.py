@@ -1,4 +1,4 @@
-from pdr1_queries import write_frames, write_fieldsearch
+from pdr1_queries import write_frames, write_fieldsearch, write_fieldsearch_meas
 import predirs as prd
 import os
 
@@ -10,10 +10,15 @@ import os
 ################################
 
 #Per-frame metadata
-write_frames("pdr1_wide","frames_wide.sql",submit=True)
-write_frames("pdr1_deep","frames_deep.sql",submit=True)
-write_frames("pdr1_udeep","frames_udeep.sql",submit=True)
+#write_frames("pdr1_wide","frames_wide.sql",submit=True)
+#write_frames("pdr1_deep","frames_deep.sql",submit=True)
+#write_frames("pdr1_udeep","frames_udeep.sql",submit=True)
 
+for fld in ['gama09h']:
+    write_fieldsearch_meas("pdr1_wide",fld,"field_wide_"+fld+"_pz_strict.sql",do_field=True,
+                           submit=True,do_photoz=True,strict_cuts=True,do_download=False)
+exit(1)
+'''
 #WIDE fields
 for fld in ['aegis','gama09h','gama15h','hectomap','wide12h','xmm_lss'] :
     write_fieldsearch("pdr1_wide",fld,"field_wide_"+fld+"_pz_strict.sql",do_field=True,
@@ -154,3 +159,4 @@ for pc in ['nnpz','ephor','ephor_ab','demp','frankenz'] :
               'wide_wide12h','wide_xmmlss',
               'deep_cosmos','deep_elaisn1','deep_xmmlss','deep_deep23'] :
         get_pdfs(f,pc)
+'''

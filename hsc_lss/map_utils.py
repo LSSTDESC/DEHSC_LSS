@@ -12,19 +12,19 @@ def createCountsMap(ra, dec, flatSkyGrid):
     
     return mp
 
-def createMeanStdMaps(ra, dec, quantity, flatSkyGrid) :
+def createMeanStdMaps(ra, dec, quantity, fsk):
     """
     Creates maps of the mean and standard deviation of a given quantity measured at the position 
     of a number of objects.
     :param ra: right ascension for each object.
     :param dec: declination for each object.
     :param quantity: measurements of the quantity to map for each object.
-    :param flatSkyGrid: a flatmaps.FlatMapInfo object describing the geometry of the output map.
+    :param fsk: a flatmaps.FlatMapInfo object describing the geometry of the output map.
     """
-    pix_ids=flatSkyGrid.pos2pix(ra, dec)
-    mp= np.bincount(pix_ids, weights= None, minlength= flatSkyGrid.get_size())
-    mpWeighted= np.bincount(pix_ids, weights= quantity, minlength= flatSkyGrid.get_size())
-    mpWeightedSq= np.bincount(pix_ids, weights= quantity**2, minlength= flatSkyGrid.get_size())
+    pix_ids=fsk.pos2pix(ra, dec)
+    mp= np.bincount(pix_ids, weights= None, minlength= fsk.get_size())
+    mpWeighted= np.bincount(pix_ids, weights= quantity, minlength= fsk.get_size())
+    mpWeightedSq= np.bincount(pix_ids, weights= quantity**2, minlength= fsk.get_size())
     idgood=np.where(mp>0)[0];
     mean=np.zeros(len(mp)); std=np.zeros(len(mp))
     mean[idgood]= mpWeighted[idgood]/mp[idgood]

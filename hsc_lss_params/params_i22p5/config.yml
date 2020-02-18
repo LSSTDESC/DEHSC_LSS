@@ -6,6 +6,8 @@ global:
     flat_project: CAR
     mask_type: sirius
     band: i
+    mask_thr: 0.5
+    sys_collapse_type: average
 
 ReduceCat:
     min_snr: 10.
@@ -20,7 +22,7 @@ COSMOSWeight:
 CatMapper:
     pz_code: ephor_ab
     pz_mark: best
-    pz_bins: [0.15,0.50,0.75,1.00,1.50]
+    pz_bins: [0.15,0.37,0.54,0.72,1.50]
     nz_bin_num: 100
     nz_bin_max: 4.0
 
@@ -30,14 +32,12 @@ PowerSpecter:
 #    gaus_covar_type: gaus_sim
     noise_bias_type: analytic
 #    noise_bias_type: pois_sim
-#    guess_spectrum: /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/hsc_lss_params/cls_guess_i22p5.txt
-    guess_spectrum: NONE
-    mask_thr: 0.5
+    guess_spectrum: /global/homes/d/damonge/LSST/LSS_HSC/HyperSupremeStructure-HSC-LSS/hsc_lss_params/cls_guess_i22p5.txt
+#    guess_spectrum: NONE
     mask_systematics: False
 #    mask_systematics: True
     oc_dpj_list: [airmass,seeing,sigma_sky]
 #    oc_dpj_list: [airmass,ccdtemp,ellipt,exptime,nvisit,seeing,sigma_sky,skylevel]
     oc_all_bands: True
 #    oc_all_bands: False
-    output_run_dir: CovAna_NoiAna_MskSirius_ClData_Dpj0_DpjBands1
-    sys_collapse_type: average
+    output_run_dir: CovAna_NoiAna_MskSirius_ClFit_Dpj0_DpjBands1_newDepth
