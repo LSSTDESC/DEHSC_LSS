@@ -14,7 +14,7 @@ class ReduceCat(PipelineStage) :
              ('bo_mask',FitsFile),('masked_fraction',FitsFile),('depth_map',FitsFile)]
     config_options={'min_snr':10.,'depth_cut':24.5,'res':0.0285,
                     'res_bo':0.003,'pad':0.1,'band':'i','depth_method':'fluxerr',
-                    'flat_project':'CAR','mask_type':'sirius'}
+                    'flat_project':'CAR','mask_type':'sirius', 'meas':False}
     bands=['g','r','i','z','y']
 
     def make_dust_map(self,cat,fsk) :
@@ -89,12 +89,12 @@ class ReduceCat(PipelineStage) :
         print("Creating depth maps")
         method=self.config['depth_method']
         band=self.config['band']
-        snrs=cat['%scmodel_flux'%band]/cat['%scmodel_flux_err'%band]
+        snrs=cat['%scmodel_flux'%band+self.m_post]/cat['%scmodel_flux_err'%band+self.m_post]
         if method=='fluxerr' :
-            arr1=cat['%scmodel_flux_err'%band]
+            arr1=cat['%scmodel_flux_err'%band+self.m_post]
             arr2=None
         else :
-            arr1=cat['%scmodel_mag'%band]
+            arr1=cat['%scmodel_mag'%band+self.m_post]
             arr2=snrs
         depth,_=get_depth(method,cat['ra'],cat['dec'],
                           arr1=arr1,arr2=arr2,
@@ -111,6 +111,10 @@ class ReduceCat(PipelineStage) :
         - Produces mask maps, dust maps, depth maps and star density maps.
         """
         band=self.config['band']
+        if self.config['meas']:
+            self.m_post = '_m'
+        else:
+            self.m_post = ''
 
         #Read list of files
         f=open(self.get_input('raw_data'))
@@ -151,26 +155,26 @@ class ReduceCat(PipelineStage) :
 
         #Collect sample cuts
         sel_maglim=np.ones(len(cat),dtype=bool);
-        sel_maglim[cat['%scmodel_mag'%band]-
+        sel_maglim[cat['%scmodel_mag'%band+self.m_post]-
                    cat['a_%s'%band]>self.config['depth_cut']]=0
         # Blending
         sel_blended=np.ones(len(cat),dtype=bool);
         sel_blended[cat['iblendedness_abs_flux']>=0.42169650342]=0 #abs_flux<10^-0.375
         # S/N in i
         sel_fluxcut_i=np.ones(len(cat),dtype=bool);
-        sel_fluxcut_i[cat['icmodel_flux']<10*cat['icmodel_flux_err']]=0
+        sel_fluxcut_i[cat['icmodel_flux'+self.m_post]<10*cat['icmodel_flux_err'+self.m_post]]=0
         # S/N in g
         sel_fluxcut_g=np.ones(len(cat),dtype=int);
-        sel_fluxcut_g[cat['gcmodel_flux']<5*cat['gcmodel_flux_err']]=0
+        sel_fluxcut_g[cat['gcmodel_flux'+self.m_post]<5*cat['gcmodel_flux_err'+self.m_post]]=0
         # S/N in r
         sel_fluxcut_r=np.ones(len(cat),dtype=int);
-        sel_fluxcut_r[cat['rcmodel_flux']<5*cat['rcmodel_flux_err']]=0
+        sel_fluxcut_r[cat['rcmodel_flux'+self.m_post]<5*cat['rcmodel_flux_err'+self.m_post]]=0
         # S/N in z
         sel_fluxcut_z=np.ones(len(cat),dtype=int);
-        sel_fluxcut_z[cat['zcmodel_flux']<5*cat['zcmodel_flux_err']]=0
+        sel_fluxcut_z[cat['zcmodel_flux'+self.m_post]<5*cat['zcmodel_flux_err'+self.m_post]]=0
         # S/N in y
         sel_fluxcut_y=np.ones(len(cat),dtype=int);
-        sel_fluxcut_y[cat['ycmodel_flux']<5*cat['ycmodel_flux_err']]=0
+        sel_fluxcut_y[cat['ycmodel_flux'+self.m_post]<5*cat['ycmodel_flux_err'+self.m_post]]=0
         # S/N in grzy (at least 2 pass)
         sel_fluxcut_grzy=(sel_fluxcut_g+sel_fluxcut_r+sel_fluxcut_z+sel_fluxcut_y>=2)
         # Overall S/N

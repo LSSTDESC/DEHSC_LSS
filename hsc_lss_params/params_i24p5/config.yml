@@ -8,6 +8,7 @@ global:
     band: i
     mask_thr: 0.5
     sys_collapse_type: average
+    meas: True
 
 ReduceCat:
     min_snr: 10.
