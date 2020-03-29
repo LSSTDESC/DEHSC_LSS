@@ -117,23 +117,23 @@ class CatMapper(PipelineStage) :
                            " not supported. Choose arcturus or sirius")
         cat=cat[self.msk]
 
-        print("Reading pdf filenames")
-        data_syst=np.genfromtxt(self.get_input('pdf_matched'),
-                                dtype=[('pzname','|U8'),('fname','|U256')])
-        self.pdf_files={n:fn for n,fn in zip(data_syst['pzname'],data_syst['fname'])}
-        
-        print("Parsing photo-z bins")
-        self.zi_arr=self.config['pz_bins'][:-1]
-        self.zf_arr=self.config['pz_bins'][ 1:]
-        self.nbins=len(self.zi_arr)
-
-        print("Getting COSMOS N(z)s")
-        pzs_cosmos=self.get_nz_cosmos()
-
-        print("Getting pdf stacks")
-        pzs_stack={}
-        for n in self.pdf_files.keys() :
-            pzs_stack[n]=self.get_nz_stack(cat,n)
+        # print("Reading pdf filenames")
+        # data_syst=np.genfromtxt(self.get_input('pdf_matched'),
+        #                         dtype=[('pzname','|U8'),('fname','|U256')])
+        # self.pdf_files={n:fn for n,fn in zip(data_syst['pzname'],data_syst['fname'])}
+        #
+        # print("Parsing photo-z bins")
+        # self.zi_arr=self.config['pz_bins'][:-1]
+        # self.zf_arr=self.config['pz_bins'][ 1:]
+        # self.nbins=len(self.zi_arr)
+        #
+        # print("Getting COSMOS N(z)s")
+        # pzs_cosmos=self.get_nz_cosmos()
+        #
+        # print("Getting pdf stacks")
+        # pzs_stack={}
+        # for n in self.pdf_files.keys() :
+        #     pzs_stack[n]=self.get_nz_stack(cat,n)
 
         print("Getting number count maps")
         n_maps=self.get_nmaps(cat)
@@ -152,12 +152,12 @@ class CatMapper(PipelineStage) :
             hdus.append(hdu)
             
             #Nz
-            cols=[fits.Column(name='z_i',array=pzs_cosmos[im,0,:],format='E'),
-                  fits.Column(name='z_f',array=pzs_cosmos[im,1,:],format='E'),
-                  fits.Column(name='nz_cosmos',array=pzs_cosmos[im,2,:],format='E'),
-                  fits.Column(name='enz_cosmos',array=pzs_cosmos[im,3,:],format='E')]
+            cols=[fits.Column(name='z_i',array=-1*np.ones(100),format='E'),
+                  fits.Column(name='z_f',array=-1*np.ones(100),format='E'),
+                  fits.Column(name='nz_cosmos',array=-1*np.ones(100),format='E'),
+                  fits.Column(name='enz_cosmos',array=-1*np.ones(100),format='E')]
             for n in self.pdf_files.keys() :
-                cols.append(fits.Column(name='nz_'+n,array=pzs_stack[n][im,2,:],format='E'))
+                cols.append(fits.Column(name='nz_'+n,array=-1*np.ones(100),format='E'))
             hdus.append(fits.BinTableHDU.from_columns(cols))
         hdulist=fits.HDUList(hdus)
         hdulist.writeto(self.get_output('ngal_maps'),overwrite=True)
