@@ -77,6 +77,7 @@ for t1,t2,typ,ells,ndx in s_all['data'].sortTracers():
     ax.text(0.82,0.9,'$(%d,%d)$'%(t1+1,t2+1),transform=ax.transAxes,fontsize=12)
     ax.set_xlim([110,18000])
     ax.axvspan(lmax,ax.get_xlim()[1],color='grey',alpha=0.2)
+    ax.set_yticks([1E-12,1E-9,1E-6])
     #if t1==t2 :
     ax.set_xlabel("$\\ell$",fontsize=18)
     ax.set_ylabel("$C_\\ell$",fontsize=18)
