@@ -122,10 +122,10 @@ class CatMapper(PipelineStage) :
         #                         dtype=[('pzname','|U8'),('fname','|U256')])
         # self.pdf_files={n:fn for n,fn in zip(data_syst['pzname'],data_syst['fname'])}
         #
-        # print("Parsing photo-z bins")
-        # self.zi_arr=self.config['pz_bins'][:-1]
-        # self.zf_arr=self.config['pz_bins'][ 1:]
-        # self.nbins=len(self.zi_arr)
+        print("Parsing photo-z bins")
+        self.zi_arr=self.config['pz_bins'][:-1]
+        self.zf_arr=self.config['pz_bins'][ 1:]
+        self.nbins=len(self.zi_arr)
         #
         # print("Getting COSMOS N(z)s")
         # pzs_cosmos=self.get_nz_cosmos()
