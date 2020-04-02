@@ -156,7 +156,7 @@ class CatMapper(PipelineStage) :
                   fits.Column(name='z_f',array=-1*np.ones(100),format='E'),
                   fits.Column(name='nz_cosmos',array=-1*np.ones(100),format='E'),
                   fits.Column(name='enz_cosmos',array=-1*np.ones(100),format='E')]
-            for n in self.pdf_files.keys() :
+            for n in ['nnpz', 'ephor', 'ephor_ab', 'demp', 'frankenz'] :
                 cols.append(fits.Column(name='nz_'+n,array=-1*np.ones(100),format='E'))
             hdus.append(fits.BinTableHDU.from_columns(cols))
         hdulist=fits.HDUList(hdus)
